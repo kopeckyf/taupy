@@ -1,5 +1,8 @@
+from decimal import Decimal
+from math import log10
 from sympy.logic.boolalg import And, Implies, Not
-from .utilities import (iter_to_string, neighbours_of_list)
+from .utilities import (iter_to_string, neighbours_of_list, 
+                        satisfiability_count)
 
 class Argument(Implies):
     """
@@ -35,5 +38,5 @@ class Debate(And):
         return _d
     
     def density(self):
-        _sigma = len([p for p in satisfiable(self, all_models=True)])
+        _sigma = satisfiability_count ( self )
         return Decimal ( len(self.atoms()) - log10(_sigma) / len(self.atoms()))

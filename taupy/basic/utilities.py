@@ -1,5 +1,5 @@
 from dd.autoref import BDD
-from sympy.logic import to_cnf
+from sympy.logic import to_cnf, And, Implies, Not
 
 def dict_to_prop(dictionary):
     """

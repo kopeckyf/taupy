@@ -1,5 +1,5 @@
 from sympy.logic.boolalg import And, Implies, Not
-from .utilities import (list_to_string, neighbours_of_list)
+from .utilities import (iter_to_string, neighbours_of_list)
 
 class Argument(Implies):
     """
@@ -30,8 +30,8 @@ class Debate(And):
         _props = sorted(_pos[0].keys(), key=lambda x: x.sort_key())
         _bits  = [ list ( 1 if _p[_i] == True else 0 for _i in _props ) for _p in _pos ]
         for _b in _bits:
-            _neighbourlist = [list_to_string(x) for x in neighbours_of_list(_b) if x in _bits]
-            _d[list_to_string(_b)] = _neighbourlist
+            _neighbourlist = [iter_to_string(x) for x in neighbours_of_list(_b) if x in _bits]
+            _d[iter_to_string(_b)] = _neighbourlist
         return _d
     
     def density(self):

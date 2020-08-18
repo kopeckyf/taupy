@@ -9,7 +9,7 @@ def dict_to_prop(dictionary):
         if v == False: _l.append(Not(k))
     return And(*_l)
 
-def list_to_string(l):
+def iter_to_string(l):
     """
     Helper function that converts a dictionary position to a bit string.
     """
@@ -23,3 +23,4 @@ def neighbours_of_list(l):
     _complements = [1,0] # _complement[0] == 1 and _complement[1] == 0
     for i in range(len(l)):
         yield (l[:i] + [_complements[l[i]]] + l[i+1:])
+        

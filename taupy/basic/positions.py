@@ -1,6 +1,6 @@
 class Position(dict):
     """
-    A dictionary that contains sentences 
+    Document me! 
     """
     def __init__(self, debate, *args):
         self.debate = debate
@@ -11,3 +11,11 @@ class Position(dict):
     
     def is_coherent(self):    
         return True if satisfiable(And(dict_to_prop(self), self.debate)) else False
+    
+    def is_closed(self):
+        for argument in self.debate.args:
+            if all ( premise in self and self[premise] is True for premise in argument.args[0].args ):
+                if argument.args[1] not in self or self[ argument.args[1] ] is False:
+                    return False
+        else:
+            return True

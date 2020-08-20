@@ -1,20 +1,10 @@
 from decimal import Decimal
-from math import log10
+from math import log2
 from sympy.logic import (And, Implies, Not, satisfiable)
 from .utilities import (iter_to_string, neighbours_of_list, 
                         satisfiability_count)
 
-class Argument(Implies):
-    """
-    Must protect against Inputs like Argument((a,b),c)!
-    """
-    pass
-    
-class Debate(And):
-    """
-    Debates
-    """
-    
+class Base():
     def graph(self):
         pass
     
@@ -39,4 +29,19 @@ class Debate(And):
     
     def density(self):
         _sigma = satisfiability_count ( self )
-        return Decimal ( (len(self.atoms()) - log10(_sigma)) / len(self.atoms()))
+        return Decimal ( (len(self.atoms()) - log2(_sigma)) / len(self.atoms()))
+    
+
+class Argument(Implies,Base):
+    """
+    Must protect against Inputs like Argument((a,b),c)!
+    """
+    pass
+    
+class Debate(And,Base):
+    """
+    Debates
+    """
+    def __init__(self, *args): # Check *args
+        And.__init__(self)
+        self.actual_positions = []

@@ -21,6 +21,7 @@ taupy
  - simulation
    - agreement
    - polarisation
+   - argument introduction methods
    - belief updating rules
  - visualisation
    - plot tau

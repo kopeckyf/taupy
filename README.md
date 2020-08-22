@@ -9,9 +9,6 @@ taupy
      - Argument
    - positions
      - Position
-   - updating
-     - argument introduction
-     - position updating
  - analysis
    - agreement
    - centrality/distance

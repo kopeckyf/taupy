@@ -31,6 +31,12 @@ class Base():
         _sigma = satisfiability_count ( self )
         return Decimal ( (len(self.atoms()) - log2(_sigma)) / len(self.atoms()))
     
+    def list_of_premises(self):
+        """
+        Returns a list with tuples containing the premises used in the Debate's Arguments.
+        """
+        return [p.args[0].args for p in self.args]
+        
 
 class Argument(Implies,Base):
     """

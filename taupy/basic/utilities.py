@@ -42,3 +42,21 @@ def satisfiability_count(_formula):
     _diagram.declare(*_variables)
     _expression = _diagram.add_expr(str(to_cnf(_formula)))
     return _diagram.count(_expression)
+
+def satisfiability(_formula, all_models = False):
+    """
+    Return a generator of models for the given Boolean formula, using BDDs
+    """
+    _variables = iter_to_list_of_strings(_formula.atoms())
+    _diagram = BDD()
+    _diagram.declare(*_variables)
+    
+    if all_models:
+        pass # Not sure if an impementation is needed
+    else:
+        try:
+            _expression = _diagram.add_expr(str(to_cnf(_formula)))
+            next(_diagram.pick_iter(_expression))
+            return True
+        except StopIteration:
+            return False

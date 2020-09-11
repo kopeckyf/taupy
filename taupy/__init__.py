@@ -8,6 +8,7 @@ from math import log2
 
 from .basic import Argument, Debate
 from .basic import Position
+from .basic import satisfiability_count, satisfiability
 
 from .analysis import doj, hd, bna
 
@@ -19,5 +20,7 @@ __all__ = [
             # .analysis tools
             'doj', 'hd', 'bna',
             # .simulation
-            'Simulation'
+            'Simulation',
+            # Common utilities
+            'satisfiability_count', 'satisfiability'
           ]

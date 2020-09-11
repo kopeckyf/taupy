@@ -7,14 +7,17 @@ from itertools import combinations, chain
 
 class Simulation(list):
     
-    def __init__(self, sentencepool="p:10"):
-        if sentencepool == "auto":
+    def __init__(self, sentencepool="p:10", argumentlength=2):
+        if sentencepool == "auto": # import from input debate
             self.sentencepool = [i for i in self.atoms()]
         else:
             self.sentencepool = [i for i in symbols(sentencepool)]
+            
+        self.init_premisepool(argumentlength)
+        
         list.__init__(self)
         
-    def premisepool(self, r):
+    def init_premisepool(self, r):
         """
         A generator to obtain all premise combinations available for the 
         introduction of a new argument.
@@ -34,11 +37,10 @@ class Simulation(list):
                                      r ) )
         except TypeError: # the input r is not an iterable. Now assume integer.
             _iterator = combinations ( _premisepool , r )
-    
+         
+        self.premisepool = []
         for i in _iterator:
-            if i in self[-1].list_of_premises():
-                # There's already an argument with premises 
-                continue
             for x in i:
                 if Not(x) in i: break
-            else: yield i
+            else: 
+                self.premisepool.append(i)

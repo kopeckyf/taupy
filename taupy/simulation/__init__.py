@@ -1,7 +1,7 @@
 from .simulation import Simulation
-#from .update import update, response
+from .update import random, introduce
 
 __all__ = [
             'Simulation',
-            #'update', 'response'  
+            'random', 'introduce'  
           ]

@@ -13,6 +13,7 @@ from .basic import satisfiability_count, satisfiability
 from .analysis import doj, hd, bna
 
 from .simulation import Simulation
+from .simulation import random, introduce
 
 __all__ = [
             # .basics
@@ -22,5 +23,7 @@ __all__ = [
             # .simulation
             'Simulation',
             # Common utilities
-            'satisfiability_count', 'satisfiability'
+            'satisfiability_count', 'satisfiability',
+            # Update mechanisms
+            'random', 'introduce'
           ]

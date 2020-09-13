@@ -5,8 +5,6 @@ from .utilities import (iter_to_string, neighbours_of_list,
                         satisfiability_count)
 
 class Base():
-    def graph(self):
-        pass
     
     def sccp(self):
         """
@@ -26,6 +24,32 @@ class Base():
             _neighbourlist = [iter_to_string(x) for x in neighbours_of_list(_b) if x in _bits]
             _d[iter_to_string(_b)] = _neighbourlist
         return _d
+    
+    def map(self, method = "plain"):
+        """
+        Returns the plot of the argument map.
+        """
+        
+        _conclusions = [(i, c.args[1]) for i, c in enumerate(self.args)]
+        _premises    = [(i, p.args[0].args) for i, p in enumerate(self.args)]
+        
+        if method == "plain":
+            _result = {}
+            for (i, _conc) in _conclusions:
+                _innerdict = {}
+                for (j, _prems) in _premises:
+                    if _conc in _prems:
+                        _innerdict [j] = {"edge_color": "support"}
+                    if Not(_conc) in _prems:
+                        _innerdict [j] = {"edge_color": "attack"}
+                _result [i] = _innerdict
+            return _result
+        
+        if method == "networkx":
+            pass
+        
+        if method == "graphtool":
+            pass            
     
     def density(self):
         _sigma = satisfiability_count ( self )

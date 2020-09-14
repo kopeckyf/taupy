@@ -8,12 +8,12 @@ from math import log2
 
 from .basic import Argument, Debate
 from .basic import Position
-from .basic import satisfiability_count, satisfiability
+from .basic import satisfiability_count, satisfiability, dict_to_prop
 
 from .analysis import doj, hd, bna
 
 from .simulation import Simulation
-from .simulation import random, introduce
+from .simulation import introduce_random, introduce, response_random
 
 __all__ = [
             # .basics
@@ -23,7 +23,7 @@ __all__ = [
             # .simulation
             'Simulation',
             # Common utilities
-            'satisfiability_count', 'satisfiability',
+            'satisfiability_count', 'satisfiability', 'dict_to_prop',
             # Update mechanisms
-            'random', 'introduce'
+            'introduce_random', 'introduce', 'response_random'
           ]

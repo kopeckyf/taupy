@@ -13,8 +13,7 @@ class Base():
         structure serves as the basis for graph analysis and graph drawing.
         
         Iteration is done over the possible neighbours of a position rather than
-        with all other positions, b/c the searches' complexity will be O(n*|n|)
-        where |n| is the length of a position, rather than O(n^n).
+        with all other positions, b/c the searches' complexity will be lower.
         """
         _d     = {}
         _pos   = [p for p in satisfiable(self, all_models=True)]
@@ -62,13 +61,13 @@ class Base():
         return [p.args[0].args for p in self.args]
         
 
-class Argument(Implies,Base):
+class Argument(Implies, Base):
     """
     Must protect against Inputs like Argument((a,b),c)!
     """
     pass
     
-class Debate(And,Base):
+class Debate(And, Base):
     """
     Debates
     """

@@ -59,6 +59,8 @@ class Simulation(list):
         it is best to manually assign values according to their ID.
         """
         self.positions = []
+        _positions = []
         for p in positions:
-            self.positions.append( { s: p[s] if s in p else choice([True, False]) for s in self.sentencepool } )        
+            _positions.append( { s: p[s] if s in p else choice([True, False]) for s in self.sentencepool } )        
+        self.positions.append(_positions)
                     

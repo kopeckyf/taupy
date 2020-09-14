@@ -13,7 +13,9 @@ from .basic import satisfiability_count, satisfiability, dict_to_prop
 from .analysis import doj, hd, bna
 
 from .simulation import Simulation
-from .simulation import introduce_random, introduce, response_random
+from .simulation import introduce, introduce_random, response_random
+
+from .graphs import plot_sccp, plot_map
 
 __all__ = [
             # .basics
@@ -25,5 +27,7 @@ __all__ = [
             # Common utilities
             'satisfiability_count', 'satisfiability', 'dict_to_prop',
             # Update mechanisms
-            'introduce_random', 'introduce', 'response_random'
+            'introduce', 'introduce_random', 'response_random',
+            # Applications of graph theory
+            'plot_sccp', 'plot_map'
           ]

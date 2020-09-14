@@ -1,5 +1,6 @@
 from dd.autoref import BDD
 from sympy.logic import to_cnf, And, Implies, Not
+from sympy import symbols
 
 def dict_to_prop(dictionary):
     """
@@ -53,7 +54,7 @@ def satisfiability(_formula, all_models = False):
     
     if all_models == True:
         _expression = _diagram.add_expr(str(to_cnf(_formula)))
-        return list(_diagram.pick_iter(_expression))
+        return [{symbols(k): v for (k, v) in m.items()} for m in _diagram.pick_iter(_expression)]
     else:
         try:
             _expression = _diagram.add_expr(str(to_cnf(_formula)))

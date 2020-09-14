@@ -1,3 +1,7 @@
+from sympy import And
+
+from taupy.basic.utilities import satisfiability, dict_to_prop
+
 class Position(dict):
     """
     Document me! 
@@ -10,7 +14,7 @@ class Position(dict):
         return True if self.keys() == self.debate.atoms() else False
     
     def is_coherent(self):    
-        return True if satisfiable(And(dict_to_prop(self), self.debate)) else False
+        return True if satisfiability(And(dict_to_prop(self), self.debate)) else False
     
     def is_closed(self):
         for argument in self.debate.args:

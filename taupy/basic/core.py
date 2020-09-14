@@ -49,11 +49,11 @@ class Base():
             pass
         
         if method == "graphtool":
-            pass            
+            pass                
     
     def density(self):
         _sigma = satisfiability_count ( self )
-        return Decimal ( (len(self.atoms()) - log2(_sigma)) / len(self.atoms()))
+        return Decimal ( (len(self.atoms()) - log2(_sigma)) / len(self.atoms()) )
     
     def list_of_premises(self):
         """

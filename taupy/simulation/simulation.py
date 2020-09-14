@@ -4,16 +4,21 @@ Basic tools in simulations
 
 from sympy import symbols, Not
 from itertools import combinations, chain
+from random import choice
+
+from taupy.basic.utilities import satisfiability
 
 class Simulation(list):
     
-    def __init__(self, sentencepool="p:10", argumentlength=2):
+    def __init__(self, sentencepool="p:10", argumentlength=2, positions=[]):
         if sentencepool == "auto": # import from input debate
             self.sentencepool = [i for i in self.atoms()]
         else:
             self.sentencepool = [i for i in symbols(sentencepool)]
             
         self.init_premisepool(argumentlength)
+        
+        self.init_positions(positions)
         
         list.__init__(self)
         
@@ -44,3 +49,16 @@ class Simulation(list):
                 if Not(x) in i: break
             else: 
                 self.premisepool.append(i)
+                
+    def init_positions(self, positions):
+        """"
+        Generate initial Positions based on facultative information about these
+        Positions.
+        
+        Since the names for sentences are usually not defined in the global namespace,
+        it is best to manually assign values according to their ID.
+        """
+        self.positions = []
+        for p in positions:
+            self.positions.append( { s: p[s] if s in p else choice([True, False]) for s in self.sentencepool } )        
+                    

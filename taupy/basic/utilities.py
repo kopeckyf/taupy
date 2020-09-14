@@ -51,8 +51,9 @@ def satisfiability(_formula, all_models = False):
     _diagram = BDD()
     _diagram.declare(*_variables)
     
-    if all_models:
-        pass # Not sure if an impementation is needed
+    if all_models == True:
+        _expression = _diagram.add_expr(str(to_cnf(_formula)))
+        return list(_diagram.pick_iter(_expression))
     else:
         try:
             _expression = _diagram.add_expr(str(to_cnf(_formula)))

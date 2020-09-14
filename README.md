@@ -1,9 +1,9 @@
 # taupy
 
 ## Dependencies
- - [https://github.com/sympy/sympy](sympy), for its Boolean algebra
- - [https://github.com/tulip-control/dd](dd), to create BDDs to check satisfiability as well as listing and counting their number
- - [https://git.skewed.de/count0/graph-tool](graph_tool), for graph analysis and plotting
+ - [sympy](https://github.com/sympy/sympy), for its Boolean algebra
+ - [dd](https://github.com/tulip-control/dd), to create BDDs to check satisfiability as well as listing and counting their number
+ - [graph_tool](https://git.skewed.de/count0/graph-tool), for graph analysis and plotting
 
 ## Functional structure:
 

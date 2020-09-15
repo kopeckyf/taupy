@@ -106,6 +106,10 @@ introduce(sim1, introduce_random(sim1))
 # Make the three positions respond to the latest introduction.
 # Right now, there's only a very basic random reponse pattern:
 response_random(sim1)
+
+# It is possible to customise the length of introduced Arguments, i.e. the number of their premises:
+sim3 = Simulation(argumentlength=2) # Introduce Arguments with two premises
+sim3 = Simulation(argumentlength=[2,3]) # Arguments with two or three premises
 ```
 
 ## Functional structure

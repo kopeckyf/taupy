@@ -6,7 +6,7 @@
  - [graph_tool](https://git.skewed.de/count0/graph-tool), for graph analysis and plotting
  
 ## Examples of usage
-In place of a in-depth documentation, some examples for taupy's current functions and classes are given below.
+In place of a in-depth documentation, some examples for taupy's current functions and classes are given below. Please keep in mind that this is a construction site. Please watch your step for scattered hazards.
 
 taupy inherits the symbolic approach from sympy. Since everything has to be declared before it can be used, you need to do so, too:
 

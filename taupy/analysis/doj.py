@@ -2,9 +2,13 @@ from taupy.basic.utilities import satisfiability_count, dict_to_prop
 from sympy.logic import (And, Implies, Not)
 from fractions import Fraction
 
-def doj( pos, debate=None, conditional=None ):
+def doj(pos, debate=None, conditional=None):
     """
     Degree of justification for a position given its associated debate.
+    
+    ---
+    References: Betz, Gregor. 2012. On degrees of justification. Erkenntnis 77.
+                pp. 237--272. DOI: 10/bkng95
     """
     
     if debate is None: 
@@ -17,6 +21,6 @@ def doj( pos, debate=None, conditional=None ):
         # Adding the condition to the inspected debate.
         debate = And(dict_to_prop(conditional), debate)
     
-    _n = satisfiability_count ( And(dict_to_prop(pos), debate) )
-    _m = satisfiability_count ( debate )
+    _n = satisfiability_count (And(dict_to_prop(pos), debate))
+    _m = satisfiability_count (debate)
     return Fraction(_n, _m)

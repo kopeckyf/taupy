@@ -9,8 +9,8 @@ def dict_to_prop(dictionary):
     """
     _l = []
     for (k, v) in dictionary.items():
-        if v == True: _l.append(k)
-        if v == False: _l.append(Not(k))
+        if v: _l.append(k)
+        if not v: _l.append(Not(k))
     return And(*_l)
 
 def iter_to_string(l, sep=""):
@@ -20,9 +20,6 @@ def iter_to_string(l, sep=""):
     return sep.join(str(i) for i in l)
 
 def iter_to_list_of_strings(l):
-    """
-    
-    """
     return [str(i) for i in l]
 
 def neighbours_of_list(l):
@@ -52,7 +49,7 @@ def satisfiability(_formula, all_models = False):
     _diagram = BDD()
     _diagram.declare(*_variables)
     
-    if all_models == True:
+    if all_models:
         _expression = _diagram.add_expr(str(to_cnf(_formula)))
         return [{symbols(k): v for (k, v) in m.items()} for m in _diagram.pick_iter(_expression)]
     else:

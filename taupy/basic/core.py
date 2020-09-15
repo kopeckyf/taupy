@@ -15,10 +15,10 @@ class Base():
         Iteration is done over the possible neighbours of a position rather than
         with all other positions, b/c the searches' complexity will be lower.
         """
-        _d     = {}
-        _pos   = [p for p in satisfiable(self, all_models=True)]
+        _d = {}
+        _pos = [p for p in satisfiable(self, all_models=True)]
         _props = sorted(_pos[0].keys(), key=lambda x: x.sort_key())
-        _bits  = [ list ( 1 if _p[_i] == True else 0 for _i in _props ) for _p in _pos ]
+        _bits = [list (1 if _p[_i] else 0 for _i in _props) for _p in _pos]
         for _b in _bits:
             _neighbourlist = [iter_to_string(x) for x in neighbours_of_list(_b) if x in _bits]
             _d[iter_to_string(_b)] = _neighbourlist
@@ -30,7 +30,7 @@ class Base():
         """
         
         _conclusions = [(i, c.args[1]) for i, c in enumerate(self.args)]
-        _premises    = [(i, p.args[0].args) for i, p in enumerate(self.args)]
+        _premises = [(i, p.args[0].args) for i, p in enumerate(self.args)]
         
         if method == "plain":
             _result = {}
@@ -52,7 +52,7 @@ class Base():
     
     def density(self):
         _sigma = satisfiability_count ( self )
-        return Decimal ( (len(self.atoms()) - log2(_sigma)) / len(self.atoms()) )
+        return Decimal ((len(self.atoms()) - log2(_sigma)) / len(self.atoms()))
     
     def list_of_premises(self):
         """

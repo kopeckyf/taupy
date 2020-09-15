@@ -17,7 +17,6 @@ class Simulation(list):
             self.sentencepool = [i for i in symbols(sentencepool)]
             
         self.init_premisepool(argumentlength)
-        
         self.init_positions(positions)
         
         list.__init__(self)
@@ -38,10 +37,9 @@ class Simulation(list):
         _premisepool = self.sentencepool + [Not(i) for i in self.sentencepool]
         
         try: # Assume variable length of subsequence. Following an idea by Dan H.
-            _iterator = chain( *map (lambda i: combinations( _premisepool, i ),
-                                     r ) )
+            _iterator = chain(*map(lambda i: combinations(_premisepool, i), r))
         except TypeError: # the input r is not an iterable. Now assume integer.
-            _iterator = combinations ( _premisepool , r )
+            _iterator = combinations (_premisepool, r)
          
         self.premisepool = []
         for i in _iterator:
@@ -60,7 +58,8 @@ class Simulation(list):
         """
         self.positions = []
         _positions = []
+        
         for p in positions:
             _positions.append( { s: p[s] if s in p else choice([True, False]) for s in self.sentencepool } )        
+        
         self.positions.append(_positions)
-                    

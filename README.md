@@ -1,6 +1,11 @@
 # taupy
 
-Functional structure:
+## Dependencies
+ - [sympy](https://github.com/sympy/sympy), for its Boolean algebra
+ - [dd](https://github.com/tulip-control/dd), to create BDDs to check satisfiability as well as listing and counting their number
+ - [graph_tool](https://git.skewed.de/count0/graph-tool), for graph analysis and plotting
+
+## Functional structure:
 
 taupy
  - basic
@@ -11,7 +16,6 @@ taupy
      - Position
  - analysis
    - agreement
-   - centrality/distance
    - mutual coherence
    - doj
    - inferential density
@@ -20,6 +24,8 @@ taupy
    - polarisation
    - argument introduction methods
    - belief updating rules
- - visualisation
-   - plot tau
-   - plot sccp
+ - graphs
+   - centrality/distance measures
+   - visualisation
+     - plot tau
+     - plot sccp

@@ -10,7 +10,7 @@ from .basic import Argument, Debate
 from .basic import Position
 from .basic import satisfiability_count, satisfiability, dict_to_prop
 
-from .analysis import doj, hd, bna
+from .analysis import doj, hd, bna, next_neighbours
 
 from .simulation import Simulation
 from .simulation import introduce, introduce_random, response_random
@@ -21,7 +21,7 @@ __all__ = [
             # .basics
             'Argument', 'Debate', 'Position',
             # .analysis tools
-            'doj', 'hd', 'bna',
+            'doj', 'hd', 'bna', 'next_neighbours',
             # .simulation
             'Simulation',
             # Common utilities

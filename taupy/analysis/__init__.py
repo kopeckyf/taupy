@@ -1,7 +1,7 @@
 from .doj import doj
-from .agreement import (hd, bna)
+from .agreement import (hd, bna, next_neighbours)
 
 __all__ = [
             'doj',
-            'hd', 'bna'
+            'hd', 'bna', 'next_neighbours'
           ]

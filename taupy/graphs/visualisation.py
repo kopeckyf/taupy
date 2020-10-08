@@ -1,4 +1,4 @@
-from graph_tool.all import Graph, graph_draw
+from graph_tool.all import Graph, graph_draw, remove_parallel_edges
 
 from taupy.basic import Argument, Debate
 
@@ -34,4 +34,5 @@ def plot_sccp(_debate):
     _edgelist = [(_pos1, _pos2) for _pos1 in _debate.sccp().keys() for _pos2 in _debate.sccp()[_pos1]]
 
     _g.add_edge_list(_edgelist, hashed=True, string_vals=True)
+    remove_parallel_edges(_g)
     graph_draw(_g)

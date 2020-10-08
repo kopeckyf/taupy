@@ -64,5 +64,5 @@ def next_neighbours(_pos, _debate):
     To pick a random next door neighbour, choose random.choice(next_neighbours())
     """
     _candidates = [i for i in satisfiability(_debate, all_models = True)]
-    _distances = {_candidates.index(c): hd(_pos,c) for c in _candidates if hd(_pos,c) != 0}
+    _distances = {_candidates.index(c): edit_distance(_pos,c) for c in _candidates if edit_distance(_pos,c) != 0}
     return [_candidates[i] for i in _distances if _distances[i] == min(_distances.values())]

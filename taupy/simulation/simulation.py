@@ -7,6 +7,8 @@ from itertools import combinations, chain
 from random import choice
 
 from taupy.basic.utilities import satisfiability
+from .update import (introduce, introduce_random, 
+                     closest_coherent)
 
 class Simulation(list):
     
@@ -63,3 +65,19 @@ class Simulation(list):
             _positions.append( { s: p[s] if s in p else choice([True, False]) for s in self.sentencepool } )        
         
         self.positions.append(_positions)
+        
+    def run(self, max_density = 1, max_steps = 1000, introduction_method = None,
+            update_mechanism = None):
+        """
+        Run a Simulation using introduction_method and update_mechanism until
+        either max_density is reached or max_steps have been taken.
+        """
+        i = 0
+        while True:            
+            introduce(self, introduce_random(self))
+            closest_coherent(self)
+            
+            i += 1
+            if self[-1].density() >= max_density or i >= max_steps:
+                break
+        print("Simulation ended. %d steps were taken." % (i))

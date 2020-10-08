@@ -6,7 +6,6 @@ from random import randrange, choice
 from sympy import And, Not
 from taupy import (Argument, Debate, satisfiability, satisfiability_count, 
                    dict_to_prop, next_neighbours)
-from .simulation import Simulation
 
 def introduce(_simulation, _argument):
     """

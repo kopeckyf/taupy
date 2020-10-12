@@ -1,8 +1,8 @@
 from decimal import Decimal
 from math import log2
-from sympy.logic import (And, Implies, Not, satisfiable)
+from sympy.logic import (And, Implies, Not)
 from .utilities import (iter_to_string, neighbours_of_list, 
-                        satisfiability_count)
+                        satisfiability_count, satisfiability)
 
 class Base():
     
@@ -16,7 +16,7 @@ class Base():
         with all other positions, b/c the searches' complexity will be lower.
         """
         _d = {}
-        _pos = [p for p in satisfiable(self, all_models=True)]
+        _pos = [p for p in satisfiability(self, all_models=True)]
         _props = sorted(_pos[0].keys(), key=lambda x: x.sort_key())
         _bits = [list (1 if _p[_i] else 0 for _i in _props) for _p in _pos]
         for _b in _bits:

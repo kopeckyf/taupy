@@ -13,6 +13,23 @@ def dict_to_prop(dictionary):
         if not v: _l.append(Not(k))
     return And(*_l)
 
+def free_premises(debate):
+    """
+    Returns a list of premises that are "free" in the sense of [1: Def. 3].
+    -----
+    Referenes:
+    [1] Betz, Gregor. 2009. Evaluating dialectical structures. In: Journal
+        of philosophical logic 38: 283--312. DOI: 10/cxrbhh
+    """
+    premises = set()
+    for i in debate.args:
+        for j in [*i.args[0].atoms()]:
+            premises.add(j)
+    conclusions = {i.args[1] for i in debate.args}
+    
+    return {i for i in premises if i not in conclusions and 
+            Not(i) not in conclusions}
+
 def iter_to_string(l, sep=""):
     """
     Helper function that converts a dictionary position to a bit string.

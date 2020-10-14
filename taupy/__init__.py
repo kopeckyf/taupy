@@ -8,7 +8,8 @@ from math import log2
 
 from .basic import Argument, Debate
 from .basic import Position
-from .basic import satisfiability_count, satisfiability, dict_to_prop
+from .basic import (satisfiability_count, satisfiability, dict_to_prop, 
+                    free_premises)
 
 from .analysis import (doj, hd, bna, next_neighbours, edit_distance)
 
@@ -27,6 +28,7 @@ __all__ = [
             'Simulation',
             # Common utilities
             'satisfiability_count', 'satisfiability', 'dict_to_prop',
+            'free_premises',
             # Update mechanisms
             'introduce', 'introduce_random', 'response_random', 
             'closest_coherent',

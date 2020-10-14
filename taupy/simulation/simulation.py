@@ -66,16 +66,17 @@ class Simulation(list):
         
         self.positions.append(_positions)
         
-    def run(self, max_density = 1, max_steps = 1000, introduction_method = None,
-            update_mechanism = None):
+    def run(self, max_density = 1, max_steps = 1000, 
+            introduction_method = introduce_random, 
+            update_mechanism = closest_coherent):
         """
         Run a Simulation using introduction_method and update_mechanism until
         either max_density is reached or max_steps have been taken.
         """
         i = 0
         while True:            
-            introduce(self, introduce_random(self))
-            closest_coherent(self)
+            introduce(self, introduction_method(self))
+            update_mechanism(self)
             
             i += 1
             if self[-1].density() >= max_density or i >= max_steps:

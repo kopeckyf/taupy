@@ -40,5 +40,7 @@ def position_compatibility(pos1, pos2, deep=False):
             if not satisfiability(And(dict_to_prop({**pos1, **pos2})), 
                                   pos1.debate):
                 return False
+            else:
+                return True
         else:
             return True

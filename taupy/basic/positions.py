@@ -23,3 +23,22 @@ class Position(dict):
                     return False
         else:
             return True
+
+def position_compatibility(pos1, pos2, deep=False):
+    """
+    Check for compatibility of pos1 and pos2. When deep=False, the check is 
+    only lexicographic. A deep check also checks for satisfiability of the 
+    intersected positions.
+    """
+    if deep == True and pos1.debate != pos2.debate:
+        raise ValueError("Deep compatibility can only be checked for positions of the same debate.")
+    
+    if any(pos1[k] in pos2 and pos1[k] != pos2[k] for k in pos1):
+        return False
+    else:
+        if deep == True:
+            if not satisfiability(And(dict_to_prop({**pos1, **pos2})), 
+                                  pos1.debate):
+                return False
+        else:
+            return True

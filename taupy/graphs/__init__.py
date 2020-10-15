@@ -1,5 +1,5 @@
-from .visualisation import plot_sccp, plot_map
+from .visualisation import graph_from_sccp, plot_map
 
 __all__ = [
-            'plot_sccp', 'plot_map'
+            'graph_from_sccp', 'plot_map'
           ]

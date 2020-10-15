@@ -72,10 +72,6 @@ def closest_coherent(_sim):
             _updated.append(p)
             print ("no update needed")
         else:
-            # Python < 3.7
-            #_closest = p.copy()
-            #_closest.update(...)
-            # Python >= 3.7
             _updated.append({**p, **choice(next_neighbours(p,_sim[-1]))})
             print ("update needed")
     _sim.positions.append(_updated)

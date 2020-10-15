@@ -23,6 +23,13 @@ class Position(dict):
                     return False
         else:
             return True
+        
+def position_inverse(pos):
+    """
+    Return the inverse of a position, that is the position that assigns 
+    contradictory truth values to those in pos.
+    """
+    return {k: not pos[k] for k in pos}
 
 def position_compatibility(pos1, pos2, deep=False):
     """

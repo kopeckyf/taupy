@@ -1,8 +1,11 @@
 from decimal import Decimal
+from itertools import combinations
 from math import log2
 from sympy.logic import (And, Implies, Not)
 from .utilities import (iter_to_string, neighbours_of_list, 
                         satisfiability_count, satisfiability)
+from taupy.analysis.agreement import edit_distance
+
 
 class Base():
     
@@ -22,6 +25,20 @@ class Base():
         for _b in _bits:
             _neighbourlist = [iter_to_string(x) for x in neighbours_of_list(_b) if x in _bits]
             _d[iter_to_string(_b)] = _neighbourlist
+        return _d
+    
+    def weighted_sccp(self, distance_measure=edit_distance):
+        """
+        Return 
+        """
+        _d = {}
+        _sat = satisfiability(self, all_models=True)
+        _combs = combinations(satisfiability(self, all_models=True), r=2)
+        _props = sorted(_sat[0].keys(), key=lambda x: x.sort_key())
+        for c in _combs:
+            _bits = [list(1 if j[i] else 0 for i in _props) for j in c]
+            _d.setdefault(iter_to_string(_bits[0]),{}).update({iter_to_string(_bits[1]): {"weight": 1 / distance_measure(c[0], c[1])}})
+        
         return _d
     
     def map(self, method = "plain"):

@@ -18,8 +18,8 @@ class Position(dict):
     
     def is_closed(self):
         for argument in self.debate.args:
-            if all (premise in self and self[premise] is True for premise in argument.args[0].args):
-                if argument.args[1] not in self or self[argument.args[1]] is False:
+            if all (premise in self and self[premise] == True for premise in argument.args[0].args):
+                if argument.args[1] not in self or self[argument.args[1]] == False:
                     return False
         else:
             return True

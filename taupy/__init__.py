@@ -7,31 +7,33 @@ from fractions import Fraction
 from math import log2
 
 from .basic import Argument, Debate
-from .basic import Position
+from .basic import (Position, position_compatibility, position_inverse)
 from .basic import (satisfiability_count, satisfiability, dict_to_prop, 
                     free_premises)
 
-from .analysis import (doj, hd, bna, next_neighbours, edit_distance)
+from .analysis import (doj, hamming_distance, bna, next_neighbours, 
+                       edit_distance)
 
 from .simulation import Simulation
-from .simulation import (introduce, introduce_random, response_random, 
+from .simulation import (introduce, introduce_strategical, response_random, 
                          closest_coherent)
 
-from .graphs import plot_sccp, plot_map
+#from .graphs import graph_from_sccp, plot_map
 
 __all__ = [
             # .basics
-            'Argument', 'Debate', 'Position',
+            'Argument', 'Debate', 'Position', 'position_compatibility',
+            'position_inverse',
             # .analysis tools
-            'doj', 'hd', 'bna', 'next_neighbours', 'edit_distance',
+            'doj', 'hamming_distance', 'bna', 'next_neighbours', 'edit_distance',
             # .simulation
             'Simulation',
             # Common utilities
             'satisfiability_count', 'satisfiability', 'dict_to_prop',
             'free_premises',
             # Update mechanisms
-            'introduce', 'introduce_random', 'response_random', 
+            'introduce', 'introduce_strategical', 'response_random', 
             'closest_coherent',
             # Applications of graph theory
-            'plot_sccp', 'plot_map'
+            #'graph_from_sccp', 'plot_map'
           ]

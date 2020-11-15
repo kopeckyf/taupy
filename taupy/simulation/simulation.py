@@ -7,7 +7,7 @@ from itertools import combinations, chain
 from random import choice
 
 from taupy.basic.utilities import satisfiability
-from .update import (introduce, introduce_random, 
+from .update import (introduce, introduce_strategical, 
                      closest_coherent)
 
 class Simulation(list):
@@ -19,7 +19,12 @@ class Simulation(list):
             self.sentencepool = [i for i in symbols(sentencepool)]
             
         self.init_premisepool(argumentlength)
+        # It's a good idea to store the argument length so that other functions
+        # can access that information.
+        self.argumentlength = argumentlength
         self.init_positions(positions)
+
+        self.log = []
         
         list.__init__(self)
         
@@ -67,7 +72,7 @@ class Simulation(list):
         self.positions.append(_positions)
         
     def run(self, max_density = 1, max_steps = 1000, 
-            introduction_method = introduce_random, 
+            introduction_method = "random", 
             update_mechanism = closest_coherent):
         """
         Run a Simulation using introduction_method and update_mechanism until
@@ -75,7 +80,7 @@ class Simulation(list):
         """
         i = 0
         while True:            
-            introduce(self, introduction_method(self))
+            introduce(self, method=introduction_method)
             update_mechanism(self)
             
             i += 1

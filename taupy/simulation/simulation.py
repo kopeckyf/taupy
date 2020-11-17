@@ -7,8 +7,7 @@ from itertools import combinations, chain
 from random import choice
 
 from taupy.basic.utilities import satisfiability
-from .update import (introduce, introduce_strategical, 
-                     closest_coherent)
+from .update import (introduce, closest_coherent)
 
 class Simulation(list):
     

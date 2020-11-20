@@ -6,14 +6,16 @@ class Position(dict):
     """
     Document me! 
     """
-    def __init__(self, debate, *args):
+    def __init__(self, debate, *args, introduction_strategy=None, update_strategy=None):
         self.debate = debate
+        self.introduction_strategy = introduction_strategy
+        self.update_strategy = update_strategy
         dict.__init__(self, *args)
         
     def is_complete(self):
         return True if self.keys() == self.debate.atoms() else False
     
-    def is_coherent(self):    
+    def is_coherent(self):
         return satisfiability(And(dict_to_prop(self), self.debate))
     
     def is_closed(self):
@@ -23,13 +25,13 @@ class Position(dict):
                     return False
         else:
             return True
-        
-def position_inverse(pos):
-    """
-    Return the inverse of a position, that is the position that assigns 
-    contradictory truth values to those in pos.
-    """
-    return {k: not pos[k] for k in pos}
+
+    def inverse(self):
+        """
+        Return the inverse of a position, that is the position that assigns 
+        contradictory truth values.
+        """
+        return {k: not self[k] for k in self}   
 
 def position_compatibility(pos1, pos2, deep=False):
     """

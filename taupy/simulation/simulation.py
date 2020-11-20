@@ -4,14 +4,21 @@ Basic tools in simulations
 
 from sympy import symbols, Not
 from itertools import combinations, chain
-from random import choice
+from random import choice, sample
 
 from taupy.basic.utilities import satisfiability
-from .update import (introduce, closest_coherent)
+from .update import (introduce, response)
 
 class Simulation(list):
     
-    def __init__(self, sentencepool="p:10", argumentlength=2, positions=[]):
+    def __init__(self,
+                 directed=True, 
+                 sentencepool="p:10", 
+                 argumentlength=2, 
+                 positions=[],
+                 default_introduction_strategy = "random", 
+                 default_update_strategy = "closest_coherent"):
+        
         if sentencepool == "auto": # import from input debate
             self.sentencepool = [i for i in self.atoms()]
         else:
@@ -23,8 +30,10 @@ class Simulation(list):
         self.argumentlength = argumentlength
         self.init_positions(positions)
 
-        self.log = []
-        
+        self.directed = directed
+        self.default_introduction_strategy = default_introduction_strategy
+        self.default_update_strategy = default_update_strategy
+        self.log = []        
         list.__init__(self)
         
     def init_premisepool(self, r):
@@ -55,34 +64,54 @@ class Simulation(list):
                 self.premisepool.append(i)
                 
     def init_positions(self, positions):
-        """"
-        Generate initial Positions based on facultative information about these
-        Positions.
-        
-        Since the names for sentences are usually not defined in the global namespace,
-        it is best to manually assign values according to their ID.
+        """
+        Generate initial Positions. Optionally, the Positions may start off with explicit
+        truth-value attributions. This function complementises the Positions such that they
+        begin as complete positions.
         """
         self.positions = []
-        _positions = []
-        
+
         for p in positions:
-            _positions.append( { s: p[s] if s in p else choice([True, False]) for s in self.sentencepool } )        
-        
-        self.positions.append(_positions)
-        
-    def run(self, max_density = 1, max_steps = 1000, 
-            introduction_method = "random", 
-            update_mechanism = closest_coherent):
+            for s in self.sentencepool:
+                if s not in p:
+                    p[s] = choice([True, False])
+
+        self.positions.append(positions)
+                
+    def run(self, max_density = 1, max_steps = 1000):
         """
         Run a Simulation using introduction_method and update_mechanism until
         either max_density is reached or max_steps have been taken.
         """
+
         i = 0
-        while True:            
-            introduce(self, method=introduction_method)
-            update_mechanism(self)
+        # self.log.append("Directed Simulation initiated.") if self.directed else 
+        # self.log.append("Undirected Simulation initiated.")
+
+        while True:
+            if self.directed and len(self.positions[-1]) >= 2:
+                # The user asked for a directed simulation and has supplied
+                # enough Positions.
+                pick_positions = sample(self.positions[-1], k=2)
+                argument_introduced = introduce(self, 
+                                                source=pick_positions[0],
+                                                target=pick_positions[1],
+                                                strategy=pick_positions[0].introduction_strategy)
+                if argument_introduced:
+                    # Check if introduction was succesful before attempting response.
+                    response(self, method=self.default_update_strategy)
+            else:
+                argument_introduced = introduce(self, strategy=self.default_introduction_strategy)
+                if argument_introduced:
+                    response(self, method=self.default_update_strategy)
             
+            if not argument_introduced:
+                # Break out of the Simulation if no argument could be inserted.
+                # In this case, the log will tell more about what went wrong.
+                break
+
             i += 1
             if self[-1].density() >= max_density or i >= max_steps:
                 break
-        print("Simulation ended. %d steps were taken." % (i))
+        self.log.append("Simulation ended. %d steps were taken. Density at end: %f" % (i, self[-1].density()))
+        print("Simulation ended. %d steps were taken. Density at end: %f" % (i, self[-1].density()))

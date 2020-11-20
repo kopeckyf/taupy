@@ -3,6 +3,7 @@ Functions to introduce Arguments into Debates and update Positions accordingly.
 """ 
 
 from itertools import combinations, chain
+from copy import deepcopy
 from random import randrange, choice
 from sympy import And, Not
 from taupy import (Argument, Debate, satisfiability, satisfiability_count, 
@@ -31,9 +32,17 @@ def introduce(_sim, source=None, target=None, strategy=None):
         # Only copy the list if needed.
         positions = _sim.positions[-1].copy()
         if strategy["source"]:
-            source_pos = positions.pop(source) if source else positions.pop(randrange(0,len(positions)))
+            if source:
+                positions.remove(source)
+                source_pos = source
+            else:
+                source_pos = positions.pop(randrange(0,len(positions)))
         if strategy["target"]:
-            target_pos = positions.pop(target) if target else positions.pop(randrange(0,len(positions)))
+            if target:
+                positions.remove(target)
+                target_pos = target
+            else:
+                target_pos = positions.pop(randrange(0,len(positions)))
     
     # Track if source and target positions have been set. This is send to log later.
     if not strategy["source"]:
@@ -46,6 +55,7 @@ def introduce(_sim, source=None, target=None, strategy=None):
 
         if strategy["pick_premises_from"] == None:
             selected_premises = available_premises.pop(randrange(0,len(available_premises)))
+            _found_premises = True
         else:
             if strategy["pick_premises_from"] == "source":
                 try: # Assume variable length of subsequence. Following an idea by Dan H.
@@ -60,35 +70,46 @@ def introduce(_sim, source=None, target=None, strategy=None):
                     possible_premises = set(combinations(dict_to_prop(target_pos).args, r=_sim.argumentlength))
 
             possible_premises = possible_premises & set(available_premises)
-            selected_premises = choice(list(possible_premises))
-            available_premises.remove(selected_premises)
 
-        # Get the conclusion candidates from the sentence pool
-        possible_conclusions = list(set(_sim.sentencepool) - set(And(*selected_premises).atoms()))
-        possible_conclusions += list(Not(i) for i in possible_conclusions)
-
-        # Directed strategies act as filters on possible conclusions. The list of possible values is not exhausted b/c it is not required by the currently known strategies.
-        if strategy["source_accepts_conclusion"] == "Yes":
-            possible_conclusions = list(set(possible_conclusions) & set(dict_to_prop(source_pos).args))
-
-        if strategy["source_accepts_conclusion"] == "Toleration":
-            possible_conclusions = list(set(possible_conclusions) - {Not(i) for i in dict_to_prop(source_pos).args})
-            
-        if strategy["target_accepts_conclusion"] == "No":
-            possible_conclusions = list(set(possible_conclusions) & set([Not(i) for i in dict_to_prop(target_pos).args]))
-        
-        # Now select a conclusion from the (un-)filtered list of conclusions:
-        selected_conclusion = choice(possible_conclusions)
-
-        if len(_sim) == 0 or satisfiability(And( _sim[-1], Argument(And(*selected_premises), selected_conclusion))):
-            _sim.premisepool.remove(selected_premises)
-            _found_valid_argument = True
-            break
-        else:
-            _sim.log.append("Introducing argument failed because of UNSAT. %d combinations of premises remain." % (len(available_premises)) )
-            if len(available_premises) == 0:
+            if len(possible_premises) == 0:
+                # There are no further available premises. 
                 _found_valid_argument = False
                 break
+            else:
+                selected_premises = choice(list(possible_premises))
+                available_premises.remove(selected_premises)
+                _found_premises = True
+
+        if _found_premises:
+            # Get the conclusion candidates from the sentence pool
+            possible_conclusions = list(set(_sim.sentencepool) - set(And(*selected_premises).atoms()))
+            possible_conclusions += list(Not(i) for i in possible_conclusions)
+
+            # Directed strategies act as filters on possible conclusions. The list of possible values is not exhausted b/c it is not required by the currently known strategies.
+            if strategy["source_accepts_conclusion"] == "Yes":
+                possible_conclusions = list(set(possible_conclusions) & set(dict_to_prop(source_pos).args))
+
+            if strategy["source_accepts_conclusion"] == "Toleration":
+                possible_conclusions = list(set(possible_conclusions) - {Not(i) for i in dict_to_prop(source_pos).args})
+                
+            if strategy["target_accepts_conclusion"] == "No":
+                possible_conclusions = list(set(possible_conclusions) & set([Not(i) for i in dict_to_prop(target_pos).args]))
+            
+            # Now select a conclusion from the (un-)filtered list of conclusions:
+            if len(possible_conclusions) == 0:
+                _sim.log.append("Introducing argument failed because no matching conclusion could be found for the selected premises. %d combinations of premises remain." % (len(available_premises)) )
+            else:
+                selected_conclusion = choice(possible_conclusions)
+
+                if len(_sim) == 0 or satisfiability(And( _sim[-1], Argument(And(*selected_premises), selected_conclusion))):
+                    _sim.premisepool.remove(selected_premises)
+                    _found_valid_argument = True
+                    break
+                else:
+                    _sim.log.append("Introducing argument failed because of UNSAT. %d combinations of premises remain." % (len(available_premises)) )
+                    if len(available_premises) == 0:
+                        _found_valid_argument = False
+                        break
     
     if _found_valid_argument:
         _sim.log.append("Introduce argument with strategy '%s'. Premises: %s. Conclusion: %s. Source: %s. Target: %s." % (strategy["name"], And(*selected_premises), selected_conclusion, source_pos, target_pos))
@@ -111,39 +132,31 @@ def introduce(_sim, source=None, target=None, strategy=None):
         _sim.log.append("Introduction of with strategy '%s' failed. No valid combinations left in the premise pool." % (strategy["name"]) )
         return False
 
-def response(_simulation, method, _stage1=None, _stage2=None):
+def response(_sim, method):
     """
-    Updating Positions in a debate.
-    """
-    
-    if _stage1 == None:
-        _stage1 = _simulation[-1]
-        
-    if _stage2 == None:
-        _stage2 = _simulation[-2]
-    
-def response_random(_sim):
+    Updating Positions in a debate. This needs more work!
     """
     
-    """
-    _updated = []
-    for p in _sim.positions[-1]:
-        if satisfiability(And(dict_to_prop(p), _sim[-1])):
-            _updated.append(p)
-        else:
-            _updated.append(choice(satisfiability(And(*_sim.sentencepool, _sim[-1]),all_models=True)))
-    _sim.positions.append(_updated)
-
-def closest_coherent(_sim):
-    """
+    if method == "random":
+        updated_positions = []
+        for p in _sim.positions[-1]:
+            if satisfiability(And(dict_to_prop(p), _sim[-1])):
+                updated_positions.append(p)
+            else:
+                u = deepcopy(p)
+                u |= choice(satisfiability(And(*_sim.sentencepool, _sim[-1]),all_models=True)) 
+                updated_positions.append(u)
+        _sim.positions.append(updated_positions)        
     
-    """
-    _updated = []
-    for p in _sim.positions[-1]:
-        if satisfiability(And(dict_to_prop(p), _sim[-1])):
-            _updated.append(p)
-            print ("no update needed")
-        else:
-            _updated.append({**p, **choice(next_neighbours(p,_sim[-1]))})
-            print ("update needed")
-    _sim.positions.append(_updated)
+    if method == "closest_coherent":
+        updated_positions = []
+        for p in _sim.positions[-1]:
+            if satisfiability(And(dict_to_prop(p), _sim[-1])):
+                updated_positions.append(p)
+                _sim.log.append("Position with index %d did not need an update." % (_sim.positions[-1].index(p)))
+            else:
+                u = deepcopy(p)
+                u |= choice(next_neighbours(p, _sim[-1]))
+                updated_positions.append(u)
+                _sim.log.append("Position with index %d was updated with strategy closest_coherent." % (_sim.positions[-1].index(p)))
+        _sim.positions.append(updated_positions)

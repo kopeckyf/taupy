@@ -6,7 +6,7 @@ from sympy import symbols, Not
 from itertools import combinations, chain
 from random import choice, sample
 
-from taupy.basic.utilities import satisfiability
+from taupy.basic.utilities import satisfiability, satisfiability_count
 from .update import (introduce, response)
 
 class Simulation(list):
@@ -78,7 +78,7 @@ class Simulation(list):
 
         self.positions.append(positions)
                 
-    def run(self, max_density = 1, max_steps = 1000):
+    def run(self, max_density=1, max_steps=1000, min_sccp=1):
         """
         Run a Simulation using introduction_method and update_mechanism until
         either max_density is reached or max_steps have been taken.
@@ -111,7 +111,7 @@ class Simulation(list):
                 break
 
             i += 1
-            if self[-1].density() >= max_density or i >= max_steps:
+            if self[-1].density() >= max_density or i >= max_steps or satisfiability_count(self[-1]) <= min_sccp:
                 break
-        self.log.append("Simulation ended. %d steps were taken. Density at end: %f" % (i, self[-1].density()))
+        self.log.append("Simulation ended. %d steps were taken. Density at end: %f. Extension of SCCP: %d." % (i, self[-1].density(),  satisfiability_count(self[-1])))
         print("Simulation ended. %d steps were taken. Density at end: %f" % (i, self[-1].density()))

@@ -98,6 +98,7 @@ def introduce(_sim, source=None, target=None, strategy=None):
             # Now select a conclusion from the (un-)filtered list of conclusions:
             if len(possible_conclusions) == 0:
                 _sim.log.append("Introducing argument failed because no matching conclusion could be found for the selected premises. %d combinations of premises remain." % (len(available_premises)) )
+                _sim.premisepool.remove(selected_premises)
             else:
                 selected_conclusion = choice(possible_conclusions)
 

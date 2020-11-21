@@ -1,14 +1,18 @@
-from taupy import satisfiability
+from fractions import Fraction
+from taupy.basic.utilities import satisfiability
 
-def hd(pos1, pos2):
+def hamming_distance(pos1, pos2):
     """
-    Hamming distance between two complete positions.
-    It is not (yet) defined for partial positions.
+    Hamming distance between two complete positions. The Hamming distance can 
+    be interpreted as a special case of edit_distance with the specialisation of 
+    only allowing substitions. This is why the Hamming distance for positions 
+    can only be calculated for positions with the same domain.
     """
-    if len(pos1) != len(pos2):
-        raise ValueError("Hamming distance is defined for positions of equal length only")
+    if pos1.keys() != pos2.keys():
+        raise ValueError("Hamming distance is only defined for positions \
+                          of the same domain.")
     
-    return len(pos1) - len([k for k in pos1 if k in pos2 and pos1[k] == pos2[k]])
+    return len([k for k in pos1 if pos1[k] != pos2[k]])
 
 def edit_distance(pos1, pos2):
     """
@@ -47,13 +51,22 @@ def edit_distance(pos1, pos2):
         v in pos1 and 
         v in pos2 and 
         pos1[v] == pos2[v])])
+
+def kemeny_oppenheim(pos1, pos2):
+    pass
+        
+def difference_measure(pos1, pos2):
+    pass
+
+def log_likelihood_measure(pos1, pos2):
+    pass
     
 def bna(pos1, pos2):
     """
     General version of Betz' normalised agreement, which is the Hamming 
     distane normalised by the number of senteces under discussion.
     """
-    return Fraction(hd(pos1, pos2), len(pos1))
+    return 1 - Fraction(hamming_distance(pos1, pos2), len(pos1))
 
 def next_neighbours(_pos, _debate):
     """

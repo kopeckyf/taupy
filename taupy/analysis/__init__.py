@@ -2,12 +2,14 @@ from .doj import doj
 from .agreement import (hamming_distance, bna, next_neighbours, 
                         edit_distance,
                         normalised_hamming_distance, normalised_edit_distance)
-from .polarisation import (difference_matrix, spread)
+from .polarisation import (difference_matrix, spread, lauka)
 
 __all__ = [
             'doj',
+            # agreement
             'hamming_distance', 
             'bna', 'next_neighbours', 'edit_distance',
-            'difference_matrix', 'spread',
-            'normalised_edit_distance', 'normalised_hamming_distance'
+            'normalised_edit_distance', 'normalised_hamming_distance',
+            # polarisation
+            'difference_matrix', 'spread', 'lauka'
           ]

@@ -76,7 +76,16 @@ class Base():
         Returns a list with tuples containing the premises used in the Debate's Arguments.
         """
         return [p.args[0].args for p in self.args]
+
+    def list_of_positions(self, coherent=True, complete=True):
+        """
+        Return the list of valid positions of a taupy object. 
         
+        Todo: Currently outputs coherent and complete co&co positions only
+              but should be extended later to output other configurations 
+              as well.
+        """
+        return [p for p in satisfiability(self, all_models=True)]
 
 class Argument(Implies, Base):
     """

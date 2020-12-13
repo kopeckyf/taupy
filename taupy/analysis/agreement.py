@@ -14,6 +14,12 @@ def hamming_distance(pos1, pos2):
     
     return len([k for k in pos1 if pos1[k] != pos2[k]])
 
+def normalised_hamming_distance(pos1, pos2):
+    """
+    The Hamming distanced, normalised by the positions' domain.
+    """
+    return Fraction(len([k for k in pos1 if pos1[k] != pos2[k]]), len(pos1))
+
 def edit_distance(pos1, pos2):
     """
     A generalised distance measure that does not require the positions to be
@@ -37,20 +43,21 @@ def edit_distance(pos1, pos2):
     In the following measure, these operations are all weighted with factor 1. 
     There are different interpretations whether, e.g., substition would be weighted
     at 0.5 and the other two at 1.
-    """
-    
-    #_delta = 0
-    #for v in pos1.keys() | pos2.keys():
-        #if v in pos1 and v in pos2 and pos1[v] == pos2[v]:
-            #pass
-        #else:
-            #_delta += 1
-    #return _delta    
+    """   
 
     return len([v for v in pos1.keys() | pos2.keys() if not (
         v in pos1 and 
         v in pos2 and 
         pos1[v] == pos2[v])])
+
+def normalised_edit_distance(pos1, pos2):
+    """
+    The edit distance, normalised by the power of the union of the two positions' domains.
+    """   
+    return Fraction(len([v for v in pos1.keys() | pos2.keys() if not (
+    v in pos1 and 
+    v in pos2 and 
+    pos1[v] == pos2[v])]), len(set(pos1.keys()).union(set(pos2.keys()))))
 
 def kemeny_oppenheim(pos1, pos2):
     pass

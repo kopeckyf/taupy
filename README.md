@@ -124,12 +124,13 @@ taupy
      - Position
  - analysis
    - agreement
-   - mutual coherence
+     - mutual coherence
+     - edit distance, Hamming distance
    - doj
    - inferential density
+   - polarisation
  - simulation
    - agreement
-   - polarisation
    - argument introduction methods
    - belief updating rules
  - graphs

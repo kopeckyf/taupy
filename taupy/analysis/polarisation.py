@@ -36,6 +36,6 @@ def lauka(positions):
                 x += 1
             if p[i] == False:
                 y += 1
-        l.append(Fraction(x, x+y) * Fraction(y, x+y))
+        l.append(Fraction(x, _n) * Fraction(y, _n))
     
     return Fraction(sum(l), Fraction(_n-1, _n))

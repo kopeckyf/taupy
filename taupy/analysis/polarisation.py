@@ -16,6 +16,15 @@ def spread(positions, measure):
     """
     return np.amax(difference_matrix(positions, measure))
 
+def dispersion_mean_pairwise(positions, measure):
+    """
+    This measure is the TDS equivalent of statistical dispersion or variance in polling data. There are many different ways to measure mean dispersion.
+
+    For this purpose, we use the upper triangle of the difference matrix, without the diagonal zeroes (this offset is controlled by k=1). Since d(a,b) = d(b,a), these are the pairwise difference values we are after. We then take the mean of these values with np.mean().
+    """
+    return difference_matrix(positions, measure)[np.triu_indices(
+        len(positions), k=1)].mean()
+
 def lauka(positions):
     """
     Lauka's et al. (2018) mass political polarisation measure, adapted to TDS.

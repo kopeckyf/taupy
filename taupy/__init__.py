@@ -12,7 +12,8 @@ from .basic import (satisfiability_count, satisfiability, dict_to_prop,
                     free_premises)
 
 from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, next_neighbours, 
-                       edit_distance, normalised_edit_distance, difference_matrix, spread, lauka)
+                       edit_distance, normalised_edit_distance, difference_matrix, spread, lauka,
+                       dispersion_mean_pairwise)
 
 from .simulation import Simulation
 from .simulation import (introduce, response)
@@ -25,7 +26,7 @@ __all__ = [
             # .analysis tools
             'doj', 'hamming_distance', 'normalised_hamming_distance', 
             'bna', 'next_neighbours', 'edit_distance', 'normalised_edit_distance',
-            'difference_matrix', 'spread', 'lauka',
+            'difference_matrix', 'spread', 'lauka', 'dispersion_mean_pairwise',
             # .simulation
             'Simulation',
             # Common utilities

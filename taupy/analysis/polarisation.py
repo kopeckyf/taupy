@@ -55,14 +55,34 @@ def generate_groups(positions, algorithm=greedy_modularity_communities):
     return algorithm(nx.from_dict_of_lists(positions))
 
 def group_divergence(debate, measure, group_algorithm=greedy_modularity_communities):
-    _graph, _tvmap = debate.sccp(return_attributions=True)    
-    groups = generate_groups(_graph, algorithm=group_algorithm)
-    population = set().union(*groups)
-    l = []
-    for g in groups:
-        subpopulation = set(g)
-        for member in g:
-            neighbours = [measure(_tvmap[member], _tvmap[i]) for i in set(subpopulation - {member})]
-            strangers = [measure(_tvmap[member], _tvmap[j]) for j in set(population - subpopulation)]
-            l.append(abs(sum(neighbours)/len(neighbours) - sum(strangers)/len(strangers)))
-    return sum(l) / len(_graph)
+    """
+    A variant of Bramson et al.'s group divergence, adapted to TDS. 
+    This can be regarded as an aggregated measure of the mean dispersion measure,
+    but this one accounts for groups. 
+    """
+    _graph, _tvmap = debate.sccp(return_attributions=True)
+    # Groups often don't exist in debates with less than 3 positions. 
+    # So let's check that first.   
+    if len(_graph) > 2:
+        groups = generate_groups(_graph, algorithm=group_algorithm)
+        population = set().union(*groups)
+        l = []
+        for g in groups:
+            subpopulation = set(g)
+            for member in g:
+                neighbours = [measure(_tvmap[member], _tvmap[i]) for i in set(subpopulation - {member})]
+                strangers = [measure(_tvmap[member], _tvmap[j]) for j in set(population - subpopulation)]
+                if neighbours and strangers:
+                    # Control if the positions has neighbours and strangers
+                    l.append(abs(sum(neighbours)/len(neighbours) - sum(strangers)/len(strangers)))
+                else:
+                    # If not, protect against n/0 by running through all the other possibilities.
+                    if strangers:
+                        l.append(sum(strangers)/len(strangers))
+                    if neighbours:
+                        l.append(sum(neighbours)/len(neighbours))
+                    if not strangers and not neighbours:
+                        l.append(0)
+        return sum(l) / len(_graph)
+    else:
+        return 0

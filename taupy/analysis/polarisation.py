@@ -36,7 +36,7 @@ def lauka(positions):
     Lauka, Alban, Jennifer McCoy & Rengin B. Firat. 2018. Mass partisan polarization: Measuring a relational concept. American Behavioral Scientist 62(1). 107–126. DOI: 10.1177/0002764218759581
     """
     _n = len(positions)
-    _issues = {i.keys() for i in positions}
+    _issues = {j for i in positions for j in i.keys()}
     l = []
 
     for i in _issues:

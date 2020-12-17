@@ -9,7 +9,7 @@ from taupy.analysis.agreement import edit_distance
 
 class Base():
     
-    def sccp(self):
+    def sccp(self, return_attributions=False):
         """
         Returns a dictionary of lists (position: [neighbour1, neighbour2, ...])
         that resembles the space of coherent and complete positions. This 
@@ -17,6 +17,12 @@ class Base():
         
         Iteration is done over the possible neighbours of a position rather than
         with all other positions, b/c the searches' complexity will be lower.
+
+        If return_attributions is set to True, this function returns a tuple. The
+        first object then is the graph representation in a dict of lists format, the
+        second object is a mapping from the string representation of a position
+        to its dictionary format. This is useful because non-hashable objects like 
+        dictionaries can not be used as identifiers of nodes in graphs.
         """
         _d = {}
         _pos = [p for p in satisfiability(self, all_models=True)]
@@ -25,7 +31,10 @@ class Base():
         for _b in _bits:
             _neighbourlist = [iter_to_string(x) for x in neighbours_of_list(_b) if x in _bits]
             _d[iter_to_string(_b)] = _neighbourlist
-        return _d
+        if return_attributions:
+            return _d, dict(zip(list(iter_to_string(_b) for _b in _bits), _pos)) 
+        else:
+            return _d
     
     def weighted_sccp(self, distance_measure=edit_distance):
         """

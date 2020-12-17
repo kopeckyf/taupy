@@ -38,7 +38,3 @@ def graph_from_sccp(debate):
     g.add_edge_list(_edgelist, hashed=True, string_vals=True)
     remove_parallel_edges(g)
     return g
-    
-#def graph_from_sccp(debate):
-    #g = nx.from_dict_of_lists(debate.sccp())
-    #return g

@@ -13,12 +13,13 @@ from .basic import (satisfiability_count, satisfiability, dict_to_prop,
 
 from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, next_neighbours, 
                        edit_distance, normalised_edit_distance, difference_matrix, spread, lauka,
-                       dispersion_mean_pairwise)
+                       dispersion_mean_pairwise, group_divergence)
 
 from .simulation import Simulation
 from .simulation import (introduce, response)
 
-#from .graphs import graph_from_sccp, plot_map
+from .graphs import graph_from_sccp, graph_from_weighted_sccp
+                    # plot_map
 
 __all__ = [
             # .basics
@@ -27,6 +28,7 @@ __all__ = [
             'doj', 'hamming_distance', 'normalised_hamming_distance', 
             'bna', 'next_neighbours', 'edit_distance', 'normalised_edit_distance',
             'difference_matrix', 'spread', 'lauka', 'dispersion_mean_pairwise',
+            'group_divergence',
             # .simulation
             'Simulation',
             # Common utilities
@@ -35,5 +37,6 @@ __all__ = [
             # Update mechanisms
             'introduce', 'response',
             # Applications of graph theory
-            #'graph_from_sccp', 'plot_map'
+            'graph_from_sccp', 'graph_from_weighted_sccp'
+            # 'plot_map'
           ]

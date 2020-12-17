@@ -1,3 +1,5 @@
+import networkx as nx
+from networkx.algorithms.community import greedy_modularity_communities
 import numpy as np
 from fractions import Fraction
 
@@ -48,3 +50,19 @@ def lauka(positions):
         l.append(Fraction(x, _n) * Fraction(y, _n))
     
     return Fraction(sum(l), Fraction(_n-1, _n))
+
+def generate_groups(positions, algorithm=greedy_modularity_communities):
+    return algorithm(nx.from_dict_of_lists(positions))
+
+def group_divergence(debate, measure, group_algorithm=greedy_modularity_communities):
+    _graph, _tvmap = debate.sccp(return_attributions=True)    
+    groups = generate_groups(_graph, algorithm=group_algorithm)
+    population = set().union(*groups)
+    l = []
+    for g in groups:
+        subpopulation = set(g)
+        for member in g:
+            neighbours = [measure(_tvmap[member], _tvmap[i]) for i in set(subpopulation - {member})]
+            strangers = [measure(_tvmap[member], _tvmap[j]) for j in set(population - subpopulation)]
+            l.append(abs(sum(neighbours)/len(neighbours) - sum(strangers)/len(strangers)))
+    return sum(l) / len(_graph)

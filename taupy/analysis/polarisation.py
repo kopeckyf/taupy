@@ -47,9 +47,9 @@ def lauka(positions):
                 x += 1
             if p[i] == False:
                 y += 1
-        l.append(Fraction(x, _n) * Fraction(y, _n))
+        l.append((x/_n) * (y/_n))
     
-    return Fraction(sum(l), Fraction(_n-1, _n))
+    return sum(l)/(_n-1/_n)
 
 def generate_groups(positions, algorithm=greedy_modularity_communities):
     return algorithm(nx.from_dict_of_lists(positions))

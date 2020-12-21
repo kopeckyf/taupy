@@ -15,8 +15,7 @@ from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, 
                        edit_distance, normalised_edit_distance, difference_matrix, spread, lauka,
                        dispersion_mean_pairwise, group_divergence)
 
-from .simulation import Simulation
-from .simulation import (introduce, response)
+from .simulation import (Simulation, experiment, introduce, response)
 
 from .graphs import graph_from_sccp, graph_from_weighted_sccp
                     # plot_map
@@ -30,12 +29,12 @@ __all__ = [
             'difference_matrix', 'spread', 'lauka', 'dispersion_mean_pairwise',
             'group_divergence',
             # .simulation
-            'Simulation',
+            'Simulation', 'experiment',
+            # Update mechanisms
+            'introduce', 'response',
             # Common utilities
             'satisfiability_count', 'satisfiability', 'dict_to_prop',
             'free_premises',
-            # Update mechanisms
-            'introduce', 'response',
             # Applications of graph theory
             'graph_from_sccp', 'graph_from_weighted_sccp'
             # 'plot_map'

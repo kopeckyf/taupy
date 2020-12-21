@@ -5,9 +5,11 @@ Basic tools in simulations
 from sympy import symbols, Not
 from itertools import combinations, chain
 from random import choice, sample
+from concurrent.futures import (ProcessPoolExecutor, as_completed)
 
 from taupy.basic.utilities import satisfiability, satisfiability_count
 from .update import (introduce, response)
+import taupy.simulation.strategies as strategies
 
 class Simulation(list):
     
@@ -16,7 +18,7 @@ class Simulation(list):
                  sentencepool="p:10", 
                  argumentlength=2, 
                  positions=[],
-                 default_introduction_strategy = "random", 
+                 default_introduction_strategy = strategies.random, 
                  default_update_strategy = "closest_coherent"):
         
         if sentencepool == "auto": # import from input debate
@@ -78,7 +80,7 @@ class Simulation(list):
 
         self.positions.append(positions)
                 
-    def run(self, max_density=1, max_steps=1000, min_sccp=1):
+    def run(self, max_density=1, max_steps=1000, min_sccp=1, quiet=True):
         """
         Run a Simulation using introduction_method and update_mechanism until
         either max_density is reached or max_steps have been taken.
@@ -114,4 +116,19 @@ class Simulation(list):
             if self[-1].density() >= max_density or i >= max_steps or satisfiability_count(self[-1]) <= min_sccp:
                 break
         self.log.append("Simulation ended. %d steps were taken. Density at end: %f. Extension of SCCP: %d." % (i, self[-1].density(),  satisfiability_count(self[-1])))
-        print("Simulation ended. %d steps were taken. Density at end: %f. Extension of SCCP: %d." % (i, self[-1].density(),  satisfiability_count(self[-1])))
+        
+        if quiet:
+            return self.log[-1]
+        else:
+            return self
+
+def experiment(n, simulations={}, runs={}):
+    simulations = [Simulation(**simulations) for _ in range(n)]
+
+    with ProcessPoolExecutor() as executor:
+        results = [executor.submit(i.run, quiet=False, **runs) for i in simulations]
+
+        for count, future in enumerate(as_completed(results), start=1):
+            print(f"Simulation {count}/{n} completed.")
+    
+    return [i.result() for i in results]

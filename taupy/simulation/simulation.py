@@ -122,10 +122,17 @@ class Simulation(list):
         else:
             return self
 
-def experiment(n, simulations={}, runs={}):
+def experiment(n, executor={}, simulations={}, runs={}):
+    """
+    Generate and execute n number of Simulations and output their results. 
+    The Simulations can be controlled via the options in the simulations dict.
+    The Simulation.run()s can be controlled via the dict runs.
+
+    Settings to the ProcessPoolExecutor can be forwarded with the executor dict.
+    """
     simulations = [Simulation(**simulations) for _ in range(n)]
 
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(**executor) as executor:
         results = [executor.submit(i.run, quiet=False, **runs) for i in simulations]
 
         for count, future in enumerate(as_completed(results), start=1):

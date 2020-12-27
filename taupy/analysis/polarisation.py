@@ -49,7 +49,7 @@ def lauka(positions):
                 y += 1
         l.append((x/_n) * (y/_n))
     
-    return sum(l)/(_n-1/_n)
+    return sum(l)/_n
 
 def generate_groups(positions, algorithm=greedy_modularity_communities):
     return algorithm(nx.from_dict_of_lists(positions))

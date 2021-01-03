@@ -2,6 +2,7 @@ import networkx as nx
 from networkx.algorithms.community import greedy_modularity_communities
 import numpy as np
 from fractions import Fraction
+from math import sqrt
 
 def difference_matrix(positions, measure):
     """
@@ -18,14 +19,14 @@ def spread(positions, measure):
     """
     return np.amax(difference_matrix(positions, measure))
 
-def dispersion_mean_pairwise(positions, measure):
+def pairwise_dispersion(positions, measure):
     """
     This measure is the TDS equivalent of statistical dispersion or variance in polling data. There are many different ways to measure mean dispersion.
 
     For this purpose, we use the upper triangle of the difference matrix, without the diagonal zeroes (this offset is controlled by k=1). Since d(a,b) = d(b,a), these are the pairwise difference values we are after. We then take the mean of these values with np.mean().
     """
-    return difference_matrix(positions, measure)[np.triu_indices(
-        len(positions), k=1)].mean()
+    return sqrt(difference_matrix(positions, measure)[np.triu_indices(
+        len(positions), k=1)].var())
 
 def lauka(positions):
     """
@@ -35,11 +36,12 @@ def lauka(positions):
     References:
     Lauka, Alban, Jennifer McCoy & Rengin B. Firat. 2018. Mass partisan polarization: Measuring a relational concept. American Behavioral Scientist 62(1). 107–126. DOI: 10.1177/0002764218759581
     """
-    _n = len(positions)
-    _issues = {j for i in positions for j in i.keys()}
+    issues = {j for i in positions for j in i.keys()}
+    num_positions = len(positions)
+    num_issues = len(issues)
     l = []
 
-    for i in _issues:
+    for i in issues:
         x = 0
         y = 0
         for p in positions:
@@ -47,9 +49,9 @@ def lauka(positions):
                 x += 1
             if p[i] == False:
                 y += 1
-        l.append((x/_n) * (y/_n))
+        l.append((x / num_positions) * (y / num_positions))
     
-    return sum(l)/_n
+    return sum(l) / ((num_issues-1) / num_issues)
 
 def generate_groups(positions, algorithm=greedy_modularity_communities):
     return algorithm(nx.from_dict_of_lists(positions))

@@ -7,11 +7,11 @@ def dict_to_prop(dictionary):
     Helper function that converts a dictionary to a propositional formula, 
     acknowledging dictionary's truth-value attributions.
     """
-    _l = []
+    l = []
     for (k, v) in dictionary.items():
-        if v: _l.append(k)
-        if not v: _l.append(Not(k))
-    return And(*_l)
+        if v: l.append(k)
+        if not v: l.append(Not(k))
+    return And(*l)
 
 def free_premises(debate):
     """
@@ -44,37 +44,37 @@ def neighbours_of_list(l):
     Find the neighbours of a position in list format. A neighbour is a position
     that has HD = 1 to the position in question.
     """
-    _complements = [1,0] # _complement[0] == 1 and _complement[1] == 0
+    complements = [1,0] # complements[0] == 1 and complements[1] == 0
     for i in range(len(l)):
-        yield (l[:i] + [_complements[l[i]]] + l[i+1:])
+        yield (l[:i] + [complements[l[i]]] + l[i+1:])
         
-def satisfiability_count(_formula):
+def satisfiability_count(formula):
     """
     Count the models that satisfy a Boolean formula, using Binary decision diagrams. 
     """
-    _variables = iter_to_list_of_strings(_formula.atoms())
-    _diagram = BDD()
-    _diagram.declare(*_variables)
-    _expression = _diagram.add_expr(str(to_cnf(_formula)))
-    return _diagram.count(_expression, nvars=len(_formula.atoms()))
+    variables = iter_to_list_of_strings(formula.atoms())
+    diagram = BDD()
+    diagram.declare(*variables)
+    expression = diagram.add_expr(str(to_cnf(formula)))
+    return diagram.count(expression, nvars=len(formula.atoms()))
 
-def satisfiability(_formula, all_models = False):
+def satisfiability(formula, all_models = False):
     """
     Return a generator of models for the given Boolean formula, using BDDs
     """
-    _variables = iter_to_list_of_strings(_formula.atoms())
-    _diagram = BDD()
-    _diagram.declare(*_variables)
+    variables = iter_to_list_of_strings(formula.atoms())
+    diagram = BDD()
+    diagram.declare(*variables)
     
     if all_models:
-        _expression = _diagram.add_expr(str(to_cnf(_formula)))
+        expression = diagram.add_expr(str(to_cnf(formula)))
         return [{symbols(k): v for (k, v) in m.items()} for m in \
-            _diagram.pick_iter(_expression, care_vars={str(i) for i in \
-                _formula.atoms()})]
+            diagram.pick_iter(expression, care_vars={str(i) for i in \
+                formula.atoms()})]
     else:
         try:
-            _expression = _diagram.add_expr(str(to_cnf(_formula)))
-            next(_diagram.pick_iter(_expression))
+            expression = diagram.add_expr(str(to_cnf(formula)))
+            next(diagram.pick_iter(expression))
             return True
         except StopIteration:
             return False

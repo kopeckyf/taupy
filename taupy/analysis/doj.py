@@ -16,7 +16,7 @@ def doj(pos, debate=None, conditional=None):
         debate = pos.debate
     
     if conditional is not None:
-        if pos.debate is not conditional.debate:
+        if pos.debate != conditional.debate:
             raise ValueError("Positions do not belong to same debate")
         # Adding the condition to the inspected debate.
         debate = And(dict_to_prop(conditional), debate)

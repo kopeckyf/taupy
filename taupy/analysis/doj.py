@@ -21,6 +21,6 @@ def doj(pos, debate=None, conditional=None):
         # Adding the condition to the inspected debate.
         debate = And(dict_to_prop(conditional), debate)
     
-    _n = satisfiability_count (And(dict_to_prop(pos), debate))
-    _m = satisfiability_count (debate)
-    return Fraction(_n, _m)
+    n = satisfiability_count (And(dict_to_prop(pos), debate))
+    m = satisfiability_count (debate)
+    return Fraction(n, m)

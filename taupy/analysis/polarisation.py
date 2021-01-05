@@ -51,7 +51,7 @@ def lauka(positions):
                 y += 1
         l.append((x / num_positions) * (y / num_positions))
     
-    return sum(l) / num_issues
+    return sum(l) / num_issues * 0.25
 
 def generate_groups(positions, algorithm=greedy_modularity_communities):
     return algorithm(nx.from_dict_of_lists(positions))
@@ -100,4 +100,3 @@ def group_consensus(debate, measure, group_algorithm=greedy_modularity_communiti
         return 1 - sum(l)/len(l)
     except ZeroDivisionError:
         return 0
-        

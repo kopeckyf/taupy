@@ -13,7 +13,7 @@ from .basic import (satisfiability_count, satisfiability, dict_to_prop,
 
 from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, next_neighbours, 
                        edit_distance, normalised_edit_distance, difference_matrix, spread, lauka,
-                       pairwise_dispersion, group_divergence)
+                       pairwise_dispersion, group_divergence, group_consensus)
 
 from .simulation import (Simulation, experiment, introduce, response)
 
@@ -27,7 +27,7 @@ __all__ = [
             'doj', 'hamming_distance', 'normalised_hamming_distance', 
             'bna', 'next_neighbours', 'edit_distance', 'normalised_edit_distance',
             'difference_matrix', 'spread', 'lauka', 'pairwise_dispersion',
-            'group_divergence',
+            'group_divergence', 'group_consensus',
             # .simulation
             'Simulation', 'experiment',
             # Update mechanisms

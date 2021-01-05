@@ -51,7 +51,7 @@ def lauka(positions):
                 y += 1
         l.append((x / num_positions) * (y / num_positions))
     
-    return sum(l) / ((num_issues-1) / num_issues)
+    return sum(l) / num_issues
 
 def generate_groups(positions, algorithm=greedy_modularity_communities):
     return algorithm(nx.from_dict_of_lists(positions))
@@ -62,18 +62,18 @@ def group_divergence(debate, measure, group_algorithm=greedy_modularity_communit
     This can be regarded as an aggregated measure of the mean dispersion measure,
     but this one accounts for groups. 
     """
-    _graph, _tvmap = debate.sccp(return_attributions=True)
-    # Groups often don't exist in debates with less than 3 positions. 
-    # So let's check that first.   
-    if len(_graph) > 2:
-        groups = generate_groups(_graph, algorithm=group_algorithm)
+    graph, tvmap = debate.sccp(return_attributions=True)
+    # Protect against x/0. 
+    # Unfortunately in Python, 0/0 != 0, which would be convenient here.  
+    try:
+        groups = generate_groups(graph, algorithm=group_algorithm)
         population = set().union(*groups)
         l = []
         for g in groups:
             subpopulation = set(g)
             for member in g:
-                neighbours = [measure(_tvmap[member], _tvmap[i]) for i in set(subpopulation - {member})]
-                strangers = [measure(_tvmap[member], _tvmap[j]) for j in set(population - subpopulation)]
+                neighbours = [measure(tvmap[member], tvmap[i]) for i in set(subpopulation - {member})]
+                strangers = [measure(tvmap[member], tvmap[j]) for j in set(population - subpopulation)]
                 if neighbours and strangers:
                     # Control if the positions has neighbours and strangers
                     l.append(abs(sum(neighbours)/len(neighbours) - sum(strangers)/len(strangers)))
@@ -85,6 +85,19 @@ def group_divergence(debate, measure, group_algorithm=greedy_modularity_communit
                         l.append(sum(neighbours)/len(neighbours))
                     if not strangers and not neighbours:
                         l.append(0)
-        return sum(l) / len(_graph)
-    else:
+        return sum(l) / len(graph)
+    except ZeroDivisionError:
         return 0
+
+def group_consensus(debate, measure, group_algorithm=greedy_modularity_communities):
+    """
+    A variant of Bramson et al.'s measure of group consensus, adapted to TDS.
+    """
+    graph, tvmap = debate.sccp(return_attributions=True)
+    try:
+        groups = generate_groups(graph, algorithm=group_algorithm)
+        l = [pairwise_dispersion([tvmap[member] for member in g], measure) for g in groups]
+        return 1 - sum(l)/len(l)
+    except ZeroDivisionError:
+        return 0
+        

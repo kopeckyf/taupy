@@ -96,7 +96,8 @@ def group_consensus(debate, measure, group_algorithm=greedy_modularity_communiti
     graph, tvmap = debate.sccp(return_attributions=True)
     try:
         groups = generate_groups(graph, algorithm=group_algorithm)
-        l = [pairwise_dispersion([tvmap[member] for member in g], measure) for g in groups]
-        return 1 - sum(l)/len(l)
+        l = [difference_matrix([tvmap[member] for member in g], measure)[np.triu_indices(
+        len(g), k=1)].mean() for g in groups]
+        return 1 - sum(l) / len(l)
     except ZeroDivisionError:
         return 0

@@ -40,7 +40,6 @@ def lauka(positions):
     num_positions = len(positions)
     num_issues = len(issues)
     l = []
-
     for i in issues:
         x = 0
         y = 0
@@ -51,7 +50,7 @@ def lauka(positions):
                 y += 1
         l.append((x / num_positions) * (y / num_positions))
     
-    return sum(l) / num_issues * 0.25
+    return (sum(l) / num_issues) / 0.25
 
 def generate_groups(positions, algorithm=greedy_modularity_communities):
     return algorithm(nx.from_dict_of_lists(positions))

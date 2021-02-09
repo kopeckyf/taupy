@@ -1,6 +1,7 @@
 from dd.autoref import BDD
 from sympy.logic import to_cnf, And, Implies, Not
 from sympy import symbols
+import numpy as np
 
 def dict_to_prop(dictionary):
     """
@@ -78,3 +79,37 @@ def satisfiability(formula, all_models = False):
             return True
         except StopIteration:
             return False
+
+def graph_from_positions(positions, return_attributions=False):
+    """
+    Returns a dictionary of lists (position: [neighbour1, neighbour2, ...])
+    that resembles the space of the positions.
+    
+    If return_attributions is set to True, this function returns a tuple. The
+    first object then is the graph representation in a dict of lists format, the
+    second object is a mapping from the string representation of a position
+    to its dictionary format. This is useful because non-hashable objects like 
+    dictionaries can not be used as identifiers of nodes in graphs.
+    """
+    d = {}
+    props = sorted(positions[0].keys(), key=lambda x: x.sort_key())
+    bits = [list (1 if p[i] else 0 for i in props) for p in positions]
+    for b in bits:
+        neighbourlist = [iter_to_string(x) for x in neighbours_of_list(b) if x in bits]
+        d[iter_to_string(b)] = neighbourlist
+    if return_attributions:
+        return d, dict(zip(list(iter_to_string(b) for b in bits), positions)) 
+    else:
+        return d
+
+def rand_index(partition1, partition2):
+    """
+    Calculate Rand's index, a measure of similarity for two data clusterings
+    """
+    pass
+
+def ari(partition1, partition2):
+    """
+    Calculate the Adjusted Rand Index.
+    """
+    pass

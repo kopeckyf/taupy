@@ -3,6 +3,7 @@ from networkx.algorithms.community import greedy_modularity_communities
 import numpy as np
 from fractions import Fraction
 from math import sqrt
+from taupy.basic.utilities import neighbours_of_list, iter_to_string, graph_from_positions
 
 def difference_matrix(positions, measure):
     """
@@ -55,13 +56,16 @@ def lauka(positions):
 def generate_groups(positions, algorithm=greedy_modularity_communities):
     return algorithm(nx.from_dict_of_lists(positions))
 
-def group_divergence(debate, measure, group_algorithm=greedy_modularity_communities):
+def number_of_groups(debate, group_algorithm=greedy_modularity_communities):
+    return len(generate_groups(debate.sccp, algorithm=group_algorithm))
+
+def group_divergence(positions, measure, group_algorithm=greedy_modularity_communities):
     """
     A variant of Bramson et al.'s group divergence, adapted to TDS. 
     This can be regarded as an aggregated measure of the mean dispersion measure,
     but this one accounts for groups. 
     """
-    graph, tvmap = debate.sccp(return_attributions=True)
+    graph, tvmap = graph_from_positions(positions, return_attributions=True)
     # Protect against x/0. 
     # Unfortunately in Python, 0/0 != 0, which would be convenient here.  
     try:

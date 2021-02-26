@@ -59,7 +59,7 @@ def generate_groups(positions, algorithm=greedy_modularity_communities):
 def number_of_groups(debate, group_algorithm=greedy_modularity_communities):
     return len(generate_groups(debate.sccp, algorithm=group_algorithm))
 
-def group_divergence(clusters, adjacency_matrix, measure=normalised_hamming_distance):
+def group_divergence(clusters, adjacency_matrix):
     """
     A variant of Bramson et al.'s group divergence, adapted to TDS. 
     This can be regarded as an aggregated measure of the mean dispersion measure,
@@ -70,21 +70,24 @@ def group_divergence(clusters, adjacency_matrix, measure=normalised_hamming_dist
         # With numpy.ix_, we can create a c*x adjacency sub-matrix that
         # has only the relations as indexed by the current cluster.
         neighbours = adjacency_matrix[np.ix_(c, c)]
+        # For the mean, we take out the diagonal.
+        mean_of_neighbours = neighbours[~np.eye(len(neighbours, dtype=bool))].mean()
         # We use np.setdiff1d to do the same for the (n-c)*(n-c) sub-matrix
         # of strangers. We can use len() here b/c the adjacency matrix is 
         # always quadratic.
         s = np.setdiff1d(c, np.array(len(adjacency_matrix)))
         strangers = adjacency_matrix[np.ix_(s, s)]
+        mean_of_strangers = strangers.mean()
 
         if len(neighbours) > 1 and len(strangers) > 0:
             # Every cluster has at least one member -- or it wouldn't be a cluster, hence 
             # the check for len(neighbours) > 1.
-            l.append(abs(neighbours.sum() / (len(neighbours) - 1) ** 2 - strangers.sum() / (len(strangers) - 1) ** 2))
+            l.append(abs(mean_of_neighbours - mean_of_strangers))
         else:
             if(len(neighbours) > 1):
-                l.append(neighbours.sum() / (len(neighbours) - 1) ** 2)
+                l.append(mean_of_neighbours)
             if(len(strangers) > 0):
-                l.append(strangers.sum() / (len(strangers) - 1) ** 2)
+                l.append(mean_of_strangers)
             if(len(neighbours) == 1 and len(strangers) == 0):
                 l.append(0)
         

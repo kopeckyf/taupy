@@ -59,37 +59,40 @@ def generate_groups(positions, algorithm=greedy_modularity_communities):
 def number_of_groups(debate, group_algorithm=greedy_modularity_communities):
     return len(generate_groups(debate.sccp, algorithm=group_algorithm))
 
-def group_divergence(positions, measure, group_algorithm=greedy_modularity_communities):
+def group_divergence(clusters, adjacency_matrix, measure=normalised_hamming_distance):
     """
     A variant of Bramson et al.'s group divergence, adapted to TDS. 
     This can be regarded as an aggregated measure of the mean dispersion measure,
     but this one accounts for groups. 
     """
-    graph, tvmap = graph_from_positions(positions, return_attributions=True)
-    # Protect against x/0. 
-    # Unfortunately in Python, 0/0 != 0, which would be convenient here.  
-    try:
-        groups = generate_groups(graph, algorithm=group_algorithm)
-        population = set().union(*groups)
-        l = []
-        for g in groups:
-            subpopulation = set(g)
-            for member in g:
-                neighbours = [measure(tvmap[member], tvmap[i]) for i in set(subpopulation - {member})]
-                strangers = [measure(tvmap[member], tvmap[j]) for j in set(population - subpopulation)]
-                if neighbours and strangers:
-                    # Control if the positions has neighbours and strangers
-                    l.append(abs(sum(neighbours)/len(neighbours) - sum(strangers)/len(strangers)))
-                else:
-                    # If not, protect against n/0 by running through all the other possibilities.
-                    if strangers:
-                        l.append(sum(strangers)/len(strangers))
-                    if neighbours:
-                        l.append(sum(neighbours)/len(neighbours))
-                    if not strangers and not neighbours:
-                        l.append(0)
-        return sum(l) / len(graph)
-    except ZeroDivisionError:
+    l = []
+    for c in clusters:
+        # With numpy.ix_, we can create a c*x adjacency sub-matrix that
+        # has only the relations as indexed by the current cluster.
+        neighbours = adjacency_matrix[np.ix_(c, c)]
+        # We use np.setdiff1d to do the same for the (n-c)*(n-c) sub-matrix
+        # of strangers. We can use len() here b/c the adjacency matrix is 
+        # always quadratic.
+        s = np.setdiff1d(c, np.array(len(adjacency_matrix)))
+        strangers = adjacency_matrix[np.ix_(s, s)]
+
+        if len(neighbours) > 1 and len(strangers) > 0:
+            # Every cluster has at least one member -- or it wouldn't be a cluster, hence 
+            # the check for len(neighbours) > 1.
+            l.append(abs(neighbours.sum() / (len(neighbours) - 1) ** 2 - strangers.sum() / (len(strangers) - 1) ** 2))
+        else:
+            if(len(neighbours) > 1):
+                l.append(neighbours.sum() / (len(neighbours) - 1) ** 2)
+            if(len(strangers) > 0):
+                l.append(strangers.sum() / (len(strangers) - 1) ** 2)
+            if(len(neighbours) == 1 and len(strangers) == 0):
+                l.append(0)
+        
+    if sum(l) > 0:
+        return sum(l)/len(l)
+    else:
+        # A zero result always means that no clusters were found or the population conists
+        # of just one member.
         return 0
 
 def group_consensus(debate, measure, group_algorithm=greedy_modularity_communities):

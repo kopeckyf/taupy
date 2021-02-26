@@ -9,7 +9,8 @@ from math import log2
 from .basic import Argument, Debate
 from .basic import (Position, position_compatibility)
 from .basic import (satisfiability_count, satisfiability, dict_to_prop, 
-                    free_premises, graph_from_positions)
+                    dict_to_binary,
+                    free_premises, graph_from_positions, ari)
 
 from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, next_neighbours, 
                        edit_distance, normalised_edit_distance, difference_matrix, spread, lauka,
@@ -34,7 +35,8 @@ __all__ = [
             'introduce', 'response',
             # Common utilities
             'satisfiability_count', 'satisfiability', 'dict_to_prop',
-            'free_premises', 'graph_from_positions',
+            'dict_to_binary',
+            'free_premises', 'graph_from_positions', 'ari',
             # Applications of graph theory
             'graph_from_sccp', 'graph_from_weighted_sccp'
             # 'plot_map'

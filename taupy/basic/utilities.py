@@ -14,6 +14,17 @@ def dict_to_prop(dictionary):
         if not v: l.append(Not(k))
     return And(*l)
 
+def dict_to_binary(dictionary):
+    """
+    A helper function that converts the dictionary representation of a position
+    to its presentation in a binary string.
+    """
+    l = []
+    for k in sorted(dictionary):
+        if dictionary[k]: l.append(1)
+        if not dictionary[k]: l.append(0)
+    return l
+
 def free_premises(debate):
     """
     Returns a list of premises that are "free" in the sense of [1: Def. 3].
@@ -112,4 +123,27 @@ def ari(partition1, partition2):
     """
     Calculate the Adjusted Rand Index.
     """
-    pass
+    # First, let's look at the number of elements
+    if sum(len(l) for l in partition1) != sum(len(l) for l in partition2):
+        raise ValueError("The two partitions have a different number of elements.")
+    else:
+        num_of_elements = sum(len(l) for l in partition1)
+
+    contingency = contingency_matrix(partition1, partition2)
+    sums_of_columns = contingency.sum(axis=0)
+    sums_of_rows = contingency.sum(axis=1)
+
+    columns = sum([n * (n-1)/2 for n in sums_of_columns])
+    rows = sum([n * (n-1)/2 for n in sums_of_rows])
+    elements = sum([n * (n-1)/2 for n in np.nditer(contingency)])
+    expected_value = columns * rows / (num_of_elements * (num_of_elements-1)/2)
+
+    return (elements - expected_value) / ((1/2 * (rows + columns)) - expected_value)
+
+def contingency_matrix(partition1, partition2):
+    """
+    A contingency matrix, a necessary indegredient for Rand's index and the ARI.
+    """
+    return np.array(
+        [[len(set(j) & set(k)) for j in partition1] for k in partition2]
+    )

@@ -97,11 +97,8 @@ def group_consensus(clusters, adjacency_matrix):
     """
     A variant of Bramson et al.'s measure of group consensus, adapted to TDS.
     """
-    try:
-        l = []
-        for c in clusters:
-            neighbours = adjacency_matrix[np.ix_(c, c)]
-            l.append(neighbours[~np.eye(len(neighbours, dtype=bool))].mean())
-        return 1 - sum(l)/len(l)
-    except ZeroDivisionError:
-        return 0
+    l = []
+    for c in clusters:
+        neighbours = adjacency_matrix[np.ix_(c, c)]
+        l.append(neighbours[~np.eye(len(neighbours, dtype=bool))].mean())
+    return 1 - sum(l)/len(l)

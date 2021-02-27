@@ -1,6 +1,6 @@
 import numpy as np
 from fractions import Fraction
-from math import sqrt
+from math import sqrt, log
 from taupy.basic.utilities import neighbours_of_list, iter_to_string, graph_from_positions
 
 def difference_matrix(positions, measure):
@@ -102,3 +102,14 @@ def group_consensus(clusters, adjacency_matrix):
         neighbours = adjacency_matrix[np.ix_(c, c)]
         l.append(neighbours[~np.eye(len(neighbours, dtype=bool))].mean())
     return 1 - sum(l)/len(l)
+
+def group_size_parity(clusters):
+    """
+    Bramson et al.'s measure of (group) size parity, adjusted to TDS.
+
+    WARNING: Need to contact the authors for what they mean by "population 
+             proportions". Maybe we need to use len(c)/G instead of len(c)
+             below!
+    """
+    G = number_of_groups(clusters)
+    return -1 / log(G) * sum([len(c) * log(len(c)) for c in clusters])

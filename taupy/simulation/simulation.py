@@ -8,6 +8,7 @@ from random import choice, sample
 from concurrent.futures import (ProcessPoolExecutor, as_completed)
 
 from taupy.basic.utilities import satisfiability, satisfiability_count
+from taupy import Debate
 from .update import (introduce, response)
 import taupy.simulation.strategies as strategies
 
@@ -15,14 +16,15 @@ class Simulation(list):
     
     def __init__(self,
                  directed=True, 
-                 sentencepool="p:10", 
+                 sentencepool="p:10",
+                 parent_debate=None, 
                  argumentlength=2, 
                  positions=[],
                  default_introduction_strategy = strategies.random, 
                  default_update_strategy = "closest_coherent"):
         
-        if sentencepool == "auto": # import from input debate
-            self.sentencepool = [i for i in self.atoms()]
+        if sentencepool == "inherit": # import from parent debate
+            self.sentencepool = [i for i in parent_debate.atoms()]
         else:
             self.sentencepool = [i for i in symbols(sentencepool)]
             
@@ -37,6 +39,9 @@ class Simulation(list):
         self.default_update_strategy = default_update_strategy
         self.log = []        
         list.__init__(self)
+        # Initialise the Simulation with an empty debate. This is 
+        # necessary so that the initial positions.
+        self.append(Debate()) if parent_debate == None else self.append(parent_debate)
         
     def init_premisepool(self, r):
         """

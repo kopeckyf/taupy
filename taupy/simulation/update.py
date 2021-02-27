@@ -102,7 +102,7 @@ def introduce(_sim, source=None, target=None, strategy=None):
             else:
                 selected_conclusion = choice(possible_conclusions)
 
-                if len(_sim) == 0 or satisfiability(And( _sim[-1], Argument(And(*selected_premises), selected_conclusion))):
+                if satisfiability(And( _sim[-1], Argument(And(*selected_premises), selected_conclusion))):
                     _sim.premisepool.remove(selected_premises)
                     _found_valid_argument = True
                     break
@@ -115,7 +115,7 @@ def introduce(_sim, source=None, target=None, strategy=None):
     if _found_valid_argument:
         _sim.log.append("Introduce argument with strategy '%s'. Premises: %s. Conclusion: %s. Source: %s. Target: %s." % (strategy["name"], And(*selected_premises), selected_conclusion, source_pos, target_pos))
         
-        if len(_sim) == 0:
+        if len(_sim) == 1:
             # Initialise the Simulation with _argument
             _sim.append(Debate(Argument(And(*selected_premises), selected_conclusion)))
         else:

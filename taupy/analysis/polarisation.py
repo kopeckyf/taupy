@@ -66,7 +66,7 @@ def group_divergence(clusters, adjacency_matrix):
         # has only the relations as indexed by the current cluster.
         neighbours = adjacency_matrix[np.ix_(c, c)]
         # For the mean, we take out the diagonal.
-        mean_of_neighbours = neighbours[~np.eye(len(neighbours, dtype=bool))].mean()
+        mean_of_neighbours = neighbours[~np.eye(len(neighbours), dtype=bool)].mean()
         # We use np.setdiff1d to do the same for the (n-c)*(n-c) sub-matrix
         # of strangers. We can use len() here b/c the adjacency matrix is 
         # always quadratic.
@@ -100,7 +100,7 @@ def group_consensus(clusters, adjacency_matrix):
     l = []
     for c in clusters:
         neighbours = adjacency_matrix[np.ix_(c, c)]
-        l.append(neighbours[~np.eye(len(neighbours, dtype=bool))].mean())
+        l.append(neighbours[~np.eye(len(neighbours), dtype=bool)].mean())
     return 1 - sum(l)/len(l)
 
 def group_size_parity(clusters):

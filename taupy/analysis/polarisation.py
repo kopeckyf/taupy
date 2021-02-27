@@ -1,5 +1,3 @@
-import networkx as nx
-from networkx.algorithms.community import greedy_modularity_communities
 import numpy as np
 from fractions import Fraction
 from math import sqrt
@@ -53,11 +51,8 @@ def lauka(positions):
     
     return (sum(l) / num_issues) / 0.25
 
-def generate_groups(positions, algorithm=greedy_modularity_communities):
-    return algorithm(nx.from_dict_of_lists(positions))
-
-def number_of_groups(debate, group_algorithm=greedy_modularity_communities):
-    return len(generate_groups(debate.sccp, algorithm=group_algorithm))
+def number_of_groups(clustering):
+    return np.shape(clustering)[0]
 
 def group_divergence(clusters, adjacency_matrix):
     """
@@ -98,15 +93,15 @@ def group_divergence(clusters, adjacency_matrix):
         # of just one member.
         return 0
 
-def group_consensus(debate, measure, group_algorithm=greedy_modularity_communities):
+def group_consensus(clusters, adjacency_matrix):
     """
     A variant of Bramson et al.'s measure of group consensus, adapted to TDS.
     """
-    graph, tvmap = debate.sccp(return_attributions=True)
     try:
-        groups = generate_groups(graph, algorithm=group_algorithm)
-        l = [difference_matrix([tvmap[member] for member in g], measure)[np.triu_indices(
-        len(g), k=1)].mean() for g in groups]
-        return 1 - sum(l) / len(l)
+        l = []
+        for c in clusters:
+            neighbours = adjacency_matrix[np.ix_(c, c)]
+            l.append(neighbours[~np.eye(len(neighbours, dtype=bool))].mean())
+        return 1 - sum(l)/len(l)
     except ZeroDivisionError:
         return 0

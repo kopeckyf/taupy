@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.ma as ma
 from fractions import Fraction
 from math import sqrt, log
 from taupy.basic.utilities import neighbours_of_list, iter_to_string, graph_from_positions
@@ -62,28 +63,32 @@ def group_divergence(clusters, adjacency_matrix):
     """
     l = []
     for c in clusters:
-        # With numpy.ix_, we can create a c*x adjacency sub-matrix that
-        # has only the relations as indexed by the current cluster.
-        neighbours = adjacency_matrix[np.ix_(c, c)]
-        # For the mean, we take out the diagonal.
-        mean_of_neighbours = neighbours[~np.eye(len(neighbours), dtype=bool)].mean()
-        # We use np.setdiff1d to do the same for the (n-c)*(n-c) sub-matrix
-        # of strangers. We can use len() here b/c the adjacency matrix is 
-        # always quadratic.
-        s = np.setdiff1d(c, np.array(len(adjacency_matrix)))
-        strangers = adjacency_matrix[np.ix_(s, s)]
-        mean_of_strangers = strangers.mean()
+        # Let's create a mask to detect the values of neighbours.
+        mask_of_neighbours = ma.ones(adjacency_matrix.shape)  
+        # The mask should include the cross product of neighbours.
+        mask_of_neighbours[np.ix_(c, c)] = 0
+        # But not the relations of one neighbour to itself. Those are
+        # stored on the diagonal, and so we take it out.
+        np.fill_diagonal(mask_of_neighbours, 1)
+        neighbours = ma.array(adjacency_matrix, mask=mask_of_neighbours, copy=True)
+        # Now do the inverse operation for strangers. Instead of a 
+        # matrix of Ones, we start with one of Zeros.
+        mask_of_strangers = ma.zeros(adjacency_matrix.shape)
+        # And this time, neighbours are masked instead of unmasked.
+        mask_of_strangers[np.ix_(c, c)] = 1
+        np.fill_diagonal(mask_of_strangers, 1)
+        strangers = ma.array(adjacency_matrix, mask=mask_of_strangers, copy=True)
 
-        if len(neighbours) > 1 and len(strangers) > 0:
+        if neighbours.count() > 1 and strangers.count() > 0:
             # Every cluster has at least one member -- or it wouldn't be a cluster, hence 
-            # the check for len(neighbours) > 1.
-            l.append(abs(mean_of_neighbours - mean_of_strangers))
+            # the check for neighbours.count() > 1.
+            l.append(abs(neighbours.mean() - strangers.mean()))
         else:
-            if(len(neighbours) > 1):
-                l.append(mean_of_neighbours)
-            if(len(strangers) > 0):
-                l.append(mean_of_strangers)
-            if(len(neighbours) == 1 and len(strangers) == 0):
+            if(strangers.count() > 1):
+                l.append(neighbours.mean())
+            if(strangers.count() > 0):
+                l.append(strangers.mean())
+            if(neighbours.count() == 1 and strangers.count() == 0):
                 l.append(0)
         
     if sum(l) > 0:

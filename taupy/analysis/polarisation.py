@@ -73,9 +73,11 @@ def group_divergence(clusters, adjacency_matrix):
         neighbours = ma.array(adjacency_matrix, mask=mask_of_neighbours, copy=True)
         # Now do the inverse operation for strangers. Instead of a 
         # matrix of Ones, we start with one of Zeros.
+        strangers_indices = list(set(range(len(adjacency_matrix))) - set(c))
         mask_of_strangers = ma.zeros(adjacency_matrix.shape)
         # And this time, neighbours are masked instead of unmasked.
         mask_of_strangers[np.ix_(c, c)] = 1
+        mask_of_strangers[np.ix_(strangers_indices, strangers_indices)] = 1
         np.fill_diagonal(mask_of_strangers, 1)
         strangers = ma.array(adjacency_matrix, mask=mask_of_strangers, copy=True)
 

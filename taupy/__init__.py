@@ -6,7 +6,7 @@ from decimal import Decimal
 from fractions import Fraction
 from math import log2
 
-from .basic import Argument, Debate
+from .basic import Argument, Debate, EmptyDebate
 from .basic import (Position, position_compatibility)
 from .basic import (satisfiability_count, satisfiability, dict_to_prop, 
                     dict_to_binary,
@@ -22,8 +22,9 @@ from .graphs import graph_from_sccp, graph_from_weighted_sccp
                     # plot_map
 
 __all__ = [
-            # .basics
-            'Argument', 'Debate', 'Position', 'position_compatibility',
+            # Core ontology
+            'Argument', 'Debate', 'EmptyDebate', 'Position', 
+            'position_compatibility',
             # .analysis tools
             'doj', 'hamming_distance', 'normalised_hamming_distance', 
             'bna', 'next_neighbours', 'edit_distance', 'normalised_edit_distance',

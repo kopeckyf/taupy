@@ -2,6 +2,7 @@ from decimal import Decimal
 from itertools import combinations
 from math import log2
 from sympy.logic import (And, Implies, Not)
+from sympy.logic.boolalg import BooleanTrue
 from .utilities import (iter_to_string, neighbours_of_list, 
                         satisfiability_count, satisfiability)
 from taupy.analysis.agreement import edit_distance
@@ -109,3 +110,9 @@ class Debate(And, Base):
     def __init__(self, *args): # Check *args
         And.__init__(self)
         self.actual_positions = []
+        
+class EmptyDebate(BooleanTrue, Base):
+    """
+    An empty debate dummy object.
+    """
+    pass

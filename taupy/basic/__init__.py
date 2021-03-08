@@ -1,4 +1,4 @@
-from .core import (Argument, Debate)
+from .core import (Argument, Debate, EmptyDebate)
 from .positions import (Position, position_compatibility)
 
 from .utilities import (satisfiability_count, satisfiability, dict_to_prop,
@@ -7,7 +7,7 @@ from .utilities import (satisfiability_count, satisfiability, dict_to_prop,
 
 __all__ = [
             # core
-            'Argument', 'Debate',
+            'Argument', 'Debate', 'EmptyDebate',
             # positions
             'Position', 'position_compatibility',
             # utilities

@@ -8,7 +8,7 @@ from random import choice, sample
 from concurrent.futures import (ProcessPoolExecutor, as_completed)
 
 from taupy.basic.utilities import satisfiability, satisfiability_count
-from taupy import Debate
+from taupy import Debate, EmptyDebate
 from .update import (introduce, response)
 import taupy.simulation.strategies as strategies
 
@@ -40,8 +40,8 @@ class Simulation(list):
         self.log = []        
         list.__init__(self)
         # Initialise the Simulation with an empty debate. This is 
-        # necessary so that the initial positions.
-        self.append(Debate()) if parent_debate == None else self.append(parent_debate)
+        # necessary so that the initial positions can attach to some debate.
+        self.append(EmptyDebate()) if parent_debate == None else self.append(parent_debate)
         
     def init_premisepool(self, r):
         """

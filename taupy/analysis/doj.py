@@ -4,11 +4,18 @@ from fractions import Fraction
 
 def doj(pos, debate=None, conditional=None):
     """
-    Degree of justification for a position given its associated debate.
+    Returns the degree of justification for the position in ``pos`` relative
+    to a ``debate``. If ``debate`` is `None`, the debate stored in the
+    Position object is used. 
     
-    ---
-    References: Betz, Gregor. 2012. On degrees of justification. Erkenntnis 77.
-                pp. 237--272. DOI: 10/bkng95
+    The *conditional* doj is returned if ``conditional`` is given another
+    position of the same debate. When ``conditional`` is set, ``debate``
+    must be `None`.        
+    
+    References
+    ===========
+    Betz, Gregor. 2012. On degrees of justification. Erkenntnis 77.
+    pp. 237--272. DOI: 10/bkng95
     """
     
     if debate is None: 
@@ -21,6 +28,6 @@ def doj(pos, debate=None, conditional=None):
         # Adding the condition to the inspected debate.
         debate = And(dict_to_prop(conditional), debate)
     
-    n = satisfiability_count (And(dict_to_prop(pos), debate))
-    m = satisfiability_count (debate)
+    n = satisfiability_count(And(dict_to_prop(pos), debate))
+    m = satisfiability_count(debate)
     return Fraction(n, m)

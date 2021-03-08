@@ -6,35 +6,65 @@ from taupy.basic.utilities import neighbours_of_list, iter_to_string, graph_from
 
 def difference_matrix(positions, measure):
     """
-    Create a difference profile for the given positions relative to a measure.
+    Create a quadratic matrix $D_{ij}$ in which rows and columns are filled by
+    ``positions``. The value at $D_{ij}$ is the distance, 
+    calculated by ``measure``, between positions $i$ and $j$.
+    
+    This matrix of distances is the fundamental object to calculate most 
+    polarisation measures.
     """
     return np.array([[measure(i, j) for j in positions] for i in positions])
 
 def spread(positions, measure):
     """
-    The simplest distance measure consists in measuring the diameter of 
-    positions.
-
-    So this is simply the maximum value in the distance matrix.
+    Returns the maximum distance between any two of the ``positions`` 
+    relative to a ``measure``.
+    
+    References
+    ==========
+    Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
+    and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
+    DOI: 10/d3kn.
     """
     return np.amax(difference_matrix(positions, measure))
 
 def pairwise_dispersion(positions, measure):
     """
-    This measure is the TDS equivalent of statistical dispersion or variance in polling data. There are many different ways to measure mean dispersion.
+    Returns dispersion, understood as the standard deviation of pairwise 
+    distances between the ``positions`` relative to the ``measure``.
+    
+    This is the TDS equivalent of statistical dispersion or variance in 
+    polling data. Beside standard deviation, there are other ways of measuring
+    dispersion.
+    
+    Bramson et al. take the dispersion relative to a mean. However, since such
+    a mean is not well-defined in TDS, we use dispersion on pairwise relations
+    instead.
 
-    For this purpose, we use the upper triangle of the difference matrix, without the diagonal zeroes (this offset is controlled by k=1). Since d(a,b) = d(b,a), these are the pairwise difference values we are after. We then take the mean of these values with np.mean().
+    For this purpose, we use the upper triangle of the difference matrix, 
+    without the diagonal zeroes (this offset is controlled by ``k=1``). 
+    Since $D_{a,b} = D_{b,a}$, these are the pairwise difference values we are 
+    after. We then take the standard deviation of these values.
+    
+    References
+    ==========
+    Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
+    and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
+    DOI: 10/d3kn.
     """
     return sqrt(difference_matrix(positions, measure)[np.triu_indices(
         len(positions), k=1)].var())
 
 def lauka(positions):
     """
-    Lauka's et al. (2018) mass political polarisation measure, adapted to TDS.
-
-    ----
-    References:
-    Lauka, Alban, Jennifer McCoy & Rengin B. Firat. 2018. Mass partisan polarization: Measuring a relational concept. American Behavioral Scientist 62(1). 107–126. DOI: 10.1177/0002764218759581
+    An implementation of Lauka's et al. measure of *mass political polarisation*,
+    adapted to TDS.
+    
+    References
+    ==========
+    Lauka, Alban et al. 2018. Mass partisan polarization: Measuring a relational 
+    concept. American Behavioral Scientist 62(1). 107–126. 
+    DOI: 10.1177/0002764218759581
     """
     issues = {j for i in positions for j in i.keys()}
     num_positions = len(positions)
@@ -58,8 +88,23 @@ def number_of_groups(clustering):
 def group_divergence(clusters, adjacency_matrix):
     """
     A variant of Bramson et al.'s group divergence, adapted to TDS. 
-    This can be regarded as an aggregated measure of the mean dispersion measure,
-    but this one accounts for groups. 
+    
+    Group divergence relies on a useful clustering that returns ``clusters``, 
+    which is expected to be a list of lists. The ``adjacency_matrix`` can be a 
+    modified or scaled version of ``difference_matrix()``, or the verbatim matrix.
+    
+    Algorithms which are known to being able to return good results in TDS are:
+    
+     - Leiden (implementation from ``python-igraph``) and other modularity 
+       maximisation approaches.
+     - Affinity propagation (implementation from ``scikit-learn``).
+     - Agglomerative clustering (implementation from ``scikit-learn``).
+ 
+    References
+    ==========
+    Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
+    and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
+    DOI: 10/d3kn.
     """
     l = []
     for c in clusters:
@@ -103,6 +148,16 @@ def group_divergence(clusters, adjacency_matrix):
 def group_consensus(clusters, adjacency_matrix):
     """
     A variant of Bramson et al.'s measure of group consensus, adapted to TDS.
+    
+    As ``group_divergence()``, this relies on a good clustering as well. 
+    Arguments and recommentations for algorithms to try are the same as in
+    ``group_divergence()``.
+    
+    References
+    ==========
+    Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
+    and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
+    DOI: 10/d3kn.
     """
     l = []
     for c in clusters:
@@ -117,6 +172,11 @@ def group_size_parity(clusters):
     WARNING: Need to contact the authors for what they mean by "population 
              proportions". Maybe we need to use len(c)/G instead of len(c)
              below!
+    References
+    ==========
+    Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
+    and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
+    DOI: 10/d3kn.
     """
     G = number_of_groups(clusters)
     return -1 / log(G) * sum([len(c) * log(len(c)) for c in clusters])

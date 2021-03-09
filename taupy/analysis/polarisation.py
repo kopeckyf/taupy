@@ -21,7 +21,7 @@ def spread(positions, measure):
     relative to a ``measure``.
     
     References
-    ==========
+    ----------
     Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
     and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
     DOI: 10/d3kn.
@@ -47,7 +47,7 @@ def pairwise_dispersion(positions, measure):
     after. We then take the standard deviation of these values.
     
     References
-    ==========
+    ----------
     Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
     and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
     DOI: 10/d3kn.
@@ -61,7 +61,7 @@ def lauka(positions):
     adapted to TDS.
     
     References
-    ==========
+    ----------
     Lauka, Alban et al. 2018. Mass partisan polarization: Measuring a relational 
     concept. American Behavioral Scientist 62(1). 107–126. 
     DOI: 10.1177/0002764218759581
@@ -101,7 +101,7 @@ def group_divergence(clusters, adjacency_matrix):
      - Agglomerative clustering (implementation from ``scikit-learn``).
  
     References
-    ==========
+    ----------
     Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
     and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
     DOI: 10/d3kn.
@@ -154,7 +154,7 @@ def group_consensus(clusters, adjacency_matrix):
     ``group_divergence()``.
     
     References
-    ==========
+    ----------
     Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
     and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
     DOI: 10/d3kn.
@@ -167,16 +167,19 @@ def group_consensus(clusters, adjacency_matrix):
 
 def group_size_parity(clusters):
     """
-    Bramson et al.'s measure of (group) size parity, adjusted to TDS.
+    Bramson et al.'s measure of (group) size parity, adjusted to TDS. According
+    to the authors, size parity is an entropy measure, which is irrespective of
+    the size of the population and of the number of groups. It is said to behave
+    erratically in case the groups are determined endogenously, e.g. by one of
+    the clustering algorithms Leiden, Affinity propagation, etc.
 
-    WARNING: Need to contact the authors for what they mean by "population 
-             proportions". Maybe we need to use len(c)/G instead of len(c)
-             below!
     References
-    ==========
+    ----------
     Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
     and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
     DOI: 10/d3kn.
     """
     G = number_of_groups(clusters)
-    return -1 / log(G) * sum([len(c) * log(len(c)) for c in clusters])
+    population_size = sum([len(c) for c in clusters])
+    return -1 / log(G) * sum([len(c)/population_size * log(
+        len(c)/population_size) for c in clusters])

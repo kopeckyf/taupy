@@ -40,7 +40,8 @@ def position_compatibility(pos1, pos2, deep=False):
     intersected positions.
     """
     if deep == True and pos1.debate != pos2.debate:
-        raise ValueError("Deep compatibility can only be checked for positions of the same debate.")
+        raise ValueError("Deep compatibility can only be checked for positions \
+            of the same debate.")
     
     if any(pos1[k] in pos2 and pos1[k] != pos2[k] for k in pos1):
         return False

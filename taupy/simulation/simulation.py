@@ -1,15 +1,14 @@
 """
 Basic tools in simulations
 """
-
 from sympy import symbols, Not
 from itertools import combinations, chain
 from random import choice, sample
-from concurrent.futures import (ProcessPoolExecutor, as_completed)
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from taupy.basic.utilities import satisfiability, satisfiability_count
 from taupy import Debate, EmptyDebate
-from .update import (introduce, response)
+from .update import introduce, response
 import taupy.simulation.strategies as strategies
 
 class Simulation(list):
@@ -72,8 +71,9 @@ class Simulation(list):
                 
     def init_positions(self, positions):
         """
-        Generate initial Positions. Optionally, the Positions may start off with explicit
-        truth-value attributions. This function complementises the Positions such that they
+        Generate initial Positions. Optionally, the Positions may start off with
+        explicit truth-value attributions. Positions are filled up with random
+        values for truth-value attributions they do not yet have, such that they
         begin as complete positions.
         """
         self.positions = []
@@ -85,15 +85,18 @@ class Simulation(list):
 
         self.positions.append(positions)
                 
-    def run(self, max_density=1, max_steps=1000, min_sccp=1, quiet=True):
+    def run(self, max_density=0.8, max_steps=1000, min_sccp=1, quiet=True):
         """
-        Run a Simulation using introduction_method and update_mechanism until
-        either max_density is reached or max_steps have been taken.
+        Run a Simulation using ``introduction_method`` and ``update_mechanism`` 
+        until either ``max_density`` is reached, the SCCP has an extension of 
+        ``min_sccp`` or ``max_steps`` have been taken.
+        
+        If ``quiet=False``, the last log entry which contains a summary of 
+        the simulation is not output. This is useful in batch processing of
+        Simulations (see ``experiment()``).
         """
 
         i = 0
-        # self.log.append("Directed Simulation initiated.") if self.directed else 
-        # self.log.append("Undirected Simulation initiated.")
 
         while True:
             if self.directed and len(self.positions[-1]) >= 2:
@@ -129,11 +132,13 @@ class Simulation(list):
 
 def experiment(n, executor={}, simulations={}, runs={}):
     """
-    Generate and execute n number of Simulations and output their results. 
-    The Simulations can be controlled via the options in the simulations dict.
-    The Simulation.run()s can be controlled via the dict runs.
+    Generate and execute `n` number of Simulations and output their results. 
+    The Simulations can be controlled via a dictionary passed to ``simulations``.
+    The ``Simulation.run()``s can be controlled with a dictionary passed to 
+    ``runs``.
 
-    Settings to the ProcessPoolExecutor can be forwarded with the executor dict.
+    Settings to the ``ProcessPoolExecutor`` should be forwarded in a dictionary
+    to ``executor``.
     """
     simulations = [Simulation(**simulations) for _ in range(n)]
 

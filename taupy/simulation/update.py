@@ -13,18 +13,16 @@ import taupy.simulation.strategies as strategies
 
 def introduce(_sim, source=None, target=None, strategy=None):
     """
-    Introduce an argument following an argumentation strategy from source to
-    target. If source or target are unspecified, they are filled in 
-    automatically. The source and target should be given as integers representing
-    the position's location in the Simulation.positions collection.
-
-    ----
-    References:
-    [1] Betz, Gregor. 2012. Debate dynamics: How controversy improves our beliefs. P. 94, Table 6.1            
+    Introduce an argument following an argumentation strategy from ``source`` to
+    ``target``. If ``source`` or ``target`` are unspecified, they are filled in 
+    automatically. The ``source`` and ``target`` should be given as integers 
+    representing the position's location in the ``Simulation.positions`` 
+    collection.
     """
     # Check if the simulation has possible premise combinations left
     if len(_sim.premisepool) == 0:
-        _sim.log.append("Introducing an argument failed because the Simulation's premise pool is depleted.")
+        _sim.log.append("Introducing an argument failed because the \
+            Simulation's premise pool is depleted.")
         return False
 
     # First check which positions have to be allocated (if any)
@@ -44,7 +42,7 @@ def introduce(_sim, source=None, target=None, strategy=None):
             else:
                 target_pos = positions.pop(randrange(0,len(positions)))
     
-    # Track if source and target positions have been set. This is send to log later.
+    # Track if source and target positions are set and store for log entry.
     if not strategy["source"]:
         source_pos = None
     if not strategy["target"]:
@@ -135,7 +133,10 @@ def introduce(_sim, source=None, target=None, strategy=None):
 
 def response(_sim, method):
     """
-    Updating Positions in a debate. This needs more work!
+    Updating Positions in a debate.
+    
+    Currently, we only have one sensisble strategy, ``closest_coherent``. 
+    Surely, many more remain to be discovered.
     """
     
     if method == "random":

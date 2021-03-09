@@ -1,5 +1,11 @@
 """
-Argument input strategies, defined in dictionary mappings
+Argument input strategies, defined in dictionary mappings. These strategies are
+defined in Betz 2013: Table 6.1.
+
+References
+----------
+Betz, Gregor. 2013. Debate dynamics: How controversy improves our beliefs. 
+Springer. DOI: 10/d3cx
 """
 
 random = {"source": False,

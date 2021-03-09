@@ -2,7 +2,8 @@ import numpy as np
 import numpy.ma as ma
 from fractions import Fraction
 from math import sqrt, log
-from taupy.basic.utilities import neighbours_of_list, iter_to_string, graph_from_positions
+from taupy.basic.utilities import (neighbours_of_list, iter_to_string, 
+                                   graph_from_positions)
 
 def difference_matrix(positions, measure):
     """
@@ -60,6 +61,9 @@ def lauka(positions):
     An implementation of Lauka's et al. measure of *mass political polarisation*,
     adapted to TDS.
     
+    0.25 is the maximum value that the ``sum(l)/num_issues`` can take. The Lauka
+    measure is thus a relation of actual compared to maximal value.
+    
     References
     ----------
     Lauka, Alban et al. 2018. Mass partisan polarization: Measuring a relational 
@@ -70,6 +74,7 @@ def lauka(positions):
     num_positions = len(positions)
     num_issues = len(issues)
     l = []
+    
     for i in issues:
         x = 0
         y = 0
@@ -78,9 +83,9 @@ def lauka(positions):
                 x += 1
             if p[i] == False:
                 y += 1
-        l.append((x / num_positions) * (y / num_positions))
+        l.append((x/num_positions) * (y/num_positions))
     
-    return (sum(l) / num_issues) / 0.25
+    return (sum(l)/num_issues) / 0.25
 
 def number_of_groups(clustering):
     return np.shape(clustering)[0]

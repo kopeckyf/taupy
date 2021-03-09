@@ -13,7 +13,7 @@ def doj(pos, debate=None, conditional=None):
     must be `None`.        
     
     References
-    ===========
+    ----------
     Betz, Gregor. 2012. On degrees of justification. Erkenntnis 77.
     pp. 237--272. DOI: 10/bkng95
     """

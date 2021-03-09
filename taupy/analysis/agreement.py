@@ -75,7 +75,7 @@ def bna(pos1, pos2):
     agreement is understood as the inverse of the normalised Hamming distance.
     
     References
-    ==========
+    ----------
     Betz, Gregor. 2013. Debate dynamics: How controversy improves our beliefs. 
     Springer. DOI: 10/d3cx
     """

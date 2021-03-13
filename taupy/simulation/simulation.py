@@ -108,10 +108,21 @@ class Simulation(list):
                 # The user asked for a directed simulation and has supplied
                 # enough Positions.
                 pick_positions = sample(self.positions[-1], k=2)
+                
+                # Support for positions with multiple introduction strategies. 
+                # First, try to pick a random element from the list of introduction
+                # strategies of a position. If that fails, assume that the strategy
+                # preference of a position is not given as a list, but as a single
+                # item.
+                try:
+                    pick_strategy = choice(pick_positions[0].introduction_strategy)
+                except KeyError:
+                    pick_strategy = pick_positions[0].introduction_strategy
+                
                 argument_introduced = introduce(self, 
                                                 source=pick_positions[0],
                                                 target=pick_positions[1],
-                                                strategy=pick_positions[0].introduction_strategy)
+                                                strategy=pick_strategy)
                 if argument_introduced:
                     # Check if introduction was succesful before attempting response.
                     response(self, method=self.default_update_strategy)

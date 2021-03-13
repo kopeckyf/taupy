@@ -2,8 +2,21 @@ import numpy as np
 import numpy.ma as ma
 from fractions import Fraction
 from math import sqrt, log
+from sympy import symbols
 from taupy.basic.utilities import (neighbours_of_list, iter_to_string, 
                                    graph_from_positions)
+
+
+def groups_from_stance_toward_single_proposition(positions, proposition):
+    """
+    Returns a clustering of the input ``positions`` to a single ``proposition``.
+
+    The first sublist contains the ``positions`` that assert ``proposition``, 
+    the second sublist those that deny it.
+    """
+    q = symbols(proposition)
+    return [[n for n, p in enumerate(positions) if p[q] == True], 
+            [n for n, p in enumerate(positions) if p[q] == False]]
 
 def difference_matrix(positions, measure):
     """

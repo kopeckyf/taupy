@@ -13,7 +13,9 @@ from .basic import (satisfiability_count, satisfiability, dict_to_prop,
                     free_premises, graph_from_positions, ari)
 
 from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, next_neighbours, 
-                       edit_distance, normalised_edit_distance, difference_matrix, spread, lauka,
+                       edit_distance, normalised_edit_distance, 
+                       groups_from_stance_toward_single_proposition,
+                       difference_matrix, spread, lauka,
                        pairwise_dispersion, group_divergence, group_consensus, group_size_parity)
 
 from .simulation import (Simulation, experiment, introduce, response)
@@ -25,9 +27,10 @@ __all__ = [
             # Core ontology
             'Argument', 'Debate', 'EmptyDebate', 'Position', 
             'position_compatibility',
-            # .analysis tools
+            # .analysis
             'doj', 'hamming_distance', 'normalised_hamming_distance', 
             'bna', 'next_neighbours', 'edit_distance', 'normalised_edit_distance',
+            'groups_from_stance_toward_single_proposition',
             'difference_matrix', 'spread', 'lauka', 'pairwise_dispersion',
             'group_divergence', 'group_consensus', 'group_size_parity',
             # .simulation

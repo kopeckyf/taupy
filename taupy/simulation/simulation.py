@@ -18,8 +18,8 @@ class Simulation(list):
                  sentencepool="p:10",
                  sentences_sources=[],
                  sentences_sinks=[],
-                 parent_debate=None, 
-                 argumentlength=2, 
+                 parent_debate=None,
+                 argumentlength=2,
                  positions=[],
                  default_introduction_strategy = strategies.random, 
                  default_update_strategy = "closest_coherent"):
@@ -29,8 +29,8 @@ class Simulation(list):
         else:
             self.sentencepool = [i for i in symbols(sentencepool)]
 
-        self.sources = sentences_sources + [Not(i) for i in sentences_sources]
-        self.sinks = sentences_sinks + [Not(i) for i in sentences_sinks]
+        self.sources = [i for i in symbols(sentences_sources)] + [Not(i) for i in symbols(sentences_sources)]
+        self.sinks = [i for i in symbols(sentences_sinks)] + [Not(i) for i in symbols(sentences_sinks)]
             
         self.init_premisepool(argumentlength)
         # It's a good idea to store the argument length so that other functions
@@ -60,7 +60,7 @@ class Simulation(list):
         have ~x & x in their list. The last step in particular is currently
         in need of optimisation.
         """
-        _premisepool = self.sentencepool + [Not(i) for i in self.sentencepool] - self.sinks
+        _premisepool = set(self.sentencepool + [Not(i) for i in self.sentencepool]) - set(self.sinks)
         
         try: # Assume variable length of subsequence. Following an idea by Dan H.
             _iterator = chain(*map(lambda i: combinations(_premisepool, i), r))

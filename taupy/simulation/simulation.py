@@ -16,6 +16,8 @@ class Simulation(list):
     def __init__(self,
                  directed=True, 
                  sentencepool="p:10",
+                 sentences_sources=[],
+                 sentences_sinks=[],
                  parent_debate=None, 
                  argumentlength=2, 
                  positions=[],
@@ -26,6 +28,9 @@ class Simulation(list):
             self.sentencepool = [i for i in parent_debate.atoms()]
         else:
             self.sentencepool = [i for i in symbols(sentencepool)]
+
+        self.sources = sentences_sources + [Not(i) for i in sentences_sources]
+        self.sinks = sentences_sinks + [Not(i) for i in sentences_sinks]
             
         self.init_premisepool(argumentlength)
         # It's a good idea to store the argument length so that other functions
@@ -55,7 +60,7 @@ class Simulation(list):
         have ~x & x in their list. The last step in particular is currently
         in need of optimisation.
         """
-        _premisepool = self.sentencepool + [Not(i) for i in self.sentencepool]
+        _premisepool = self.sentencepool + [Not(i) for i in self.sentencepool] - self.sinks
         
         try: # Assume variable length of subsequence. Following an idea by Dan H.
             _iterator = chain(*map(lambda i: combinations(_premisepool, i), r))

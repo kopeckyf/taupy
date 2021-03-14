@@ -4,6 +4,7 @@ Basic tools in simulations
 from sympy import symbols, Not
 from itertools import combinations, chain
 from random import choice, sample
+from copy import deepcopy
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from taupy.basic.utilities import satisfiability, satisfiability_count
@@ -14,13 +15,14 @@ import taupy.simulation.strategies as strategies
 class Simulation(list):
     
     def __init__(self,
-                 directed=True, 
-                 sentencepool="p:10",
-                 sentences_sources=[],
-                 sentences_sinks=[],
-                 parent_debate=None,
-                 argumentlength=2,
-                 positions=[],
+                 directed = True, 
+                 sentencepool = "p:10",
+                 sentences_sources = [],
+                 sentences_sinks = [],
+                 parent_debate = None,
+                 argumentlength = 2,
+                 positions = [],
+                 copy_input_positions = True,
                  default_introduction_strategy = strategies.random, 
                  default_update_strategy = "closest_coherent"):
         
@@ -36,7 +38,10 @@ class Simulation(list):
         # It's a good idea to store the argument length so that other functions
         # can access that information.
         self.argumentlength = argumentlength
-        self.init_positions(positions)
+        if copy_input_positions == True:
+            self.init_positions(deepcopy(positions))
+        else:
+            self.init_positions(positions)
 
         self.directed = directed
         self.default_introduction_strategy = default_introduction_strategy

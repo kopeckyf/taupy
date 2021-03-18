@@ -28,7 +28,7 @@ author = 'Felix Kopecky'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx_math_dollar', 'sphinx.ext.mathjax',
-              'sphinx_copybutton']
+              'sphinx_copybutton', 'sphinx.ext.viewcode']
 
 mathjax_config = {
     'tex2jax': {
@@ -52,8 +52,11 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
+html_title = 'taupy'
+
 html_theme = 'furo'
 #html_theme = 'alabaster'
+
 
 #html_theme_options = {
     #'description': 'A Python package for the study of dialectical structures',

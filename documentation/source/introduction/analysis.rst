@@ -157,17 +157,17 @@ You can then use the objects returned by the class methods `sccp()` and `map()` 
 plot them using networkx, graph-tool, or similar packages.
 
 .. important:: taupy is not aimed to be a visualisation tool. If you are looking for 
-               a capable argument visualisation tool, have a look at `Argdown <https://argdown.org/>`
+               a capable argument visualisation tool, have a look at `Argdown <https://argdown.org/>`_.
 
 References
 ==========
 
 .. [Betz2012] Betz, Gregor. 2012. On degrees of justification. Erkenntnis 77.
-              pp. 237--272. DOI: <https://doi.org/10/bkng95>
+              pp. 237--272. DOI: `10/bkng95 <https://doi.org/10/bkng95>`_.
 
 .. [Betz2013] Betz, Gregor. 2013. Debate dynamics. How controversy improves
-              our beliefs. Springer. DOI: <https://doi.org/10/d3cx>
+              our beliefs. Springer. DOI: `10/d3cx <https://doi.org/10/d3cx>`_.
               
 .. [BramsonEtAl2016] Bramson, Aaron et al. 2016. Disambiguation of social 
    polarization concepts and measures. The Journal of Mathematical Sociology 
-   40(2), pp. 80--111. DOI: <https://doi.org/10/d3kn>
+   40(2), pp. 80--111. DOI: `10/d3kn <https://doi.org/10/d3kn>`_.

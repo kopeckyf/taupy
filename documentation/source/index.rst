@@ -1,19 +1,17 @@
-.. taupy documentation master file, created by
-   sphinx-quickstart on Fri Jan 15 23:23:25 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Contents
 ########
 
 Welcome to taupy's documentation! taupy is a Python package for the study of
 dialectical structures. 
 
-Introduction for new users
-==========================
+User guide
+==========
 
 .. toctree::
-   :maxdepth: 2
+   :hidden:
+   :caption: User guide
+   
+   installation
    
    introduction/basic
    introduction/analysis
@@ -24,7 +22,8 @@ Tutorials and examples
 ======================
 
 .. toctree::
-   :maxdepth: 2
+   :hidden:
+   :caption: Examples
    
    tutorials/plotting-sccp
    tutorials/agreement
@@ -35,9 +34,9 @@ Technical documentation
 =======================
 
 .. toctree::
-   :maxdepth: 2
+   :hidden:
+   :caption: Reference
    
    reference
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`

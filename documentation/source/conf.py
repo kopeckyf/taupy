@@ -27,7 +27,8 @@ author = 'Felix Kopecky'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx_math_dollar', 'sphinx.ext.mathjax']
+extensions = ['sphinx.ext.autodoc', 'sphinx_math_dollar', 'sphinx.ext.mathjax',
+              'sphinx_copybutton']
 
 mathjax_config = {
     'tex2jax': {
@@ -51,16 +52,18 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'furo'
+#html_theme = 'alabaster'
 
-html_theme_options = {
-        'description': 'A Python package for the study of dialectical structures',
-        'font_family': 'Helvetica, Arial, sans-serif',
-        'font_size': '20px',
-        'link': '#000',
-        'link_hover': '#aaa',
-        'pre_bg': '#ddd'
-}
+#html_theme_options = {
+    #'description': 'A Python package for the study of dialectical structures',
+    #'font_family': 'Helvetica, Arial, sans-serif',
+    #'font-size': '50px',
+    #'link': '#000',
+    #'link_hover': '#aaa',
+    #'pre_bg': '#ddd'
+#}
+
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

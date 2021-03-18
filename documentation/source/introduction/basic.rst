@@ -1,5 +1,5 @@
 Introduction to taupy and its basic ontology
-*********************************************
+********************************************
 
 taupy is a Python package for studying the theory of dialectical structures (TDS) in Python.
 

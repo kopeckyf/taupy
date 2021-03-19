@@ -35,7 +35,7 @@ The :ref:`genindex` and the :ref:`modindex` and the :ref:`modules`.
    :hidden:
    :caption: User guide
    
-   installation
+   introduction/installation
    
    introduction/basic
    introduction/analysis

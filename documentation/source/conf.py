@@ -53,10 +53,8 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 html_title = 'taupy'
-
 html_theme = 'furo'
 #html_theme = 'alabaster'
-
 
 #html_theme_options = {
     #'description': 'A Python package for the study of dialectical structures',

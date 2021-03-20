@@ -42,4 +42,4 @@ proposition, or `1` if the position accepts the proposition. Positions are
 connected by an edge if they differ in exactly one truth-value attribution (i.e.,
 if their Hamming distance equals 1).
 
-.. image:: tutorials_example_sccp.png
+.. image:: tutorials_example_sccp.svg

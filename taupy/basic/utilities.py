@@ -2,6 +2,7 @@ from dd.autoref import BDD
 from sympy.logic import to_cnf, And, Implies, Not
 from sympy import symbols
 import numpy as np
+from random import sample
 
 def dict_to_prop(dictionary):
     """
@@ -147,3 +148,15 @@ def contingency_matrix(partition1, partition2):
     return np.array(
         [[len(set(j) & set(k)) for j in partition1] for k in partition2]
     )
+
+def pick_random_positions_from_debate(n, debate):
+    """
+    A helper function to pull `n` random positions from a debate's SCCP. Returns
+    :py:obj:`False` if the debate's SCCP is smaller than `n`.
+    """
+    if satisfiability_count(debate) >= n:
+        # Using satisfiability_count() here can spare us the construction of 
+        # a SCCP, which is more complex than just obtaining the SCCP's number.
+        return sample(population=debate.sccp(), k=n)
+    else:
+        return False

@@ -5,7 +5,7 @@ from .agreement import (hamming_distance, bna, next_neighbours,
 from .polarisation import (groups_from_stance_toward_single_proposition,
                            difference_matrix, spread, lauka,
                            pairwise_dispersion, group_divergence, group_consensus,
-                           group_size_parity)
+                           group_size_parity, number_of_groups)
 
 __all__ = [
             'doj',
@@ -16,5 +16,6 @@ __all__ = [
             # polarisation
             'groups_from_stance_toward_single_proposition',
             'difference_matrix', 'spread', 'lauka', 'pairwise_dispersion',
-            'group_divergence', 'group_consensus', 'group_size_parity'
+            'group_divergence', 'group_consensus', 'group_size_parity',
+            'number_of_groups'
           ]

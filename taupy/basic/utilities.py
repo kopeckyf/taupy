@@ -157,6 +157,6 @@ def pick_random_positions_from_debate(n, debate):
     if satisfiability_count(debate) >= n:
         # Using satisfiability_count() here can spare us the construction of 
         # a SCCP, which is more complex than just obtaining the SCCP's number.
-        return sample(population=debate.sccp(), k=n)
+        return sample(population=satisfiability(debate, all_models=True), k=n)
     else:
         return False

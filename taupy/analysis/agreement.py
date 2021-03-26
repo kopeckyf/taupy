@@ -1,5 +1,7 @@
 from fractions import Fraction
-from taupy.basic.utilities import satisfiability
+from taupy.basic.utilities import satisfiability, dict_to_prop
+from sympy import And
+from itertools import combinations
 
 def hamming_distance(pos1, pos2):
     """
@@ -87,8 +89,22 @@ def next_neighbours(pos, debate):
     A next door neighbour is any position that, among all the positions in
     ``debate``, has a minimal Hamming distance to ``pos``.
     
-    ``random.choice(next_neighbours())`` returns a random neighbour.
+    ``random.choice(next_neighbours())`` returns a random next neighbour.
+
+    Maybe the most natural implementation of this search would be a top-down
+    approach: Obtain all the candidates and return those with minimum distance.
+
+    However, this is prohibitively expensive. A better search is to do bottom-up,
+    starting with candidates that have distance 1, checking whether there are some
+    that are coherent, and looping until the maximum distance is checked. 
     """
-    candidates = [i for i in satisfiability(debate, all_models = True)]
-    distances = {candidates.index(c): edit_distance(pos,c) for c in candidates if edit_distance(pos,c) != 0}
-    return [candidates[i] for i in distances if distances[i] == min(distances.values())]
+    for i in range(1, len(pos)):
+        # Build a list of candidates that are 
+        candidates = [{p: pos[p] if p not in j else not pos[p] for p in pos} for j in combinations(pos.keys(), i)]
+        coherent_candidates = [i for i in candidates if satisfiability(And(dict_to_prop(i), debate))]
+        if coherent_candidates:
+            return coherent_candidates
+        else:
+            continue
+    else:
+        return False

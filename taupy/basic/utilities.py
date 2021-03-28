@@ -1,4 +1,4 @@
-from dd.autoref import BDD
+from dd.cudd import BDD
 from sympy.logic import to_cnf, And, Implies, Not
 from sympy import symbols
 import numpy as np

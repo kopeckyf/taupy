@@ -158,7 +158,7 @@ def response(_sim, method):
                 _sim.log.append("Position with index %d did not need an update." % (_sim.positions[-1].index(p)))
             else:
                 u = deepcopy(p)
-                u |= choice(next_neighbours(p, _sim[-1]))
+                u |= next_neighbours(p, _sim[-1], desire="one")
                 updated_positions.append(u)
                 _sim.log.append("Position with index %d was updated with strategy closest_coherent." % (_sim.positions[-1].index(p)))
         _sim.positions.append(updated_positions)

@@ -2,6 +2,7 @@ from fractions import Fraction
 from taupy.basic.utilities import satisfiability, dict_to_prop
 from sympy import And
 from itertools import combinations
+from random import shuffle
 
 def hamming_distance(pos1, pos2):
     """
@@ -83,14 +84,12 @@ def bna(pos1, pos2):
     """
     return 1 - Fraction(hamming_distance(pos1, pos2), len(pos1))
 
-def next_neighbours(pos, debate):
+def next_neighbours(pos, debate, *, desire="all"):
     """
     For the position ``pos``, find the "next door neighbours" in ``debate``.
     A next door neighbour is any position that, among all the positions in
     ``debate``, has a minimal Hamming distance to ``pos``.
     
-    ``random.choice(next_neighbours())`` returns a random next neighbour.
-
     Maybe the most natural implementation of this search would be a top-down
     approach: Obtain all the candidates and return those with minimum distance.
 
@@ -99,12 +98,23 @@ def next_neighbours(pos, debate):
     that are coherent, and looping until the maximum distance is checked. 
     """
     for i in range(1, len(pos)):
-        # Build a list of candidates that are 
+        # Build a list of candidates with a Hamming distance of i to pos. 
         candidates = [{p: pos[p] if p not in j else not pos[p] for p in pos} for j in combinations(pos.keys(), i)]
-        coherent_candidates = [i for i in candidates if satisfiability(And(dict_to_prop(i), debate))]
-        if coherent_candidates:
-            return coherent_candidates
-        else:
-            continue
+        
+        if desire == "one":
+            # Shuffle the candidates first to ensure a random neighbour is picked.
+            shuffle(candidates)
+            # Now loop through the candidates until a fitting one is found.
+            for i in candidates:
+                if satisfiability(And(dict_to_prop(i), debate)):
+                    return i
+
+        if desire == "all":
+            # Build a list of all candidates that are SAT.
+            coherent_candidates = [i for i in candidates if satisfiability(And(dict_to_prop(i), debate))]
+            # If the list is non-empty, return the candidates.
+            if coherent_candidates:
+                return coherent_candidates
+
     else:
         return False

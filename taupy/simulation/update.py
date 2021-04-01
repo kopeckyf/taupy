@@ -4,10 +4,12 @@ Functions to introduce Arguments into Debates and update Positions accordingly.
 
 from itertools import combinations, chain
 from copy import deepcopy
+import numpy as np
 from random import randrange, choice
 from sympy import And, Not
+from sympy.logic.algorithms.pycosat_wrapper import pycosat_satisfiable
 from taupy import (Argument, Debate, satisfiability, satisfiability_count, 
-                   dict_to_prop, next_neighbours)
+                   dict_to_prop, next_neighbours, hamming_distance)
 
 import taupy.simulation.strategies as strategies
 
@@ -150,10 +152,29 @@ def response(_sim, method):
                 updated_positions.append(u)
         _sim.positions.append(updated_positions)        
     
+    if method == "closest_coherent_complete_search":
+        updated_positions = []
+        models = list(satisfiability(_sim[-1], all_models="True"))
+        examinees = [{k: i[k] for k in i if k in _sim[-1].atoms()} for i in _sim.positions[-1]]
+        distances = np.array([[hamming_distance(i, j) for i in models] for j in examinees])
+
+        for i in range(distances.shape[0]):
+            if np.min(distances[i]) == 0:
+                updated_positions.append(_sim.positions[-1][i])
+                _sim.log.append("Position with index %d did not need an update." % (i))
+            else:
+                u = deepcopy(_sim.positions[-1][i])
+                update_index = choice(np.where(distances[i] == distances[i].min())[0].tolist())
+                u |= models[update_index]
+                updated_positions.append(u)
+                _sim.log.append("Position with index %d was updated with strategy closest_coherent." % (i))
+
+        _sim.positions.append(updated_positions)
+
     if method == "closest_coherent":
         updated_positions = []
         for p in _sim.positions[-1]:
-            if satisfiability(And(dict_to_prop(p), _sim[-1])):
+            if pycosat_satisfiable(And(dict_to_prop(p), _sim[-1])):
                 updated_positions.append(p)
                 _sim.log.append("Position with index %d did not need an update." % (_sim.positions[-1].index(p)))
             else:

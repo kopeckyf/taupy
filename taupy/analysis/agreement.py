@@ -1,6 +1,7 @@
 from fractions import Fraction
 from taupy.basic.utilities import satisfiability, dict_to_prop
 from sympy import And
+from sympy.logic.algorithms.pycosat_wrapper import pycosat_satisfiable
 from itertools import combinations
 from random import shuffle
 
@@ -106,7 +107,7 @@ def next_neighbours(pos, debate, *, desire="all"):
             shuffle(candidates)
             # Now loop through the candidates until a fitting one is found.
             for i in candidates:
-                if satisfiability(And(dict_to_prop(i), debate)):
+                if pycosat_satisfiable(And(dict_to_prop(i), debate)):
                     return i
 
         if desire == "all":

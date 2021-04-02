@@ -6,6 +6,7 @@ from itertools import combinations, chain
 from random import choice, sample
 from copy import deepcopy
 from concurrent.futures import ProcessPoolExecutor, as_completed
+import time
 
 from taupy.basic.utilities import satisfiability, satisfiability_count
 from taupy import Debate, EmptyDebate
@@ -167,6 +168,6 @@ def experiment(n, executor={}, simulations={}, runs={}):
         results = [executor.submit(i.run, quiet=False, **runs) for i in simulations]
 
         for count, future in enumerate(as_completed(results), start=1):
-            print(f"Simulation {count}/{n} completed.")
+            print(f"Simulation {count}/{n} completed at {time.ctime()}.")
     
     return [i.result() for i in results]

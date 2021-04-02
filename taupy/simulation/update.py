@@ -7,7 +7,7 @@ from copy import deepcopy
 import numpy as np
 from random import randrange, choice
 from sympy import And, Not
-from sympy.logic.algorithms.pycosat_wrapper import pycosat_satisfiable
+from sympy.logic.algorithms.dpll2 import dpll_satisfiable
 from taupy import (Argument, Debate, satisfiability, satisfiability_count, 
                    dict_to_prop, next_neighbours, hamming_distance)
 
@@ -174,7 +174,7 @@ def response(_sim, method):
     if method == "closest_coherent":
         updated_positions = []
         for p in _sim.positions[-1]:
-            if pycosat_satisfiable(And(dict_to_prop(p), _sim[-1])):
+            if dpll_satisfiable(And(dict_to_prop(p), _sim[-1])):
                 updated_positions.append(p)
                 _sim.log.append("Position with index %d did not need an update." % (_sim.positions[-1].index(p)))
             else:

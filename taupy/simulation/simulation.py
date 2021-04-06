@@ -162,6 +162,7 @@ def experiment(n, executor={}, simulations={}, runs={}):
     Settings to the ``ProcessPoolExecutor`` should be forwarded in a dictionary
     to ``executor``.
     """
+    print(f"Starting experiment at {time.ctime()}.")
     simulations = [Simulation(**simulations) for _ in range(n)]
 
     with ProcessPoolExecutor(**executor) as executor:

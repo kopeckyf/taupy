@@ -174,13 +174,14 @@ def response(_sim, method):
 
     if method == "closest_coherent":
         updated_positions = []
+        list_of_models = list(satisfiability(_sim[-1], all_models=True))
         for p in _sim.positions[-1]:
             if dpll_satisfiable(And(dict_to_prop(p), _sim[-1])):
                 updated_positions.append(p)
                 _sim.log.append("Position with index %d did not need an update." % (_sim.positions[-1].index(p)))
             else:
                 u = deepcopy(p)
-                u |= next_neighbours(p, _sim[-1], desire="one")
+                u |= choice(next_neighbours(p, debate=_sim[-1], models=list_of_models))
                 updated_positions.append(u)
                 _sim.log.append("Position with index %d was updated with strategy closest_coherent." % (_sim.positions[-1].index(p)))
         _sim.positions.append(updated_positions)

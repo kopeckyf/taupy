@@ -65,14 +65,15 @@ def introduce(_sim, source=None, target=None, strategy=None):
             
             if strategy["pick_premises_from"] == "target":
                 try: # Assume variable length of subsequence. Following an idea by Dan H.
-                    possible_premises = set(chain(*map(lambda i: combinations(target_pos, i), _sim.argumentlength)))
+                    possible_premises = set(chain(*map(lambda i: combinations(dict_to_prop(target_pos).args, i), _sim.argumentlength)))
                 except TypeError: # the input r is not an iterable. Now assume integer.
                     possible_premises = set(combinations(dict_to_prop(target_pos).args, r=_sim.argumentlength))
 
             possible_premises = possible_premises & set(available_premises)
 
             if len(possible_premises) == 0:
-                # There are no further available premises. 
+                # There are no further available premises.
+                _sim.log.append("Can't find premises for source %s and target %s" % (source_pos, target_pos))
                 _found_valid_argument = False
                 break
             else:
@@ -130,7 +131,7 @@ def introduce(_sim, source=None, target=None, strategy=None):
         return True
         # return Argument(And(*selected_premises), selected_conclusion)    
     else:
-        _sim.log.append("Introduction of with strategy '%s' failed. No valid combinations left in the premise pool." % (strategy["name"]) )
+        _sim.log.append("Introduction with strategy '%s' failed. No valid combinations left in the premise pool." % (strategy["name"]) )
         return False
 
 def response(_sim, method):

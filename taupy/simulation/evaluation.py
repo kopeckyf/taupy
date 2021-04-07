@@ -1,8 +1,8 @@
 from igraph import Graph, ADJ_MAX
 from sklearn.cluster import AffinityPropagation, AgglomerativeClustering
 from concurrent.futures import ProcessPoolExecutor
-from taupy import (difference_matrix, group_divergence, normalised_hamming_distance, 
-                   pairwise_dispersion, number_of_groups)
+from taupy import (difference_matrix, group_divergence, group_consensus,
+                   normalised_hamming_distance, pairwise_dispersion, number_of_groups)
 import numpy as np
 import pandas as pd
 
@@ -39,9 +39,11 @@ def group_divergence_leiden(simulation, *, densities=True):
     graphs = [Graph.Weighted_Adjacency(i.astype("float64").tolist(), mode=ADJ_MAX) for i in filtered_matrices]
     clusterings = [list(g.community_leiden(weights="weight", objective_function="modularity")) for g in graphs]
     divergences = [group_divergence(i, matrices[num]) for num, i in enumerate(clusterings)]
+    consensus = [group_consensus(i, matrices[num]) for num, i in enumerate(clusterings)]
 
     if densities:
-        return pd.DataFrame(list(zip(densities, divergences)), columns=["density", "divergence"])
+        return pd.DataFrame(list(zip(densities, divergences, consensus)), 
+                            columns=["density", "divergence", "consensus"])
     else:
         return divergences
 
@@ -58,9 +60,11 @@ def group_divergence_agglomerative(simulation, *, densities=True):
     
     clusters = [[[i[0] for i in enumerate(k.labels_) if i[1] == j] for j in range(k.n_clusters_)] for k in agglomerative]
     divergences = [group_divergence(i, matrices[num]) for num, i in enumerate(clusters)]
+    consensus = [group_consensus(i, matrices[num]) for num, i in enumerate(clusters)]
 
     if densities:
-        return pd.DataFrame(list(zip(densities, divergences)), columns=["density", "divergence"])
+        return pd.DataFrame(list(zip(densities, divergences, consensus)), 
+                            columns=["density", "divergence", "consensus"])
     else:
         return divergences
 
@@ -73,8 +77,10 @@ def group_divergence_affinity_propagation(simulation, *, densities=True):
     fits = [AffinityPropagation(affinity="precomputed", random_state=0).fit(i) for i in matrices]
     clusterings = [[[i[0] for i in enumerate(k.labels_) if i[1] == j] for j in range(len(k.cluster_centers_indices_))] for k in fits]
     divergences = [group_divergence(i, matrices[num]) for num, i in enumerate(clusterings)]
+    consensus = [group_consensus(i, matrices[num]) for num, i in enumerate(clusterings)]
 
     if densities:
-        return pd.DataFrame(list(zip(densities, divergences)), columns=["density", "divergence"])
+        return pd.DataFrame(list(zip(densities, divergences, consensus)), 
+                            columns=["density", "divergence", "consensus"])
     else:
         return divergences

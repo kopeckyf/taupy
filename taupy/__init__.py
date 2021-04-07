@@ -19,7 +19,7 @@ from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, 
                        pairwise_dispersion, group_divergence, group_consensus, group_size_parity)
 
 from .simulation import (Simulation, experiment, introduce, response, 
-                         evaluate_experiment_with_leiden)
+                         evaluate_experiment)
 
 from .graphs import graph_from_sccp, graph_from_weighted_sccp
                     # plot_map
@@ -36,7 +36,7 @@ __all__ = [
             'group_divergence', 'group_consensus', 'group_size_parity',
             # .simulation
             'Simulation', 'experiment',
-            'evaluate_experiment_with_leiden',
+            'evaluate_experiment',
             # Update mechanisms
             'introduce', 'response',
             # Common utilities

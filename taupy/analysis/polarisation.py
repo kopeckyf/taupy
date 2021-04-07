@@ -199,5 +199,8 @@ def group_size_parity(clusters):
     """
     G = number_of_groups(clusters)
     population_size = sum([len(c) for c in clusters])
-    return -1 / log(G) * sum([len(c)/population_size * log(
-        len(c)/population_size) for c in clusters])
+    try:
+        return -1 / log(G) * sum([len(c)/population_size * log(
+            len(c)/population_size) for c in clusters])
+    except ZeroDivisionError:
+        return float("nan")

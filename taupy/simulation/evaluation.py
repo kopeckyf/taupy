@@ -23,7 +23,7 @@ def variance_dispersion(simulation, *, densities=True):
     else:
         return dispersions
 
-def group_divergence_leiden(simulation, *, densities=True):
+def group_measures_leiden(simulation, *, densities=True):
     if densities:
         densities = [i.density() for i in simulation]
 
@@ -49,7 +49,7 @@ def group_divergence_leiden(simulation, *, densities=True):
     else:
         return divergences
 
-def group_divergence_agglomerative(simulation, *, densities=True):
+def group_measures_agglomerative(simulation, *, densities=True):
     if densities:
         densities = [i.density() for i in simulation]
 
@@ -73,13 +73,20 @@ def group_divergence_agglomerative(simulation, *, densities=True):
         return divergences
 
 
-def group_divergence_affinity_propagation(simulation, *, densities=True):
+def group_measures_affinity_propagation(simulation, *, densities=True):
     if densities:
         densities = [i.density() for i in simulation]
     
     matrices = [difference_matrix(i, measure=normalised_hamming_distance) for i in simulation.positions]
+    filtered_matrices = [np.exp(-4 * i.astype("float64")) for i in matrices]
+    
+    for i in filtered_matrices:
+        np.fill_diagonal(i, 0)
+        # Assume number of positions is homogenous.
+        i[np.triu_indices(len(simulation.positions[0]))] = 0
+        i[i<0.2] = 0
 
-    fits = [AffinityPropagation(affinity="precomputed", random_state=0).fit(i) for i in matrices]
+    fits = [AffinityPropagation(affinity="precomputed", random_state=0).fit(i) for i in filtered_matrices]
     clusterings = [[[i[0] for i in enumerate(k.labels_) if i[1] == j] for j in range(len(k.cluster_centers_indices_))] for k in fits]
     divergences = [group_divergence(i, matrices[num]) for num, i in enumerate(clusterings)]
     consensus = [group_consensus(i, matrices[num]) for num, i in enumerate(clusterings)]

@@ -156,12 +156,10 @@ def group_divergence(clusters, adjacency_matrix):
             if(neighbours.count() == 1 and strangers.count() == 0):
                 l.append(0)
         
-    if sum(l) > 0:
+    try:
         return sum(l)/len(l)
-    else:
-        # A zero result always means that no clusters were found or the population conists
-        # of just one member.
-        return 0
+    except ZeroDivisionError:
+        return float("nan")
 
 def group_consensus(clusters, adjacency_matrix):
     """
@@ -180,8 +178,14 @@ def group_consensus(clusters, adjacency_matrix):
     l = []
     for c in clusters:
         neighbours = adjacency_matrix[np.ix_(c, c)]
-        l.append(neighbours[~np.eye(len(neighbours), dtype=bool)].mean())
-    return 1 - sum(l)/len(l)
+        try:
+            l.append(neighbours[~np.eye(len(neighbours), dtype=bool)].mean())
+        except ZeroDivisionError:
+            l.append(0)
+    try:
+        return 1 - sum(l)/len(l)
+    except ZeroDivisionError:
+        return float("nan")
 
 def group_size_parity(clusters):
     """

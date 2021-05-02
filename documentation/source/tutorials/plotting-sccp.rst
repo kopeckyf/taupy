@@ -16,7 +16,7 @@ Let's go ahead with a really simple debate:
     p1, p2, p3, p4, p5 = symbols("p:5")
 
     # create a simple debate with two arguments.
-    d = Debate(Argument(p1&p2&p3, p4), Argument(p5&~p2, ~p4))
+    d = Debate(Argument(p1&p2&p3, p4), Argument(p5&~p2, ~p3))
     
 :py:meth:`taupy.basic.core.Base.sccp` returns a dictionary of list representation of a graph,
 which can be easily imported by :py:obj:`networkx`.

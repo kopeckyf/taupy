@@ -10,7 +10,7 @@ def evaluate_experiment(experiment, *, function=None, densities=True, executor={
     with ProcessPoolExecutor(**executor) as executor:
         results = [executor.submit(function, simulation=i) for i in experiment]
     
-    return pd.concat([i.result() for i in results])
+    return pd.concat([i.result() for i in results], keys=[n for n, _ in enumerate(results)])
 
 def variance_dispersion(simulation, *, densities=True):
     if densities:

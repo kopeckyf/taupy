@@ -85,7 +85,7 @@ def bna(pos1, pos2):
     Betz, Gregor. 2013. Debate dynamics: How controversy improves our beliefs. 
     Springer. DOI: 10/d3cx
     """
-    return 1 - Fraction(hamming_distance(pos1, pos2), len(pos1))
+    return 1 - normalised_hamming_distance(pos1, pos2)
 
 def next_neighbours(pos, *, debate, models):
     """

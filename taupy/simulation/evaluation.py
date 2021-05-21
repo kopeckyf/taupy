@@ -16,7 +16,8 @@ def mean_population_wide_agreement(simulation, *, densities=True):
     if densities:
         densities = [i.density() for i in simulation]
     
-    agreement = [difference_matrix(i, measure=bna).mean() for i in simulation.positions]
+    matrices = [difference_matrix(i, measure=bna) for i in simulation.positions]
+    agreement = [i[np.triu_indices(len(simulation.positions[0]), k=1)].mean() for i in matrices]
     
     if densities:
         return pd.DataFrame(list(zip(densities, agreement)), columns=["density", "agreement"])

@@ -83,7 +83,7 @@ def introduce(_sim, source=None, target=None, strategy=None):
 
         if _found_premises:
             # Get the conclusion candidates from the sentence pool
-            possible_conclusions = list(set(_sim.sentencepool) - set(_sim.leafs) - set(And(*selected_premises).atoms()))
+            possible_conclusions = list(set(_sim.sentencepool) - set(_sim.leaves) - set(And(*selected_premises).atoms()))
             possible_conclusions += list(Not(i) for i in possible_conclusions)
 
             # Directed strategies act as filters on possible conclusions. The list of possible values is not exhausted b/c it is not required by the currently known strategies.

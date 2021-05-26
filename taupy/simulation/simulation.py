@@ -18,7 +18,7 @@ class Simulation(list):
     def __init__(self,
                  directed = True, 
                  sentencepool = "p:10",
-                 leafs = [],
+                 leaves = [],
                  sinks = [],
                  parent_debate = None,
                  argumentlength = 2,
@@ -32,7 +32,7 @@ class Simulation(list):
         else:
             self.sentencepool = [i for i in symbols(sentencepool)]
 
-        self.leafs = [i for i in symbols(leafs)]
+        self.leaves = [i for i in symbols(leaves)]
         self.sinks = [i for i in symbols(sinks)]
 
         self.init_premisepool(argumentlength)

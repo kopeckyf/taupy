@@ -18,8 +18,8 @@ class Simulation(list):
     def __init__(self,
                  directed = True, 
                  sentencepool = "p:10",
-                 sentences_sources = [],
-                 sentences_sinks = [],
+                 leafs = [],
+                 sinks = [],
                  parent_debate = None,
                  argumentlength = 2,
                  positions = [],
@@ -32,8 +32,8 @@ class Simulation(list):
         else:
             self.sentencepool = [i for i in symbols(sentencepool)]
 
-        self.sources = [i for i in symbols(sentences_sources)]
-        self.sinks = [i for i in symbols(sentences_sinks)]
+        self.leafs = [i for i in symbols(leafs)]
+        self.sinks = [i for i in symbols(sinks)]
 
         self.init_premisepool(argumentlength)
         # It's a good idea to store the argument length so that other functions

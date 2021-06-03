@@ -112,27 +112,50 @@ class Simulation(list):
         while True:
             if self.directed and len(self.positions[-1]) >= 2:
                 # The user asked for a directed simulation and has supplied
-                # enough Positions.
-                pick_positions = sample(self.positions[-1], k=2)
-                
-                # Support for positions with multiple introduction strategies. 
-                # First, try to pick a random element from the list of introduction
-                # strategies of a position. If that fails, assume that the strategy
-                # preference of a position is not given as a list, but as a single
-                # item.
-                try:
-                    pick_strategy = choice(pick_positions[0].introduction_strategy)
-                except KeyError:
-                    pick_strategy = pick_positions[0].introduction_strategy
-                
-                argument_introduced = introduce(self, 
-                                                source=pick_positions[0],
-                                                target=pick_positions[1],
-                                                strategy=pick_strategy)
+                # enough Positions. Now instantiate turns of trying to introduce
+                # arguments.
+                j = 0
+                while j < len(self.positions[-1]) / 2:
+                    pick_positions = sample(self.positions[-1], k=2)
+                    
+                    # Support for positions with multiple introduction strategies. 
+                    # First, try to pick a random element from the list of introduction
+                    # strategies of a position. If that fails, assume that the strategy
+                    # preference of a position is not given as a list, but as a single
+                    # item.
+                    try:
+                        pick_strategy = choice(pick_positions[0].introduction_strategy)
+                    except KeyError:
+                        pick_strategy = pick_positions[0].introduction_strategy
+                    
+                    argument_introduced = introduce(self,
+                                                    source=pick_positions[0],
+                                                    target=pick_positions[1],
+                                                    strategy=pick_strategy)
+                    if not argument_introduced:
+                        # The argument introduction did not succeed in this turn.
+                        # We are trying it again if there have been less tries than
+                        # half the size of the population.
+                        j += 1
+                        continue
+                    else:
+                        # An argument was found, break out of the loop. 
+                        # (implies argument_introduced == True)
+                        self.log.append("Argument introduction suceeded after %d attempts." % (j+1))
+                        break
+                else:
+                    # There have been more tries equal to half of the population
+                    # size, but an argument could not be found. This is enough
+                    # grounds to terminate the simulation run.
+                    self.log.append("Argument introduction did not succeed, even after %d attempts." % (j+1))
+                    argument_introduced = False
+                    
                 if argument_introduced:
                     # Check if introduction was succesful before attempting response.
                     response(self, method=self.default_update_strategy)
             else:
+                # The user did not ask for a directed simulation and/or provided less than 2 positions.
+                # In this case, we're investing less work.
                 argument_introduced = introduce(self, strategy=self.default_introduction_strategy)
                 if argument_introduced:
                     response(self, method=self.default_update_strategy)

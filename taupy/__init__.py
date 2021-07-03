@@ -21,9 +21,6 @@ from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, 
 from .simulation import (Simulation, experiment, introduce, response, 
                          evaluate_experiment)
 
-from .graphs import graph_from_sccp, graph_from_weighted_sccp
-                    # plot_map
-
 __all__ = [
             # Core ontology
             'Argument', 'Debate', 'EmptyDebate', 'Position', 
@@ -42,8 +39,5 @@ __all__ = [
             # Common utilities
             'satisfiability_count', 'satisfiability', 'dict_to_prop',
             'dict_to_binary', 'pick_random_positions_from_debate',
-            'free_premises', 'graph_from_positions', 'ari',
-            # Applications of graph theory
-            'graph_from_sccp', 'graph_from_weighted_sccp'
-            # 'plot_map'
+            'free_premises', 'graph_from_positions', 'ari'
           ]

@@ -38,7 +38,8 @@ class Base():
     
     def weighted_sccp(self, distance_measure=edit_distance):
         """
-        Return 
+        Return a weighted SCCP, useful for measures other than the Hamming
+        distance.
         """
         d = {}
         sat = satisfiability(self, all_models=True)
@@ -50,14 +51,14 @@ class Base():
         
         return d
     
-    def map(self, method="plain"):
+    def argument_map(self, method="plain"):
         """
         Create an argument map of the input debate.
         
         Note
         ----
         ``taupy`` is not designed to be an argument/debate visualisation tool.
-        The `map()` function is intented as a very rudimentary option for quick
+        The `argument_map()` function is intented as a very rudimentary option for quick
         visualitions. Users looking for comprehensive argument and debate 
         visualisation are advised to take a look at Argdown.
         """
@@ -113,7 +114,7 @@ class Base():
 
 class Argument(Implies, Base):
     """
-    Must protect against Inputs like Argument((a,b),c)!
+    TODO: Must protect against Inputs like Argument((a,b),c)!
     """
     pass
     

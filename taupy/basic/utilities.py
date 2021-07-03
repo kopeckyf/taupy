@@ -116,7 +116,8 @@ def graph_from_positions(positions, return_attributions=False):
 
 def rand_index(partition1, partition2):
     """
-    Calculate Rand's index, a measure of similarity for two data clusterings
+    Calculate Rand's index, a measure of similarity for two data clusterings.
+    Not yet implemented.
     """
     pass
 

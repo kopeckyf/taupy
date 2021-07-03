@@ -1,10 +1,10 @@
 from sympy import And
-
 from taupy.basic.utilities import satisfiability, dict_to_prop
 
 class Position(dict):
     """
-    Document me! 
+    A position in terms of the theory of dialectical structure, used to model
+    agent's belief systems. 
     """
     def __init__(self, debate, *args, introduction_strategy=None, update_strategy=None):
         self.debate = debate

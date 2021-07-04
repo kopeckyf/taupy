@@ -47,7 +47,7 @@ setup(
 
     # When your source code is in a subdirectory under the project root, e.g.
     # `src/`, it is necessary to specify the `package_dir` argument.
-    package_dir={'': './'},
+    #package_dir={'': './'},
 
     # You can just specify package directories manually here if your project is
     # simple. Or you can use find_packages().
@@ -58,7 +58,7 @@ setup(
     #
     #   py_modules=["my_module"],
     #
-    packages=find_packages(where='./'),
+    packages=find_packages(),
     python_requires='>=3.9, <4',
     install_requires=['sympy>=1.6.2',
                       'dd>=0.5.6',

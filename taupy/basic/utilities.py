@@ -1,4 +1,8 @@
-from dd.cudd import BDD
+try: # Assume that CUDD is installed on the system and bindings present.
+    from dd.cudd import BDD
+except ModuleNotFoundError:
+    from dd.autoref import BDD
+    print("taupy Info: Module dd.cudd not found, reverting to dd.autoref")
 from sympy.logic import to_cnf, And, Implies, Not
 from sympy import symbols
 import numpy as np

@@ -3,7 +3,7 @@ Basic tools in simulations
 """
 from sympy import symbols, Not
 from itertools import combinations, chain
-from random import choice, sample
+from random import choice, sample, shuffle
 from copy import deepcopy
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import time
@@ -24,6 +24,7 @@ class Simulation(list):
                  argumentlength = 2,
                  positions = [],
                  copy_input_positions = True,
+                 initial_position_size = None,
                  default_introduction_strategy = strategies.random, 
                  default_update_strategy = "closest_coherent"):
         
@@ -40,9 +41,9 @@ class Simulation(list):
         # can access that information.
         self.argumentlength = argumentlength
         if copy_input_positions == True:
-            self.init_positions(deepcopy(positions))
+            self.init_positions(deepcopy(positions), target_length=initial_position_size)
         else:
-            self.init_positions(positions)
+            self.init_positions(positions, target_length=initial_position_size)
 
         self.directed = directed
         self.default_introduction_strategy = default_introduction_strategy
@@ -80,7 +81,7 @@ class Simulation(list):
             else: 
                 self.premisepool.append(i)
                 
-    def init_positions(self, positions):
+    def init_positions(self, positions, target_length):
         """
         Generate initial Positions. Optionally, the Positions may start off with
         explicit truth-value attributions. Positions are filled up with random
@@ -88,9 +89,14 @@ class Simulation(list):
         begin as complete positions.
         """
         self.positions = []
+        
+        if target_length == None:
+            target_length = len(self.sentencepool)
 
         for p in positions:
-            for s in self.sentencepool:
+            # This can generate a problem if the user has supplied positions to begin with.
+            pool = sample(self.sentencepool, k=target_length)
+            for s in pool:
                 if s not in p:
                     p[s] = choice([True, False])
 

@@ -2,7 +2,7 @@ from fractions import Fraction
 from taupy.basic.utilities import satisfiability, dict_to_prop
 from sympy import And
 from sympy.logic.algorithms.dpll2 import dpll_satisfiable
-from itertools import combinations
+from itertools import combinations, product, chain
 from random import shuffle, choice
 from math import comb
 import numpy as np
@@ -104,3 +104,17 @@ def next_neighbours(pos, *, debate, models):
     distances_to_candidates = np.array([hamming_distance(i, pos_debate_union) for i in models])
 
     return [models[i] for i in np.where(distances_to_candidates == distances_to_candidates.min())[0].tolist()]
+
+def switch_deletion_neighbourhood(position, distance):
+    """
+    Determine the neighbourhood of edit distance equal to ``distance`` or a ``position``.
+    The operations allowed here for the edit distance are removal and switching of a TVA. 
+    This function is intended to be used in finding alternatives for non-coherent partial positions.
+    This is why the function does not look for additions in the edit distance: if a partial position
+    is incoherent, so is every extension of this position. 
+
+    Returns a list of candidates for further inspection (e.g. for closedness).
+    """
+    powerset = chain.from_iterable(combinations(position, r) for r in range(len(position)+1))
+    candidates = [[set(j) for j in list(i)] for i in list(product(powerset, repeat=2))]
+    return [c for c in candidates if not (c[0] & c[1]) and (len(c[0] | c[1]) == distance)]

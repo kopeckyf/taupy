@@ -8,8 +8,8 @@ import numpy as np
 from random import randrange, choice
 from sympy import And, Not
 from sympy.logic.algorithms.dpll2 import dpll_satisfiable
-from taupy import (Argument, Debate, satisfiability, satisfiability_count, 
-                   dict_to_prop, next_neighbours, hamming_distance)
+from taupy import (Argument, Debate, Position, satisfiability, satisfiability_count, 
+                   dict_to_prop, next_neighbours, hamming_distance, switch_deletion_neighbourhood)
 
 import taupy.simulation.strategies as strategies
 
@@ -184,4 +184,64 @@ def response(_sim, method):
                 u |= choice(next_neighbours(p, debate=_sim[-1], models=list_of_models))
                 updated_positions.append(u)
                 _sim.log.append("Position with index %d was updated with strategy closest_coherent." % (_sim.positions[-1].index(p)))
+        _sim.positions.append(updated_positions)
+
+    if method == "closest_closed_partial_coherent":
+        """
+        This is a "poor man's Levenshtein automaton": we are looking for all positions with a given
+        edit distance to the positions that need updating, and we then select the one with the least
+        distance to the original position.
+        """
+        updated_positions = []
+        
+        for position in _sim.positions[-1]:
+            
+            # First, let's see whether the position has any chance wrt the updated debate:
+            if dpll_satisfiable(And(dict_to_prop(position), _sim[-1])):
+                new_position = deepcopy(position)
+                _sim.log.append("Position with index %d is still coherent given the new debate." % (_sim.positions[-1].index(position)))
+            else:
+                # The position needs other updates than for closure.
+                for d in range(len(position)):
+                    # Let's first build the list of candidates
+                    candidates = [{**{k: position[k] for k in position if k not in i[0]}, 
+                                  **{k: not position[k] for k in i[1]}} for i in switch_deletion_neighbourhood(position, d)]
+                    # We're explicitly sorting that list. The sorting here is crucial for 
+                    # agent's behaviour. They are assumed to start with the longest candidates,
+                    # i.e. they're trying to have as many TVAs as possible.
+
+                    candidates.sort(key=len, reverse=True)
+
+                    for c in candidates:
+                        if dpll_satisfiable(And(dict_to_prop(c), _sim[-1])):
+                            new_position = deepcopy(position)
+                            new_position.clear()
+                            new_position |= c
+                            _sim.log.append("Found a near neighbour for position at index %d which is coherent." % (_sim.positions[-1].index(position)))
+                            break
+                    else:
+                        _sim.log.append("Did not find any replacement for the position at index %d. I sense something is afoot." % (_sim.positions[-1].index(position)))
+
+            # Now that we have found a coherent version of the Position, let's check for closedness.
+            if len(_sim) > 2:
+                for argument in _sim[-1].args:
+                    # For each argument, check if all premises are accepted.
+                    if all (premise in new_position and new_position[premise] == True for premise in argument.args[0].args):
+                        # Then make sure the conclusion is accepted as well.
+                        if argument.args[1] not in new_position:
+                            _sim.log.append("Position needs update due to not being closed.") 
+                            new_position[argument.args[1]] = True
+            else:
+                # The first debate stage of a Simulation needs different treatment, because the content then
+                # is an Argument, not a Debate.
+                if all (premise in new_position and new_position[premise] == True for premise in _sim[-1].args[0].args):
+                        # Then make sure the conclusion is accepted as well.
+                        if _sim[-1].args[1] not in new_position:
+                            _sim.log.append("Position needs update due to not being closed.") 
+                            new_position[_sim[-1].args[1]] = True
+
+            # A final check whether the new position is satisfiable.
+            if dpll_satisfiable(And(dict_to_prop(new_position), _sim[-1])):
+                    updated_positions.append(new_position)
+        
         _sim.positions.append(updated_positions)

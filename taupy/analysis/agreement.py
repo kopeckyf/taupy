@@ -116,5 +116,5 @@ def switch_deletion_neighbourhood(position, distance):
     Returns a list of candidates for further inspection (e.g. for closedness).
     """
     powerset = chain.from_iterable(combinations(position, r) for r in range(len(position)+1))
-    candidates = [[set(j) for j in list(i)] for i in list(product(powerset, repeat=2))]
+    candidates = ([set(j) for j in list(i)] for i in product(list(powerset), repeat=2) if sum(len(k) for k in i) <= 2*distance)
     return [c for c in candidates if not (c[0] & c[1]) and (len(c[0] | c[1]) == distance)]

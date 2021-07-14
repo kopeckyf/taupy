@@ -202,7 +202,7 @@ def response(_sim, method):
                 _sim.log.append("Position with index %d is still coherent given the new debate." % (_sim.positions[-1].index(position)))
             else:
                 # The position needs other updates than for closure.
-                for d in range(len(position)):
+                for d in range(1, len(position)):
                     # Let's first build the list of candidates
                     candidates = [{**{k: position[k] for k in position if k not in i[0]}, 
                                   **{k: not position[k] for k in i[1]}} for i in switch_deletion_neighbourhood(position, d)]
@@ -220,7 +220,13 @@ def response(_sim, method):
                             _sim.log.append("Found a near neighbour for position at index %d which is coherent." % (_sim.positions[-1].index(position)))
                             break
                     else:
-                        _sim.log.append("Did not find any replacement for the position at index %d. I sense something is afoot." % (_sim.positions[-1].index(position)))
+                        continue
+                    # This pattern of if-break-else-continue-break follows an idea that is explained, 
+                    # e.g., here: https://stackoverflow.com/a/3150107
+                    break
+
+                else:
+                    _sim.log.append("Did not find any replacement for the position at index %d. I sense something is afoot." % (_sim.positions[-1].index(position)))
 
             # Now that we have found a coherent version of the Position, let's check for closedness.
             if len(_sim) > 2:

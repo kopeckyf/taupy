@@ -203,20 +203,16 @@ def response(_sim, method):
             else:
                 # The position needs other updates than for closure.
                 for d in range(1, len(position)):
-                    # Let's first build the list of candidates
-                    candidates = [{**{k: position[k] for k in position if k not in i[0]}, 
-                                  **{k: not position[k] for k in i[1]}} for i in switch_deletion_neighbourhood(position, d)]
-                    # We're explicitly sorting that list. The sorting here is crucial for 
-                    # agent's behaviour. They are assumed to start with the longest candidates,
-                    # i.e. they're trying to have as many TVAs as possible.
+                    
+                    for c in switch_deletion_neighbourhood(position, d) :
 
-                    candidates.sort(key=len, reverse=True)
-
-                    for c in candidates:
-                        if dpll_satisfiable(And(dict_to_prop(c), _sim[-1])):
+                        candidate = {**{k: position[k] for k in position if k not in c[0]}, 
+                                     **{k: not position[k] for k in c[1]}}
+                    
+                        if dpll_satisfiable(And(dict_to_prop(candidate), _sim[-1])):
                             new_position = deepcopy(position)
                             new_position.clear()
-                            new_position |= c
+                            new_position |= candidate
                             _sim.log.append("Found a near neighbour for position at index %d which is coherent." % (_sim.positions[-1].index(position)))
                             break
                     else:

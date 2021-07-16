@@ -198,12 +198,15 @@ def response(_sim, method):
             
             # First, let's see whether the position has any chance wrt the updated debate:
             if dpll_satisfiable(And(dict_to_prop(position), _sim[-1])):
-                new_position = deepcopy(position)
+                new_position = Position(_sim[-1], 
+                                        position, 
+                                        introduction_strategy=position.introduction_strategy,
+                                        update_strategy=position.update_strategy)
                 _sim.log.append("Position with index %d is still coherent given the new debate." % (_sim.positions[-1].index(position)))
             else:
                 # The position needs other updates than for closure.
                 for d in range(1, len(position)):
-                    
+
                     for c in switch_deletion_neighbourhood(position, d) :
 
                         candidate = {**{k: position[k] for k in position if k not in c[0]}, 

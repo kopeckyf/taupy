@@ -7,6 +7,7 @@ from sympy.logic import to_cnf, And, Implies, Not
 from sympy import symbols
 import numpy as np
 from random import sample
+from itertools import chain, combinations
 
 def dict_to_prop(dictionary):
     """
@@ -165,3 +166,12 @@ def pick_random_positions_from_debate(n, debate):
         return sample(population=satisfiability(debate, all_models=True), k=n)
     else:
         return False
+
+def subsequences_with_length(iterable, length):
+    """
+    A helper function to return all subsequences with a length of `length`. 
+    This is useful when used incrementally: rather than generating the complete
+    power set, work your way up and work with what you get at every `length`.
+    """
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(length+1))

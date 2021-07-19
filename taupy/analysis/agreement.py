@@ -1,5 +1,5 @@
 from fractions import Fraction
-from taupy.basic.utilities import satisfiability, dict_to_prop
+from taupy.basic.utilities import satisfiability, dict_to_prop, subsequences_with_length
 from sympy import And
 from sympy.logic.algorithms.dpll2 import dpll_satisfiable
 from itertools import combinations, product, chain
@@ -115,11 +115,13 @@ def switch_deletion_neighbourhood(position, distance):
 
     Returns a list of candidates for further inspection (e.g. for closedness).
     """
-    # powerset definition from more-itertools
-    powerset = chain.from_iterable(combinations(position, r) for r in range(distance+1))
-    # all items from P(position) x P(position) are potential neighbours,
-    # but only if their intersection is empty and their union is equal to a distance.
-    candidates = ([set(j) for j in list(i)] for i in product(list(powerset), repeat=2))
+
+    candidates = []
+
+    for i in subsequences_with_length(position.keys(), distance):
+        for k in subsequences_with_length(set(position.keys())-set(i), distance-len(i)):
+            candidates.append((i, k))
+
     for c in candidates:
-        if (not (c[0] & c[1])) and (len(c[0] | c[1]) == distance):
+        if (not (set(c[0]) & set(c[1]))) and (len(set(c[0]) | set(c[1])) == distance):
             yield c

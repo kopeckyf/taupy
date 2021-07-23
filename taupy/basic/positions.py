@@ -1,4 +1,4 @@
-from sympy import And
+from sympy import And, Not
 from taupy.basic.utilities import satisfiability, dict_to_prop
 
 class Position(dict):
@@ -19,10 +19,18 @@ class Position(dict):
         return satisfiability(And(dict_to_prop(self), self.debate))
     
     def is_closed(self):
+        """
+        ⚠️ Work in progress ⚠️
+        Warning: This implementation does not check for coherence. It can label incoherent positions as closed!
+        It currently only works for debates with more than 1 argument.
+        """
         for argument in self.debate.args:
-            if all (premise in self and self[premise] == True for premise in argument.args[0].args):
-                if argument.args[1] not in self or self[argument.args[1]] == False:
-                    return False
+            if all (premise in self and self[premise] == True for premise in argument.args[0].atoms() if \
+                premise in argument.args[0].args) and all (premise in self and self[premise] == False for \
+                    premise in argument.args[0].atoms() if Not(premise) in argument.args[0].args):
+                        conclusion, = argument.args[1].atoms()
+                        if conclusion not in self:
+                            return False
         else:
             return True
 

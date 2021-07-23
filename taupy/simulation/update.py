@@ -215,8 +215,7 @@ def response(_sim, method):
                 while True:
                     r = list({frozenset(model.items()):model for model in \
                         [item for sublist in [[{i:j[i] for i in x} for x in \
-                            chain.from_iterable(combinations(j, r) for r in range(k,k+1))] for j in l] \
-                                for item in sublist]}.values())
+                            combinations(j, k)] for j in l] for item in sublist]}.values())
 
                     a = np.array([edit_distance(i, position) for i in r])
 

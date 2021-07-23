@@ -9,7 +9,8 @@ from random import randrange, choice
 from sympy import And, Not
 from sympy.logic.algorithms.dpll2 import dpll_satisfiable
 from taupy import (Argument, Debate, Position, satisfiability, satisfiability_count, 
-                   dict_to_prop, next_neighbours, hamming_distance, switch_deletion_neighbourhood)
+                   dict_to_prop, next_neighbours, hamming_distance, satisfiable_neighbours,
+                   edit_distance)
 
 import taupy.simulation.strategies as strategies
 
@@ -205,45 +206,58 @@ def response(_sim, method):
                 _sim.log.append("Position with index %d is still coherent given the new debate." % (_sim.positions[-1].index(position)))
             else:
                 # The position needs other updates than for closure.
-                for d in range(1, len(position)):
+                # Thank you, @thefourtheye
+                l = list({frozenset(model.items()):model for model in \
+                    [{j: i[j] for j in i if j in position} for i in \
+                        satisfiable_neighbours(_sim[-1], position)]}.values())
+                
+                k = len(position)
+                while True:
+                    r = list({frozenset(model.items()):model for model in \
+                        [item for sublist in [[{i:j[i] for i in x} for x in \
+                            chain.from_iterable(combinations(j, r) for r in range(k,k+1))] for j in l] \
+                                for item in sublist]}.values())
 
-                    for c in switch_deletion_neighbourhood(position, d) :
+                    a = np.array([edit_distance(i, position) for i in r])
 
-                        candidate = {**{k: position[k] for k in position if k not in c[0]}, 
-                                     **{k: not position[k] for k in c[1]}}
-                    
-                        if dpll_satisfiable(And(dict_to_prop(candidate), _sim[-1])):
-                            new_position = deepcopy(position)
-                            new_position.clear()
-                            new_position |= candidate
-                            _sim.log.append("Found a near neighbour for position at index %d which is coherent." % (_sim.positions[-1].index(position)))
-                            break
+                    if a.size > 0:
+                        new_position = Position(_sim[-1], 
+                                        r[choice(np.argwhere(a == np.amin(a)).flatten().tolist())],
+                                        introduction_strategy=position.introduction_strategy,
+                                        update_strategy=position.update_strategy)
+                        
+                        break
                     else:
-                        continue
-                    # This pattern of if-break-else-continue-break follows an idea that is explained, 
-                    # e.g., here: https://stackoverflow.com/a/3150107
-                    break
-
-                else:
-                    _sim.log.append("Did not find any replacement for the position at index %d. I sense something is afoot." % (_sim.positions[-1].index(position)))
+                        k -= 1               
+                
+                _sim.log.append("Position with index %d updated to a new position, edit distance %d." % (_sim.positions[-1].index(position), edit_distance(position, new_position)))
 
             # Now that we have found a coherent version of the Position, let's check for closedness.
             if len(_sim) > 2:
                 for argument in _sim[-1].args:
                     # For each argument, check if all premises are accepted.
-                    if all (premise in new_position and new_position[premise] == True for premise in argument.args[0].args):
-                        # Then make sure the conclusion is accepted as well.
-                        if argument.args[1] not in new_position:
-                            _sim.log.append("Position needs update due to not being closed.") 
-                            new_position[argument.args[1]] = True
+                    if all (premise in new_position and new_position[premise] == True for \
+                        premise in argument.args[0].atoms() if premise in argument.args[0].args) and \
+                            all (premise in new_position and new_position[premise] == False for \
+                                premise in argument.args[0].atoms() if Not(premise) in argument.args[0].args):
+                                    # Then make sure the conclusion is accepted as well.
+                                    conclusion, = argument.args[1].atoms()
+                                    if conclusion not in new_position:
+                                        _sim.log.append("Position needs update due to not being closed.") 
+                                        new_position[conclusion] = False if Not(conclusion) in argument.args else True
             else:
                 # The first debate stage of a Simulation needs different treatment, because the content then
                 # is an Argument, not a Debate.
-                if all (premise in new_position and new_position[premise] == True for premise in _sim[-1].args[0].args):
-                        # Then make sure the conclusion is accepted as well.
-                        if _sim[-1].args[1] not in new_position:
-                            _sim.log.append("Position needs update due to not being closed.") 
-                            new_position[_sim[-1].args[1]] = True
+                if all (premise in new_position and new_position[premise] == True \
+                    for premise in _sim[-1].args[0].atoms() if premise in _sim[-1].args[0].args) and \
+                        all (premise in new_position and new_position[premise] == False \
+                            for premise in _sim[-1].args[0].atoms() if Not(premise) in _sim[-1].args[0].args):
+                                # Then make sure the conclusion is accepted as well.
+                                conclusion, = _sim[-1].args[1].atoms()
+                                if conclusion not in new_position:
+                                    _sim.log.append("Position needs update due to not being closed.") 
+                                    new_position[conclusion] = False if Not(conclusion) in _sim[-1].args else \
+                                        True
 
             # A final check whether the new position is satisfiable.
             if dpll_satisfiable(And(dict_to_prop(new_position), _sim[-1])):

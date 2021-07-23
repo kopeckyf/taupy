@@ -97,6 +97,18 @@ def satisfiability(formula, all_models = False):
         except StopIteration:
             return False
 
+def satisfiable_neighbours(debate, position):
+    """
+    Return all neighbours of a (partial) position that are satisfiable
+    """
+    variables = list({str(i) for i in debate.atoms()} | {str(i) for i in position.keys()})
+    diagram = BDD()
+    diagram.declare(*variables)
+    
+    expression = diagram.add_expr(str(to_cnf(debate)))
+    for m in diagram.pick_iter(expression, care_vars={str(i) for i in variables}):
+        yield {symbols(k): v for (k, v) in m.items()}
+
 def graph_from_positions(positions, return_attributions=False):
     """
     Returns a dictionary of lists (position: [neighbour1, neighbour2, ...])

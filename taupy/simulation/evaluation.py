@@ -2,7 +2,8 @@ from igraph import Graph, ADJ_MAX
 from sklearn.cluster import AffinityPropagation, AgglomerativeClustering
 from concurrent.futures import ProcessPoolExecutor
 from taupy import (difference_matrix, group_divergence, group_consensus, group_size_parity,
-                   normalised_hamming_distance, pairwise_dispersion, number_of_groups, bna)
+                   normalised_hamming_distance, pairwise_dispersion, number_of_groups, bna,
+                   normalised_edit_distance)
 import numpy as np
 import pandas as pd
 

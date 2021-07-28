@@ -36,6 +36,17 @@ def variance_dispersion(simulation, *, measure=normalised_hamming_distance, dens
     else:
         return dispersions
 
+def variance_dispersion_partial_positions(simulation, *, measure=normalised_edit_distance, densities=True):
+    if densities:
+        densities = [i.density() for i in simulation]
+
+    dispersions = [pairwise_dispersion(i, measure=measure) for i in simulation.positions]
+    
+    if densities:
+        return pd.DataFrame(list(zip(densities, dispersions)), columns=["density", "dispersion"])
+    else:
+        return dispersions
+
 def group_measures_leiden(simulation, *, densities=True):
     if densities:
         densities = [i.density() for i in simulation]

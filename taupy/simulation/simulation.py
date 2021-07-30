@@ -2,14 +2,13 @@
 Basic tools in simulations
 """
 from sympy import symbols, Not
-from itertools import combinations, chain
-from random import choice, sample, shuffle
+from random import choice, sample
 from copy import deepcopy
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import time
 
-from taupy.basic.utilities import satisfiability, satisfiability_count
-from taupy import Debate, EmptyDebate
+from taupy.basic.utilities import satisfiability_count
+from taupy import EmptyDebate
 from .update import introduce, response
 import taupy.simulation.strategies as strategies
 
@@ -30,16 +29,15 @@ class Simulation(list):
         
         if sentencepool == "inherit": # import from parent debate
             self.sentencepool = [i for i in parent_debate.atoms()]
+            raise NotImplementedError("Inherited sentence pools are not implemented.")
         else:
             self.sentencepool = [i for i in symbols(sentencepool)]
+            self.used_premises = []
 
+        self.argumentlength = argumentlength
         self.leaves = [i for i in symbols(leaves)]
         self.sinks = [i for i in symbols(sinks)]
-
-        self.init_premisepool(argumentlength)
-        # It's a good idea to store the argument length so that other functions
-        # can access that information.
-        self.argumentlength = argumentlength
+        
         if copy_input_positions == True:
             self.init_positions(deepcopy(positions), target_length=initial_position_size)
         else:
@@ -48,38 +46,14 @@ class Simulation(list):
         self.directed = directed
         self.default_introduction_strategy = default_introduction_strategy
         self.default_update_strategy = default_update_strategy
-        self.log = []        
+        self.log = []
         list.__init__(self)
         # Initialise the Simulation with an empty debate. This is 
         # necessary so that the initial positions can attach to some debate.
         self.append(EmptyDebate()) if parent_debate == None else self.append(parent_debate)
-        
-    def init_premisepool(self, r):
-        """
-        A generator to obtain all premise combinations available for the 
-        introduction of a new argument.
-        
-        In _premisepool, the closure under negation of the Simulation's
-        sentencepool is generated.
-        
-        This pool is then filtered for configurations that are already used
-        in the latest Debate stage (self[-1]), and for those combinations that
-        have ~x & x in their list. The last step in particular is currently
-        in need of optimisation.
-        """
-        _premisepool = set(self.sentencepool + [Not(i) for i in self.sentencepool]) - set(self.sinks + [Not(i) for i in self.sinks])
-        
-        try: # Assume variable length of subsequence. Following an idea by Dan H.
-            _iterator = chain(*map(lambda i: combinations(_premisepool, i), r))
-        except TypeError: # the input r is not an iterable. Now assume integer.
-            _iterator = combinations (_premisepool, r)
-         
-        self.premisepool = []
-        for i in _iterator:
-            for x in i:
-                if Not(x) in i: break
-            else: 
-                self.premisepool.append(i)
+                
+    def premise_candidates(self):
+        return set(self.sentencepool + [Not(i) for i in self.sentencepool]) - set(self.sinks + [Not(i) for i in self.sinks])
                 
     def init_positions(self, positions, target_length):
         """

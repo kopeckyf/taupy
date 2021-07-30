@@ -2,16 +2,12 @@
 taupy is a Python 3 library for the theory of dialectical structures.
 """
 
-from decimal import Decimal
-from fractions import Fraction
-from math import log2
-
 from .basic import Argument, Debate, EmptyDebate
 from .basic import (Position, position_compatibility)
 from .basic import (satisfiability_count, satisfiability, dict_to_prop, 
                     dict_to_binary, pick_random_positions_from_debate,
                     free_premises, graph_from_positions, ari,
-                    subsequences_with_length, satisfiable_neighbours)
+                    subsequences_with_length, satisfiable_neighbours, fetch_premises)
 
 from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, next_neighbours, 
                        edit_distance, normalised_edit_distance, switch_deletion_neighbourhood,
@@ -42,5 +38,5 @@ __all__ = [
             'satisfiability_count', 'satisfiability', 'dict_to_prop',
             'dict_to_binary', 'pick_random_positions_from_debate',
             'free_premises', 'graph_from_positions', 'ari', 
-            'subsequences_with_length', 'satisfiable_neighbours'
+            'subsequences_with_length', 'satisfiable_neighbours', 'fetch_premises'
           ]

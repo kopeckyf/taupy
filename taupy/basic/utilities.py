@@ -6,8 +6,10 @@ except ModuleNotFoundError:
 from sympy.logic import to_cnf, And, Implies, Not
 from sympy import symbols
 import numpy as np
-from random import sample
+from random import sample, choice
 from itertools import chain, combinations
+from more_itertools import random_combination
+import math
 
 def dict_to_prop(dictionary):
     """
@@ -187,3 +189,37 @@ def subsequences_with_length(iterable, length):
     """
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(length+1))
+
+def fetch_premises(pool, length, exclude=[]):
+    """
+    Fetch a combination of premises with length `n` from the input pool of 
+    sentences. This function will not return a combination of premises that 
+    contains a sink, or a combination that is already used in `exclude`.
+    
+    This way of iteratively drawing a random sample has no natural breakpoint
+    (i.e., there is no iterator that is empty at some point). Thus we estimate
+    that there are at most (k over n) tries, where k is the length of the
+    pool and `n` the desired length. The main weakness of this approach
+    is that it can theoretically happen that the only available combination
+    is not reached before the maximum amount of tries is done.
+    """
+    
+    try:
+        n = choice(length)
+    except TypeError:
+        n = length
+    
+    j = 0
+    k = math.comb(len(pool), n)
+    
+    while True:
+        if j < k:
+            i = random_combination(pool, n)
+            if i not in exclude:
+                for x in i:
+                    if Not(x) in i: break
+                else:
+                    return i
+            j += 1
+        else:
+            return False

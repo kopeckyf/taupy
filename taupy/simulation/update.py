@@ -2,16 +2,14 @@
 Functions to introduce Arguments into Debates and update Positions accordingly.
 """ 
 
-from itertools import combinations, chain
+from itertools import combinations
 from copy import deepcopy
 import numpy as np
 from random import randrange, choice
 from sympy import And, Not
 from sympy.logic.algorithms.dpll2 import dpll_satisfiable
-from taupy import (Argument, Debate, Position, satisfiability, satisfiability_count, 
-                   dict_to_prop, next_neighbours, hamming_distance, satisfiable_neighbours,
-                   edit_distance)
-
+from taupy import (Argument, Debate, Position, satisfiability, dict_to_prop, next_neighbours, 
+                   hamming_distance, satisfiable_neighbours, edit_distance, fetch_premises)
 import taupy.simulation.strategies as strategies
 
 def introduce(_sim, source=None, target=None, strategy=None):
@@ -22,11 +20,6 @@ def introduce(_sim, source=None, target=None, strategy=None):
     representing the position's location in the ``Simulation.positions`` 
     collection.
     """
-    # Check if the simulation has possible premise combinations left
-    if len(_sim.premisepool) == 0:
-        _sim.log.append("Introducing an argument failed because the \
-            Simulation's premise pool is depleted.")
-        return False
 
     # First check which positions have to be allocated (if any)
     if strategy["source"] | strategy["target"]:
@@ -51,36 +44,35 @@ def introduce(_sim, source=None, target=None, strategy=None):
     if not strategy["target"]:
         target_pos = None
     
+    seen_premises = []
+    
     while True:
-        available_premises = _sim.premisepool.copy()
 
         if strategy["pick_premises_from"] == None:
-            selected_premises = available_premises.pop(randrange(0,len(available_premises)))
-            _found_premises = True
+            selected_premises = fetch_premises(_sim.premise_candidates(),
+                                               length=_sim.argumentlength, 
+                                               exclude=_sim.used_premises + seen_premises)
+            if selected_premises:
+                _found_premises = True
         else:
             if strategy["pick_premises_from"] == "source":
-                try: # Assume variable length of subsequence. Following an idea by Dan H.
-                    possible_premises = set(chain(*map(lambda i: combinations(dict_to_prop(source_pos).args, i), _sim.argumentlength)))
-                except TypeError: # the input r is not an iterable. Now assume integer.
-                    possible_premises = set(combinations(dict_to_prop(source_pos).args, r=_sim.argumentlength))
+                selected_premises = fetch_premises(set(dict_to_prop(source_pos).args) - set(_sim.sinks + [Not(i) for i in _sim.sinks]),
+                                                   length=_sim.argumentlength,
+                                                   exclude=_sim.used_premises + seen_premises)
             
             if strategy["pick_premises_from"] == "target":
-                try: # Assume variable length of subsequence. Following an idea by Dan H.
-                    possible_premises = set(chain(*map(lambda i: combinations(dict_to_prop(target_pos).args, i), _sim.argumentlength)))
-                except TypeError: # the input r is not an iterable. Now assume integer.
-                    possible_premises = set(combinations(dict_to_prop(target_pos).args, r=_sim.argumentlength))
+                selected_premises = fetch_premises(set(dict_to_prop(target_pos).args) - set(_sim.sinks + [Not(i) for i in _sim.sinks]),
+                                                   length=_sim.argumentlength,
+                                                   exclude=_sim.used_premises + seen_premises)
 
-            possible_premises = possible_premises & set(available_premises)
-
-            if len(possible_premises) == 0:
-                # There are no further available premises.
+            if selected_premises:
+                _found_premises = True
+                seen_premises.append(selected_premises)
+            else:
+                # Can't find available premises.
                 _sim.log.append("Can't find premises for source %s and target %s" % (source_pos, target_pos))
                 _found_valid_argument = False
                 break
-            else:
-                selected_premises = choice(list(possible_premises))
-                available_premises.remove(selected_premises)
-                _found_premises = True
 
         if _found_premises:
             # Get the conclusion candidates from the sentence pool
@@ -99,18 +91,18 @@ def introduce(_sim, source=None, target=None, strategy=None):
             
             # Now select a conclusion from the (un-)filtered list of conclusions:
             if len(possible_conclusions) == 0:
-                _sim.log.append("Introducing argument failed because no matching conclusion could be found for the selected premises. %d combinations of premises remain." % (len(available_premises)) )
-                _sim.premisepool.remove(selected_premises)
+                _sim.log.append("Introducing argument failed because no matching conclusion could be found for the selected premises. %d combinations of premises have been tried." % (len(seen_premises)))
+                _sim.used_premises.append(selected_premises)
             else:
                 selected_conclusion = choice(possible_conclusions)
 
                 if satisfiability(And( _sim[-1], Argument(And(*selected_premises), selected_conclusion))):
-                    _sim.premisepool.remove(selected_premises)
+                    _sim.used_premises.append(selected_premises)
                     _found_valid_argument = True
                     break
                 else:
-                    _sim.log.append("Introducing argument failed because of UNSAT. %d combinations of premises remain." % (len(available_premises)) )
-                    if len(available_premises) == 0:
+                    _sim.log.append("Introducing argument failed because of UNSAT. %d combinations of premises tried." % (len(seen_premises)) )
+                    if not selected_premises:
                         _found_valid_argument = False
                         break
     

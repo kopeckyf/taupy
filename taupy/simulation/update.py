@@ -226,7 +226,7 @@ def response(_sim, method):
             # Now that we have found a coherent version of the Position, let's check for closedness.
             if len(_sim[-1].args) > 0:
                 # Only check closedness if the Simulation contains Arguments.
-                if len(_sim) > 2:
+                if isinstance(_sim[-1], Debate):
                     for argument in _sim[-1].args:
                         # For each argument, check if all premises are accepted.
                         if all (premise in new_position and new_position[premise] == True for \
@@ -238,7 +238,7 @@ def response(_sim, method):
                                         if conclusion not in new_position:
                                             _sim.log.append("Position needs update due to not being closed.") 
                                             new_position[conclusion] = False if Not(conclusion) in argument.args else True
-                else:
+                if isinstance(_sim[-1], Argument):
                     # The first debate stage of a Simulation needs different treatment, because the content then
                     # is an Argument, not a Debate.
                     if all (premise in new_position and new_position[premise] == True \

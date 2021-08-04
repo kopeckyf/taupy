@@ -224,31 +224,33 @@ def response(_sim, method):
                 _sim.log.append("Position with index %d updated to a new position, edit distance %d." % (_sim.positions[-1].index(position), edit_distance(position, new_position)))
 
             # Now that we have found a coherent version of the Position, let's check for closedness.
-            if len(_sim) > 2:
-                for argument in _sim[-1].args:
-                    # For each argument, check if all premises are accepted.
-                    if all (premise in new_position and new_position[premise] == True for \
-                        premise in argument.args[0].atoms() if premise in argument.args[0].args) and \
-                            all (premise in new_position and new_position[premise] == False for \
-                                premise in argument.args[0].atoms() if Not(premise) in argument.args[0].args):
+            if len(_sim[-1].args) > 0:
+                # Only check closedness if the Simulation contains Arguments.
+                if len(_sim) > 2:
+                    for argument in _sim[-1].args:
+                        # For each argument, check if all premises are accepted.
+                        if all (premise in new_position and new_position[premise] == True for \
+                            premise in argument.args[0].atoms() if premise in argument.args[0].args) and \
+                                all (premise in new_position and new_position[premise] == False for \
+                                    premise in argument.args[0].atoms() if Not(premise) in argument.args[0].args):
+                                        # Then make sure the conclusion is accepted as well.
+                                        conclusion, = argument.args[1].atoms()
+                                        if conclusion not in new_position:
+                                            _sim.log.append("Position needs update due to not being closed.") 
+                                            new_position[conclusion] = False if Not(conclusion) in argument.args else True
+                else:
+                    # The first debate stage of a Simulation needs different treatment, because the content then
+                    # is an Argument, not a Debate.
+                    if all (premise in new_position and new_position[premise] == True \
+                        for premise in _sim[-1].args[0].atoms() if premise in _sim[-1].args[0].args) and \
+                            all (premise in new_position and new_position[premise] == False \
+                                for premise in _sim[-1].args[0].atoms() if Not(premise) in _sim[-1].args[0].args):
                                     # Then make sure the conclusion is accepted as well.
-                                    conclusion, = argument.args[1].atoms()
+                                    conclusion, = _sim[-1].args[1].atoms()
                                     if conclusion not in new_position:
                                         _sim.log.append("Position needs update due to not being closed.") 
-                                        new_position[conclusion] = False if Not(conclusion) in argument.args else True
-            else:
-                # The first debate stage of a Simulation needs different treatment, because the content then
-                # is an Argument, not a Debate.
-                if all (premise in new_position and new_position[premise] == True \
-                    for premise in _sim[-1].args[0].atoms() if premise in _sim[-1].args[0].args) and \
-                        all (premise in new_position and new_position[premise] == False \
-                            for premise in _sim[-1].args[0].atoms() if Not(premise) in _sim[-1].args[0].args):
-                                # Then make sure the conclusion is accepted as well.
-                                conclusion, = _sim[-1].args[1].atoms()
-                                if conclusion not in new_position:
-                                    _sim.log.append("Position needs update due to not being closed.") 
-                                    new_position[conclusion] = False if Not(conclusion) in _sim[-1].args else \
-                                        True
+                                        new_position[conclusion] = False if Not(conclusion) in _sim[-1].args else \
+                                            True
 
             # A final check whether the new position is satisfiable.
             if dpll_satisfiable(And(dict_to_prop(new_position), _sim[-1])):

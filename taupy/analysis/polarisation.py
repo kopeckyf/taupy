@@ -201,6 +201,8 @@ def group_size_parity(clusters):
     and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
     DOI: 10/d3kn.
     """
+    # Catch empty clusters (applicable to the exogenous group detection)
+    clusters = [c for c in clusters if c]
     G = number_of_groups(clusters)
     population_size = sum([len(c) for c in clusters])
     try:

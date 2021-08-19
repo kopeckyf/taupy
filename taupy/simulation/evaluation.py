@@ -7,9 +7,9 @@ from taupy import (difference_matrix, group_divergence, group_consensus, group_s
 import numpy as np
 import pandas as pd
 
-def evaluate_experiment(experiment, *, function=None, densities=True, executor={}):
+def evaluate_experiment(experiment, *, function=None, densities=True, executor={}, arguments={}):
     with ProcessPoolExecutor(**executor) as executor:
-        results = [executor.submit(function, simulation=i) for i in experiment]
+        results = [executor.submit(function, simulation=i, **arguments) for i in experiment]
     
     return pd.concat([i.result() for i in results], keys=[n for n, _ in enumerate(results)])
 
@@ -46,6 +46,39 @@ def variance_dispersion_partial_positions(simulation, *, measure=normalised_edit
         return pd.DataFrame(list(zip(densities, dispersions)), columns=["density", "dispersion"])
     else:
         return dispersions
+    
+def group_measures_exogenous(simulation, *, sentence=None, densities=True):
+    if densities:
+        densities = [i.density() for i in simulation]
+
+    matrices = [difference_matrix(i, measure=normalised_edit_distance) for i in simulation.positions]
+    
+    clusterings = []
+    for i in simulation.positions:
+        accepting_positions = []
+        rejecting_positions = []
+        suspending_positions = []
+        for num, pos in enumerate(i):
+            if sentence in pos:
+                if pos[sentence] == True:
+                    accepting_positions.append(num)
+                if pos[sentence] == False:
+                    rejecting_positions.append(num)
+            else:
+                suspending_positions.append(num)
+        clusterings.append([accepting_positions, rejecting_positions, 
+                            suspending_positions])  
+    
+    divergences = [group_divergence(i, matrices[num]) for num, i in enumerate(clusterings)]
+    consensus = [group_consensus(i, matrices[num]) for num, i in enumerate(clusterings)]
+    numbers = [number_of_groups(i) for i in clusterings]
+    size_parity = [group_size_parity(i) for i in clusterings]
+
+    if densities:
+        return pd.DataFrame(list(zip(densities, divergences, consensus, numbers, size_parity)), 
+                            columns=["density", "divergence", "consensus", "numbers", "size_parity"])
+    else:
+        return divergences
 
 def group_measures_leiden(simulation, *, densities=True):
     if densities:

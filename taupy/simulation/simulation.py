@@ -74,11 +74,14 @@ class Simulation(list):
             target_length = len(self.sentencepool)
 
         for p in positions:
-            # TODO: This can generate a problem if the user has supplied positions to begin with.
-            pool = sample(self.sentencepool, k=target_length)
-            for s in pool:
-                if s not in p:
-                    p[s] = choice([True, False])
+            if len(p) < target_length:
+                # Only fill up positions that do not have the desired length.
+                pool = sample(self.sentencepool, k=target_length)
+                for s in pool:
+                    if s not in p and len(p) < target_length:
+                        # While filling up a position, catch when it reaches the 
+                        # desired length.
+                        p[s] = choice([True, False])
 
         self.positions.append(positions)
                 

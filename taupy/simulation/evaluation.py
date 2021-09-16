@@ -3,7 +3,7 @@ from sklearn.cluster import AffinityPropagation, AgglomerativeClustering
 from concurrent.futures import ProcessPoolExecutor
 from taupy import (difference_matrix, group_divergence, group_consensus, group_size_parity,
                    normalised_hamming_distance, pairwise_dispersion, number_of_groups, bna,
-                   normalised_edit_distance)
+                   normalised_edit_distance, satisfiability_count)
 from statistics import mean
 import numpy as np
 import pandas as pd
@@ -45,6 +45,12 @@ def mean_population_wide_agreement(simulation, *, densities=True):
         return pd.DataFrame(list(zip(densities, agreement)), columns=["density", "agreement"])
     else:
         return agreement
+
+def auxiliary_information(simulation):
+    size_of_sccp = [satisfiability_count(i) for i in simulation]
+    unique_positions = [len([dict(i) for i in set(frozenset(position.items()) for position in stage)]) for stage in simulation.positions]
+
+    return pd.DataFrame(list(zip(size_of_sccp, unique_positions)), columns=["sccp_extension", "number_uniq_pos"])
 
 def variance_dispersion(simulation, *, measure=normalised_hamming_distance, densities=True):
     if densities:

@@ -4,6 +4,7 @@ from concurrent.futures import ProcessPoolExecutor
 from taupy import (difference_matrix, group_divergence, group_consensus, group_size_parity,
                    normalised_hamming_distance, pairwise_dispersion, number_of_groups, bna,
                    normalised_edit_distance)
+from statistics import mean
 import numpy as np
 import pandas as pd
 
@@ -12,6 +13,26 @@ def evaluate_experiment(experiment, *, function=None, densities=True, executor={
         results = [executor.submit(function, simulation=i, **arguments) for i in experiment]
     
     return pd.concat([i.result() for i in results], keys=[n for n, _ in enumerate(results)])
+
+def position_changes(simulation, *, measure=hamming_distance, densities=True):
+    if densities:
+        densities = [i.density() for i in simulation]
+    
+    #pairs of debate stages
+    p = [simulation.positions[i:i+2] for i in range(len(simulation.positions)-1)]
+    averages = []
+    
+    for pair in p:
+        d = [measure(pair[0][i], pair[1][i]) for i in range(len(pair[0]))]
+        averages.append(mean(d))
+    
+    density_pairs = [mean(densities[i:i+2]) for i in range(len(densities)-1)]
+    
+    if densities:
+        return pd.DataFrame(list(zip(density_pairs, averages)), columns=["avg density in pair", "position difference"])
+    else:
+        return averages
+    
 
 def mean_population_wide_agreement(simulation, *, densities=True):
     if densities:

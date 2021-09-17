@@ -2,8 +2,8 @@ from igraph import Graph, ADJ_MAX
 from sklearn.cluster import AffinityPropagation, AgglomerativeClustering
 from concurrent.futures import ProcessPoolExecutor
 from taupy import (difference_matrix, group_divergence, group_consensus, group_size_parity,
-                   normalised_hamming_distance, pairwise_dispersion, number_of_groups, bna,
-                   normalised_edit_distance, satisfiability_count)
+                   normalised_hamming_distance, hamming_distance, normalised_edit_distance, 
+                   pairwise_dispersion, number_of_groups, bna, satisfiability_count)
 from statistics import mean
 import numpy as np
 import pandas as pd
@@ -24,7 +24,7 @@ def position_changes(simulation, *, measure=hamming_distance, densities=True):
     
     for pair in p:
         d = [measure(pair[0][i], pair[1][i]) for i in range(len(pair[0]))]
-        averages.append(mean(d))
+        averages.append(len([pos for pos in d if pos != 0]))
     
     density_pairs = [mean(densities[i:i+2]) for i in range(len(densities)-1)]
     

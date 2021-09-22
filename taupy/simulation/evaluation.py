@@ -116,7 +116,7 @@ def group_measures_leiden(simulation, *, densities=True, key_propositions=None):
     if key_propositions == None:
         clustering_matrices = matrices
     else:
-        filtered_positions = [[{k: j[k] if k in key_propositions} for j in i] for i in simulation.positions]
+        filtered_positions = [[{k: j[k] for k in key_propositions} for j in i] for i in simulation.positions]
         clustering_matrices = [difference_matrix(i, measure=normalised_hamming_distance) for i in filtered_positions]
         
     filtered_matrices = [np.exp(-4 * i.astype("float64")) for i in clustering_matrices]

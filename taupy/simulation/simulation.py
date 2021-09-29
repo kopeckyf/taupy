@@ -13,22 +13,20 @@ from .update import introduce, response
 import taupy.simulation.strategies as strategies
 
 class Simulation(list):
-    
+
     def __init__(self,
-                 directed = True, 
+                 directed = True,
                  events = {"introduction": 9, "new_sentence": 1},
                  sentencepool = "p:10",
                  max_sentencepool = None,
-                 leaves = [],
-                 sinks = [],
                  parent_debate = None,
                  argumentlength = 2,
                  positions = [],
                  copy_input_positions = True,
                  initial_position_size = None,
-                 default_introduction_strategy = strategies.random, 
+                 default_introduction_strategy = strategies.random,
                  default_update_strategy = "closest_coherent"):
-        
+
         if sentencepool == "inherit": # import from parent debate
             self.sentencepool = [i for i in parent_debate.atoms()]
             raise NotImplementedError("Inherited sentence pools are not implemented.")
@@ -39,11 +37,8 @@ class Simulation(list):
         self.max_sentencepool = [i for i in symbols(max_sentencepool)] if max_sentencepool else self.sentencepool
 
         self.events = events
-
         self.argumentlength = argumentlength
-        self.leaves = [i for i in symbols(leaves)]
-        self.sinks = [i for i in symbols(sinks)]
-        
+
         if copy_input_positions == True:
             self.init_positions(deepcopy(positions), target_length=initial_position_size)
         else:
@@ -54,13 +49,13 @@ class Simulation(list):
         self.default_update_strategy = default_update_strategy
         self.log = []
         list.__init__(self)
-        # Initialise the Simulation with an empty debate. This is 
+        # Initialise the Simulation with an empty debate. This is
         # necessary so that the initial positions can attach to some debate.
         self.append(EmptyDebate()) if parent_debate == None else self.append(parent_debate)
-                
+
     def premise_candidates(self):
-        return set(self.sentencepool + [Not(i) for i in self.sentencepool]) - set(self.sinks + [Not(i) for i in self.sinks])
-                
+        return set(self.sentencepool + [Not(i) for i in self.sentencepool])
+
     def init_positions(self, positions, target_length):
         """
         Generate initial Positions. Optionally, the Positions may start off with
@@ -69,7 +64,7 @@ class Simulation(list):
         begin as complete positions.
         """
         self.positions = []
-        
+
         if target_length == None:
             target_length = len(self.sentencepool)
 
@@ -79,19 +74,19 @@ class Simulation(list):
                 pool = sample(self.sentencepool, k=target_length)
                 for s in pool:
                     if s not in p and len(p) < target_length:
-                        # While filling up a position, catch when it reaches the 
+                        # While filling up a position, catch when it reaches the
                         # desired length.
                         p[s] = choice([True, False])
 
         self.positions.append(positions)
-                
+
     def run(self, max_density=0.8, max_steps=1000, min_sccp=1, quiet=True):
         """
-        Run a Simulation using ``introduction_method`` and ``update_mechanism`` 
-        until either ``max_density`` is reached, the SCCP has an extension of 
+        Run a Simulation using ``introduction_method`` and ``update_mechanism``
+        until either ``max_density`` is reached, the SCCP has an extension of
         ``min_sccp`` or ``max_steps`` have been taken.
-        
-        If ``quiet=False``, the last log entry which contains a summary of 
+
+        If ``quiet=False``, the last log entry which contains a summary of
         the simulation is not output. This is useful in batch processing of
         Simulations (see ``experiment()``).
         """
@@ -102,7 +97,7 @@ class Simulation(list):
 
             selected_event = choices([i[0] for i in self.events.items()],
                                      weights=[i[1] for i in self.events.items()])[0]
-            
+
             if selected_event not in ["introduction", "new_sentence"]:
                 raise NotImplementedError(f"No recipe for event type {selected_event}.")
 
@@ -114,8 +109,8 @@ class Simulation(list):
                     j = 0
                     while j < len(self.positions[-1]) / 2:
                         pick_positions = sample(self.positions[-1], k=2)
-                        
-                        # Support for positions with multiple introduction strategies. 
+
+                        # Support for positions with multiple introduction strategies.
                         # First, try to pick a random element from the list of introduction
                         # strategies of a position. If that fails, assume that the strategy
                         # preference of a position is not given as a list, but as a single
@@ -124,7 +119,7 @@ class Simulation(list):
                             pick_strategy = choice(pick_positions[0].introduction_strategy)
                         except KeyError:
                             pick_strategy = pick_positions[0].introduction_strategy
-                        
+
                         argument_introduced = introduce(self,
                                                         source=pick_positions[0],
                                                         target=pick_positions[1],
@@ -136,7 +131,7 @@ class Simulation(list):
                             j += 1
                             continue
                         else:
-                            # An argument was found, break out of the loop. 
+                            # An argument was found, break out of the loop.
                             # (implies argument_introduced == True)
                             self.log.append("Argument introduction suceeded after %d attempts." % (j+1))
                             break
@@ -146,7 +141,7 @@ class Simulation(list):
                         # grounds to terminate the simulation run.
                         self.log.append("Argument introduction did not succeed, even after %d attempts." % (j+1))
                         argument_introduced = False
-                        
+
                     if argument_introduced:
                         # Check if introduction was succesful before attempting response.
                         response(self, method=self.default_update_strategy)
@@ -156,12 +151,12 @@ class Simulation(list):
                     argument_introduced = introduce(self, strategy=self.default_introduction_strategy)
                     if argument_introduced:
                         response(self, method=self.default_update_strategy)
-                
+
                 if not argument_introduced:
                     # Break out of the Simulation if no argument could be inserted.
                     # In this case, the log will tell more about what went wrong.
                     break
-            
+
             if selected_event == "new_sentence":
                 # Let's see which sentences could be inserted into the debate.
                 # This will be the difference between the sentencepool and the max_sentencepool
@@ -188,8 +183,8 @@ class Simulation(list):
                             # either truth value.
                             e[selected_sentence] = choice([True, False])
                         expanded_positions.append(e)
-                    
-                    self.positions.append(expanded_positions)      
+
+                    self.positions.append(expanded_positions)
 
                 else:
                     # Failure to insert a sentence does not end the simulation, but we take note if it in the log.
@@ -200,7 +195,7 @@ class Simulation(list):
                 break
 
         self.log.append("Simulation ended. %d steps were taken. Density at end: %f. Extension of SCCP: %d." % (i, self[-1].density(),  satisfiability_count(self[-1])))
-        
+
         if quiet:
             return self.log[-1]
         else:
@@ -208,9 +203,9 @@ class Simulation(list):
 
 def experiment(n, executor={}, simulations={}, runs={}):
     """
-    Generate and execute `n` number of Simulations and output their results. 
+    Generate and execute `n` number of Simulations and output their results.
     The Simulations can be controlled via a dictionary passed to ``simulations``.
-    The ``Simulation.run()``s can be controlled with a dictionary passed to 
+    The ``Simulation.run()``s can be controlled with a dictionary passed to
     ``runs``.
 
     Settings to the ``ProcessPoolExecutor`` should be forwarded in a dictionary
@@ -224,5 +219,5 @@ def experiment(n, executor={}, simulations={}, runs={}):
 
         for count, future in enumerate(as_completed(results), start=1):
             print(f"Simulation {count}/{n} completed at {time.ctime()}.")
-    
+
     return [i.result() for i in results]

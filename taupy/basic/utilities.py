@@ -13,7 +13,7 @@ import math
 
 def dict_to_prop(dictionary):
     """
-    Helper function that converts a dictionary to a propositional formula, 
+    Helper function that converts a dictionary to a propositional formula,
     acknowledging dictionary's truth-value attributions.
     """
     l = []
@@ -46,8 +46,8 @@ def free_premises(debate):
         for j in [*i.args[0].atoms()]:
             premises.add(j)
     conclusions = {i.args[1] for i in debate.args}
-    
-    return {i for i in premises if i not in conclusions and 
+
+    return {i for i in premises if i not in conclusions and
             Not(i) not in conclusions}
 
 def iter_to_string(l, sep=""):
@@ -67,10 +67,10 @@ def neighbours_of_list(l):
     complements = [1,0] # complements[0] == 1 and complements[1] == 0
     for i in range(len(l)):
         yield (l[:i] + [complements[l[i]]] + l[i+1:])
-        
+
 def satisfiability_count(formula):
     """
-    Count the models that satisfy a Boolean formula, using Binary decision diagrams. 
+    Count the models that satisfy a Boolean formula, using Binary decision diagrams.
     """
     variables = iter_to_list_of_strings(formula.atoms())
     diagram = BDD()
@@ -85,7 +85,7 @@ def satisfiability(formula, all_models = False):
     variables = iter_to_list_of_strings(formula.atoms())
     diagram = BDD()
     diagram.declare(*variables)
-    
+
     if all_models:
         expression = diagram.add_expr(str(to_cnf(formula)))
         return [{symbols(k): v for (k, v) in m.items()} for m in \
@@ -106,7 +106,7 @@ def satisfiable_neighbours(debate, position):
     variables = list({str(i) for i in debate.atoms()} | {str(i) for i in position.keys()})
     diagram = BDD()
     diagram.declare(*variables)
-    
+
     expression = diagram.add_expr(str(to_cnf(debate)))
     for m in diagram.pick_iter(expression, care_vars={str(i) for i in variables}):
         yield {symbols(k): v for (k, v) in m.items()}
@@ -115,11 +115,11 @@ def graph_from_positions(positions, return_attributions=False):
     """
     Returns a dictionary of lists (position: [neighbour1, neighbour2, ...])
     that resembles the space of the positions.
-    
+
     If return_attributions is set to True, this function returns a tuple. The
     first object then is the graph representation in a dict of lists format, the
     second object is a mapping from the string representation of a position
-    to its dictionary format. This is useful because non-hashable objects like 
+    to its dictionary format. This is useful because non-hashable objects like
     dictionaries can not be used as identifiers of nodes in graphs.
     """
     d = {}
@@ -129,7 +129,7 @@ def graph_from_positions(positions, return_attributions=False):
         neighbourlist = [iter_to_string(x) for x in neighbours_of_list(b) if x in bits]
         d[iter_to_string(b)] = neighbourlist
     if return_attributions:
-        return d, dict(zip(list(iter_to_string(b) for b in bits), positions)) 
+        return d, dict(zip(list(iter_to_string(b) for b in bits), positions))
     else:
         return d
 
@@ -175,7 +175,7 @@ def pick_random_positions_from_debate(n, debate):
     :py:obj:`False` if the debate's SCCP is smaller than `n`.
     """
     if satisfiability_count(debate) >= n:
-        # Using satisfiability_count() here can spare us the construction of 
+        # Using satisfiability_count() here can spare us the construction of
         # a SCCP, which is more complex than just obtaining the SCCP's number.
         return sample(population=satisfiability(debate, all_models=True), k=n)
     else:
@@ -183,7 +183,7 @@ def pick_random_positions_from_debate(n, debate):
 
 def subsequences_with_length(iterable, length):
     """
-    A helper function to return all subsequences with a length of `length`. 
+    A helper function to return all subsequences with a length of `length`.
     This is useful when used incrementally: rather than generating the complete
     power set, work your way up and work with what you get at every `length`.
     """
@@ -192,10 +192,10 @@ def subsequences_with_length(iterable, length):
 
 def fetch_premises(pool, length, exclude=[]):
     """
-    Fetch a combination of premises with length `n` from the input pool of 
-    sentences. This function will not return a combination of premises that 
-    contains a sink, or a combination that is already used in `exclude`.
-    
+    Fetch a combination of premises with length `n` from the input pool of
+    sentences. This function will not return a combination of premises that
+    is mentioned in `exclude`.
+
     This way of iteratively drawing a random sample has no natural breakpoint
     (i.e., there is no iterator that is empty at some point). Thus we estimate
     that there are at most (k over n) tries, where k is the length of the
@@ -203,15 +203,15 @@ def fetch_premises(pool, length, exclude=[]):
     is that it can theoretically happen that the only available combination
     is not reached before the maximum amount of tries is done.
     """
-    
+
     try:
         n = choice(length)
     except TypeError:
         n = length
-    
+
     j = 0
     k = math.comb(len(pool), n)
-    
+
     while True:
         if j < k:
             i = random_combination(pool, n)

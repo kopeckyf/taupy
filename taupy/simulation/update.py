@@ -1,6 +1,6 @@
 """
 Functions to introduce Arguments into Debates and update Positions accordingly.
-""" 
+"""
 
 from itertools import combinations
 from copy import deepcopy
@@ -8,16 +8,16 @@ import numpy as np
 from random import randrange, choice
 from sympy import And, Not
 from sympy.logic.algorithms.dpll2 import dpll_satisfiable
-from taupy import (Argument, Debate, Position, satisfiability, dict_to_prop, next_neighbours, 
+from taupy import (Argument, Debate, Position, satisfiability, dict_to_prop, next_neighbours,
                    hamming_distance, satisfiable_neighbours, edit_distance, fetch_premises)
 import taupy.simulation.strategies as strategies
 
 def introduce(_sim, source=None, target=None, strategy=None):
     """
     Introduce an argument following an argumentation strategy from ``source`` to
-    ``target``. If ``source`` or ``target`` are unspecified, they are filled in 
-    automatically. The ``source`` and ``target`` should be given as integers 
-    representing the position's location in the ``Simulation.positions`` 
+    ``target``. If ``source`` or ``target`` are unspecified, they are filled in
+    automatically. The ``source`` and ``target`` should be given as integers
+    representing the position's location in the ``Simulation.positions``
     collection.
     """
 
@@ -37,31 +37,31 @@ def introduce(_sim, source=None, target=None, strategy=None):
                 target_pos = target
             else:
                 target_pos = positions.pop(randrange(0,len(positions)))
-    
+
     # Track if source and target positions are set and store for log entry.
     if not strategy["source"]:
         source_pos = None
     if not strategy["target"]:
         target_pos = None
-    
+
     seen_premises = []
-    
+
     while True:
 
         if strategy["pick_premises_from"] == None:
             selected_premises = fetch_premises(_sim.premise_candidates(),
-                                               length=_sim.argumentlength, 
+                                               length=_sim.argumentlength,
                                                exclude=_sim.used_premises + seen_premises)
             if selected_premises:
                 _found_premises = True
         else:
             if strategy["pick_premises_from"] == "source":
-                selected_premises = fetch_premises(set(dict_to_prop(source_pos).args) - set(_sim.sinks + [Not(i) for i in _sim.sinks]),
+                selected_premises = fetch_premises(set(dict_to_prop(source_pos).args),
                                                    length=_sim.argumentlength,
                                                    exclude=_sim.used_premises + seen_premises)
-            
+
             if strategy["pick_premises_from"] == "target":
-                selected_premises = fetch_premises(set(dict_to_prop(target_pos).args) - set(_sim.sinks + [Not(i) for i in _sim.sinks]),
+                selected_premises = fetch_premises(set(dict_to_prop(target_pos).args),
                                                    length=_sim.argumentlength,
                                                    exclude=_sim.used_premises + seen_premises)
 
@@ -76,7 +76,7 @@ def introduce(_sim, source=None, target=None, strategy=None):
 
         if _found_premises:
             # Get the conclusion candidates from the sentence pool
-            possible_conclusions = list(set(_sim.sentencepool) - set(_sim.leaves) - set(And(*selected_premises).atoms()))
+            possible_conclusions = list(set(_sim.sentencepool) - set(And(*selected_premises).atoms()))
             possible_conclusions += list(Not(i) for i in possible_conclusions)
 
             # Directed strategies act as filters on possible conclusions. The list of possible values is not exhausted b/c it is not required by the currently known strategies.
@@ -85,10 +85,10 @@ def introduce(_sim, source=None, target=None, strategy=None):
 
             if strategy["source_accepts_conclusion"] == "Toleration":
                 possible_conclusions = list(set(possible_conclusions) - {Not(i) for i in dict_to_prop(source_pos).args})
-                
+
             if strategy["target_accepts_conclusion"] == "No":
                 possible_conclusions = list(set(possible_conclusions) & set([Not(i) for i in dict_to_prop(target_pos).args]))
-            
+
             # Now select a conclusion from the (un-)filtered list of conclusions:
             if len(possible_conclusions) == 0:
                 _sim.log.append("Introducing argument failed because no matching conclusion could be found for the selected premises. %d combinations of premises have been tried." % (len(seen_premises)))
@@ -105,24 +105,24 @@ def introduce(_sim, source=None, target=None, strategy=None):
                     if not selected_premises:
                         _found_valid_argument = False
                         break
-    
+
     if _found_valid_argument:
         _sim.log.append("Introduce argument with strategy '%s'. Premises: %s. Conclusion: %s. Source: %s. Target: %s." % (strategy["name"], And(*selected_premises), selected_conclusion, source_pos, target_pos))
-        
+
         if len(_sim) == 1:
             # Initialise the Simulation with _argument
             _sim.append(Debate(Argument(And(*selected_premises), selected_conclusion)))
         else:
-            if type(_sim[-1]) == Argument: 
+            if type(_sim[-1]) == Argument:
                 # If a Debate conists of just one Argument, the debate's type
                 # is changed to Argument b/c of inheritance from sympy cls.
                 _sim.append(Debate( _sim[-1], Argument(And(*selected_premises), selected_conclusion)))
-            else: 
+            else:
                 # Assuming type is Debate or And
                 _sim.append(Debate( *_sim[-1].args, Argument(And(*selected_premises), selected_conclusion)))
-        
+
         return True
-        # return Argument(And(*selected_premises), selected_conclusion)    
+        # return Argument(And(*selected_premises), selected_conclusion)
     else:
         _sim.log.append("Introduction with strategy '%s' failed. No valid combinations left in the premise pool." % (strategy["name"]) )
         return False
@@ -130,11 +130,11 @@ def introduce(_sim, source=None, target=None, strategy=None):
 def response(_sim, method):
     """
     Updating Positions in a debate.
-    
-    Currently, we only have one sensisble strategy, ``closest_coherent``. 
+
+    Currently, we only have one sensisble strategy, ``closest_coherent``.
     Surely, many more remain to be discovered.
     """
-    
+
     if method == "random":
         updated_positions = []
         for p in _sim.positions[-1]:
@@ -142,10 +142,10 @@ def response(_sim, method):
                 updated_positions.append(p)
             else:
                 u = deepcopy(p)
-                u |= choice(satisfiability(And(*_sim.sentencepool, _sim[-1]),all_models=True)) 
+                u |= choice(satisfiability(And(*_sim.sentencepool, _sim[-1]),all_models=True))
                 updated_positions.append(u)
-        _sim.positions.append(updated_positions)        
-    
+        _sim.positions.append(updated_positions)
+
     if method == "closest_coherent_complete_search":
         updated_positions = []
         models = list(satisfiability(_sim[-1], all_models="True"))
@@ -186,13 +186,13 @@ def response(_sim, method):
         distance to the original position.
         """
         updated_positions = []
-        
+
         for position in _sim.positions[-1]:
-            
+
             # First, let's see whether the position has any chance wrt the updated debate:
             if dpll_satisfiable(And(dict_to_prop(position), _sim[-1])):
-                new_position = Position(_sim[-1], 
-                                        position, 
+                new_position = Position(_sim[-1],
+                                        position,
                                         introduction_strategy=position.introduction_strategy,
                                         update_strategy=position.update_strategy)
                 _sim.log.append("Position with index %d is still coherent given the new debate." % (_sim.positions[-1].index(position)))
@@ -202,7 +202,7 @@ def response(_sim, method):
                 l = list({frozenset(model.items()):model for model in \
                     [{j: i[j] for j in i if j in position} for i in \
                         satisfiable_neighbours(_sim[-1], position)]}.values())
-                
+
                 k = len(position)
                 while True:
                     r = list({frozenset(model.items()):model for model in \
@@ -212,15 +212,15 @@ def response(_sim, method):
                     a = np.array([edit_distance(i, position) for i in r])
 
                     if a.size > 0:
-                        new_position = Position(_sim[-1], 
+                        new_position = Position(_sim[-1],
                                         r[choice(np.argwhere(a == np.amin(a)).flatten().tolist())],
                                         introduction_strategy=position.introduction_strategy,
                                         update_strategy=position.update_strategy)
-                        
+
                         break
                     else:
-                        k -= 1               
-                
+                        k -= 1
+
                 _sim.log.append("Position with index %d updated to a new position, edit distance %d." % (_sim.positions[-1].index(position), edit_distance(position, new_position)))
 
             # Now that we have found a coherent version of the Position, let's check for closedness.
@@ -236,7 +236,7 @@ def response(_sim, method):
                                         # Then make sure the conclusion is accepted as well.
                                         conclusion, = argument.args[1].atoms()
                                         if conclusion not in new_position:
-                                            _sim.log.append("Position needs update due to not being closed.") 
+                                            _sim.log.append("Position needs update due to not being closed.")
                                             new_position[conclusion] = False if Not(conclusion) in argument.args else True
                 if isinstance(_sim[-1], Argument):
                     # The first debate stage of a Simulation needs different treatment, because the content then
@@ -248,12 +248,12 @@ def response(_sim, method):
                                     # Then make sure the conclusion is accepted as well.
                                     conclusion, = _sim[-1].args[1].atoms()
                                     if conclusion not in new_position:
-                                        _sim.log.append("Position needs update due to not being closed.") 
+                                        _sim.log.append("Position needs update due to not being closed.")
                                         new_position[conclusion] = False if Not(conclusion) in _sim[-1].args else \
                                             True
 
             # A final check whether the new position is satisfiable.
             if dpll_satisfiable(And(dict_to_prop(new_position), _sim[-1])):
                     updated_positions.append(new_position)
-        
+
         _sim.positions.append(updated_positions)

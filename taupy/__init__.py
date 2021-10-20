@@ -3,7 +3,7 @@ taupy is a Python 3 library for the theory of dialectical structures.
 """
 
 from .basic import Argument, Debate, EmptyDebate
-from .basic import (Position, position_compatibility)
+from .basic import (Position, position_compatibility, closedness)
 from .basic import (satisfiability_count, satisfiability, dict_to_prop, 
                     dict_to_binary, pick_random_positions_from_debate,
                     free_premises, graph_from_positions, ari,
@@ -21,7 +21,7 @@ from .simulation import (Simulation, experiment, introduce, response,
 __all__ = [
             # Core ontology
             'Argument', 'Debate', 'EmptyDebate', 'Position', 
-            'position_compatibility',
+            'position_compatibility', 'closedness',
             # .analysis
             'doj', 'hamming_distance', 'normalised_hamming_distance', 
             'bna', 'next_neighbours', 'edit_distance', 'normalised_edit_distance',

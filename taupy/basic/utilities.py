@@ -99,10 +99,14 @@ def satisfiability(formula, all_models = False):
         except StopIteration:
             return False
 
-def satisfiable_neighbours(debate, position):
+def satisfiable_extensions(debate, position):
     """
-    Return all neighbours of a (partial) position that are satisfiable
+    Return all extensions of a (partial) position relative to a debate. If the position is
+    complete and satisfiable, it is returned as a satisfiable extension of itself. If it is
+    a partial position and satisfiable, complete positions that extend it are returned.
     """
+    # The union of propositions in the position and debate is used here in case the position
+    # has a stance toward a proposition that is not yet part of an argument.
     variables = list({str(i) for i in debate.atoms()} | {str(i) for i in position.keys()})
     diagram = BDD()
     diagram.declare(*variables)

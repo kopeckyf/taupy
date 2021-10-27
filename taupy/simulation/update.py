@@ -9,8 +9,11 @@ from random import randrange, choice
 from sympy import And, Not
 from sympy.logic.algorithms.dpll2 import dpll_satisfiable
 from taupy import (Argument, Debate, Position, satisfiability, dict_to_prop, next_neighbours,
-                   hamming_distance, satisfiable_neighbours, edit_distance, fetch_premises)
+                   hamming_distance, satisfiable_extensions, edit_distance, fetch_premises,
+                   closedness)
 import taupy.simulation.strategies as strategies
+
+from taupy.basic.positions import closedness
 
 def introduce(_sim, source=None, target=None, strategy=None):
     """
@@ -181,7 +184,7 @@ def response(_sim, method):
 
     if method == "closest_closed_partial_coherent":
         """
-        This is a "poor man's Levenshtein automaton": we are looking for all positions with a given
+        This is a “poor man's Levenshtein automaton”: we are looking for all positions with a given
         edit distance to the positions that need updating, and we then select the one with the least
         distance to the original position.
         """
@@ -190,28 +193,41 @@ def response(_sim, method):
         for position in _sim.positions[-1]:
 
             # First, let's see whether the position has any chance wrt the updated debate:
-            if dpll_satisfiable(And(dict_to_prop(position), _sim[-1])):
-                new_position = Position(_sim[-1],
-                                        position,
-                                        introduction_strategy=position.introduction_strategy,
-                                        update_strategy=position.update_strategy)
-                _sim.log.append("Position with index %d is still coherent given the new debate." % (_sim.positions[-1].index(position)))
+            if dpll_satisfiable(And(dict_to_prop(position), _sim[-1])) and \
+                closedness(position, debate=_sim[-1]):
+                    new_position = Position(_sim[-1],
+                                            position,
+                                            introduction_strategy=position.introduction_strategy,
+                                            update_strategy=position.update_strategy)
+                    _sim.log.append("Position with index %d is still coherent and closed given the new debate." % (_sim.positions[-1].index(position)))
             else:
                 # The position needs other updates than for closure.
                 # Thank you, @thefourtheye
                 l = list({frozenset(model.items()):model for model in \
                     [{j: i[j] for j in i if j in position} for i in \
-                        satisfiable_neighbours(_sim[-1], position)]}.values())
+                        satisfiable_extensions(_sim[-1], position)]}.values())
 
+                # The list l contains satisfiable and complete extensions of the position
+                # to be updated. We now check subsets of these satisfiable extensions to 
+                # find the satisfiable (partial) position with minimal edit distance to
+                # the position.
                 k = len(position)
                 while True:
                     r = list({frozenset(model.items()):model for model in \
                         [item for sublist in [[{i:j[i] for i in x} for x in \
                             combinations(j, k)] for j in l] for item in sublist]}.values())
 
+                    # Check all candidates for closedness and update if necessary.
+                    for (n, i) in enumerate(r):
+                        closedness_result = closedness(i, debate=_sim[-1], return_alternative=True)
+                        if closedness_result[0] == False:
+                            r[n] = closedness_result[1]
+
+                    # And then calculate the edit distance to all closed candidates
                     a = np.array([edit_distance(i, position) for i in r])
 
                     if a.size > 0:
+                        # Are there any closed candidates given current k? If yes, choose one of them
                         new_position = Position(_sim[-1],
                                         r[choice(np.argwhere(a == np.amin(a)).flatten().tolist())],
                                         introduction_strategy=position.introduction_strategy,
@@ -219,38 +235,24 @@ def response(_sim, method):
 
                         break
                     else:
+                        # But if there aren't, reduce k by 1. This will raise the distance of candidates
+                        # to the position and increase the number of candidates to be considered.
                         k -= 1
+                        # We are moving k downward beginning with the length of the position, because a 
+                        # candidate is judged to be inept for two reasons: Either the position is unsat
+                        # or not closed. If unsat, then any extension of the position will be unsat as 
+                        # well. If sat but not closed, then the candidate with initial distance 0 plus
+                        # closedness can be a close neighbour.
 
                 _sim.log.append("Position with index %d updated to a new position, edit distance %d." % (_sim.positions[-1].index(position), edit_distance(position, new_position)))
 
             # Now that we have found a coherent version of the Position, let's check for closedness.
             if len(_sim[-1].args) > 0:
                 # Only check closedness if the Simulation contains Arguments.
-                if isinstance(_sim[-1], Debate):
-                    for argument in _sim[-1].args:
-                        # For each argument, check if all premises are accepted.
-                        if all (premise in new_position and new_position[premise] == True for \
-                            premise in argument.args[0].atoms() if premise in argument.args[0].args) and \
-                                all (premise in new_position and new_position[premise] == False for \
-                                    premise in argument.args[0].atoms() if Not(premise) in argument.args[0].args):
-                                        # Then make sure the conclusion is accepted as well.
-                                        conclusion, = argument.args[1].atoms()
-                                        if conclusion not in new_position:
-                                            _sim.log.append("Position needs update due to not being closed.")
-                                            new_position[conclusion] = False if Not(conclusion) in argument.args else True
-                if isinstance(_sim[-1], Argument):
-                    # The first debate stage of a Simulation needs different treatment, because the content then
-                    # is an Argument, not a Debate.
-                    if all (premise in new_position and new_position[premise] == True \
-                        for premise in _sim[-1].args[0].atoms() if premise in _sim[-1].args[0].args) and \
-                            all (premise in new_position and new_position[premise] == False \
-                                for premise in _sim[-1].args[0].atoms() if Not(premise) in _sim[-1].args[0].args):
-                                    # Then make sure the conclusion is accepted as well.
-                                    conclusion, = _sim[-1].args[1].atoms()
-                                    if conclusion not in new_position:
-                                        _sim.log.append("Position needs update due to not being closed.")
-                                        new_position[conclusion] = False if Not(conclusion) in _sim[-1].args else \
-                                            True
+                check_closedness = closedness(new_position, debate=_sim[-1], return_alternative=True)
+                new_position = check_closedness[1]
+                if check_closedness[0]:
+                    _sim.log.append("Position needs update due to not being closed.")
 
             # A final check whether the new position is satisfiable.
             if dpll_satisfiable(And(dict_to_prop(new_position), _sim[-1])):

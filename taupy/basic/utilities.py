@@ -194,6 +194,28 @@ def subsequences_with_length(iterable, length):
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(length+1))
 
+def fetch_conclusion(*, sentencepool, exclude, strategy, source, target):
+    """
+    Finds a proposition from the `sentencepool` that is not already in `exclude`
+    but which fits the introduction `strategy` and the belief systems of 
+    `source` and `target`.
+    """
+    # Get the conclusion candidates from the sentence pool
+    possible_conclusions = list(set(sentencepool) - set(exclude))
+    possible_conclusions += list(Not(i) for i in possible_conclusions)
+
+    # Directed strategies act as filters on possible conclusions. The list of possible values is not exhausted b/c it is not required by the currently known strategies.
+    if strategy["source_accepts_conclusion"] == "Yes":
+        possible_conclusions = list(set(possible_conclusions) & set(dict_to_prop(source).args))
+
+    if strategy["source_accepts_conclusion"] == "Toleration":
+        possible_conclusions = list(set(possible_conclusions) - {Not(i) for i in dict_to_prop(source).args})
+
+    if strategy["target_accepts_conclusion"] == "No":
+        possible_conclusions = list(set(possible_conclusions) & set([Not(i) for i in dict_to_prop(target).args]))
+    
+    return possible_conclusions
+
 def fetch_premises(pool, length, exclude=[]):
     """
     Fetch a combination of premises with length `n` from the input pool of
@@ -227,3 +249,62 @@ def fetch_premises(pool, length, exclude=[]):
             j += 1
         else:
             return False
+
+def select_premises(*, sentencepool, length, exclude, 
+                    reserved_conclusion=None, strategy, source, target):
+    """
+    Select fetched premises based on whether they fit an argument strategy.
+    """
+    if reserved_conclusion == None:
+        conclusion_set = set()
+    else:
+        conclusion_set = {reserved_conclusion, Not(reserved_conclusion)}        
+
+    if strategy["pick_premises_from"] == None:
+        pool = sentencepool - conclusion_set
+    else:
+        if strategy["pick_premises_from"] == "source":
+            pool = set(dict_to_prop(source).args) - conclusion_set
+        if strategy["pick_premises_from"] == "target":
+            pool = set(dict_to_prop(target).args) - conclusion_set
+
+    return fetch_premises(pool, length=length, exclude=exclude)
+
+def proposition_levels_from_debate(debate, key_statements=[]):
+    """
+    Return a dictionary of levels, following an idea by Vera Chekan.
+
+    Next level: Is it possible to determine key statements in a debate automatically?
+    """
+    if not key_statements:
+        # Check if a list of key statements is provided.
+        raise ValueError("Key statements are required to calculate levels.")
+    
+    # Key statements receive level 0
+    levels = {k: 0 for k in key_statements}
+    if len(debate.args) > 2:
+        # Check if the debate has any Arguments.
+        conclusions = [next(iter(a.args[1].atoms())) for a in debate.args]
+    else:
+        # This case holds if the Debate does not contain any Arguments, e.g. 
+        # if it is an EmptyDebate.
+        conclusions = []
+    i = 0
+
+    while True:
+        if any(levels[c] == i for c in conclusions if c in levels):
+            for argument in debate.args:
+                c = next(iter(argument.args[1].atoms()))
+                if c in levels and levels[c] == i:
+                    for p in argument.args[0].atoms():
+                        if p not in levels:
+                            levels[p] = i+1
+            i += 1
+        else:
+            break
+
+    if len(levels) != len(debate.atoms()) and __name__ == "__main__":
+        print("taupy Warning: Not all propositions received a level. Maybe the input debate \
+               did not have a connected argument map?")
+
+    return levels

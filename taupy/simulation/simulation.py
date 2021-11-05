@@ -16,9 +16,11 @@ class Simulation(list):
 
     def __init__(self,
                  directed = True,
+                 debate_growth = "random",
                  events = {"introduction": 9, "new_sentence": 1},
                  sentencepool = "p:10",
                  max_sentencepool = None,
+                 key_statements = [],
                  parent_debate = None,
                  argumentlength = 2,
                  positions = [],
@@ -35,7 +37,7 @@ class Simulation(list):
             self.used_premises = []
 
         self.max_sentencepool = [i for i in symbols(max_sentencepool)] if max_sentencepool else self.sentencepool
-
+        self.key_statements = [i for i in symbols(key_statements)]
         self.events = events
         self.argumentlength = argumentlength
 
@@ -44,6 +46,10 @@ class Simulation(list):
         else:
             self.init_positions(positions, target_length=initial_position_size)
 
+        if debate_growth not in ["random", "tree"]:
+            raise NotImplementedError("The requested growth method is not implemented. Available methods are `random`  and `tree`.")
+        
+        self.debate_growth = debate_growth
         self.directed = directed
         self.default_introduction_strategy = default_introduction_strategy
         self.default_update_strategy = default_update_strategy

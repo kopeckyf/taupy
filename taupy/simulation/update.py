@@ -99,10 +99,15 @@ def introduce(_sim, source=None, target=None, strategy=None):
             else:
                 atomic_levels = proposition_levels_from_debate(_sim[-1], key_statements=_sim.key_statements)
                 levels = atomic_levels | {Not(i): atomic_levels[i] for i in atomic_levels}
-                c = list(levels.keys())
-                w = [0.75**i for i in levels.values()]
-                selected_conclusion = choices(c, weights=w)[0]
-                _found_conclusion = True
+                c = {i: levels[i] for i in levels if i in possible_conclusions}
+                w = [0.75**i for i in c.values()]
+                if w:
+                    selected_conclusion = choices(list(c.keys()), weights=w)[0]
+                    _found_conclusion = True
+                else: 
+                    _sim.log.append("Can't find conclusion that fits proposition hierarchy for source %s and target %s" % (source_pos, target_pos))
+                    _found_valid_argument = False
+                    break
 
             if _found_conclusion:
                 selected_premises = select_premises(sentencepool=_sim.premise_candidates(),

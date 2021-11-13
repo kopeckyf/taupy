@@ -79,7 +79,7 @@ def group_measures_exogenous(simulation, *, sentence=None, densities=True):
     if densities:
         densities = [i.density() for i in simulation]
 
-    matrices = [difference_matrix(i, measure=normalised_edit_distance) for i in simulation.positions]
+    matrices = [difference_matrix(i, measure=edit_distance)/len(set.union(*[set(j) for j in i])) for i in simulation.positions]
     
     clusterings = []
     for i in simulation.positions:

@@ -2,8 +2,9 @@ from igraph import Graph, ADJ_MAX
 from sklearn.cluster import AffinityPropagation, AgglomerativeClustering
 from concurrent.futures import ProcessPoolExecutor
 from taupy import (difference_matrix, group_divergence, group_consensus, group_size_parity,
-                   normalised_hamming_distance, hamming_distance, normalised_edit_distance, 
-                   pairwise_dispersion, number_of_groups, bna, satisfiability_count)
+                   normalised_hamming_distance, hamming_distance, edit_distance, 
+                   normalised_edit_distance, pairwise_dispersion, number_of_groups, 
+                   bna, satisfiability_count)
 from statistics import mean
 import numpy as np
 import pandas as pd
@@ -63,7 +64,7 @@ def variance_dispersion(simulation, *, measure=normalised_hamming_distance, dens
     else:
         return dispersions
 
-def variance_dispersion_partial_positions(simulation, *, measure=normalised_edit_distance, densities=True):
+def variance_dispersion_partial_positions(simulation, *, measure=edit_distance, densities=True):
     if densities:
         densities = [i.density() for i in simulation]
 
@@ -167,7 +168,7 @@ def group_measures_leiden_partial_positions(simulation, *, densities=True):
     if densities:
         densities = [i.density() for i in simulation]
 
-    matrices = [difference_matrix(i, measure=normalised_edit_distance) for i in simulation.positions]
+    matrices = [difference_matrix(i, measure=edit_distance)/len(set.union(*[set(j) for j in i])) for i in simulation.positions]
     filtered_matrices = [np.exp(-3 * i.astype("float64")) for i in matrices]
     
     graphs = [Graph.Weighted_Adjacency(i.astype("float64").tolist(), mode=ADJ_MAX) for i in filtered_matrices]
@@ -214,7 +215,7 @@ def group_measures_affinity_propagation_partial_positions(simulation, *, densiti
     if densities:
         densities = [i.density() for i in simulation]
     
-    matrices = [difference_matrix(i, measure=normalised_edit_distance) for i in simulation.positions]
+    matrices = [difference_matrix(i, measure=edit_distance)/len(set.union(*[set(j) for j in i])) for i in simulation.positions]
     filtered_matrices = [np.exp(-3 * i.astype("float64")) for i in matrices]
 
     fits = [AffinityPropagation(affinity="precomputed", random_state=0).fit(i) for i in filtered_matrices]

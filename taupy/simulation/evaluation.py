@@ -164,12 +164,19 @@ def group_measures_agglomerative(simulation, *, densities=True):
     else:
         return divergences
 
-def group_measures_leiden_partial_positions(simulation, *, densities=True):
+def group_measures_leiden_partial_positions(simulation, *, densities=True, key_propositions=None):
     if densities:
         densities = [i.density() for i in simulation]
 
     matrices = [difference_matrix(i, measure=edit_distance)/len(set.union(*[set(j) for j in i])) for i in simulation.positions]
-    filtered_matrices = [np.exp(-3 * i.astype("float64")) for i in matrices]
+
+    if key_propositions == None:
+        clustering_matrices = matrices
+    else:
+        filtered_positions = [[{k: j[k] for k in key_propositions if k in j} for j in i] for i in simulation.positions]
+        clustering_matrices = [difference_matrix(i, measure=edit_distance)/len(set.union(*[set(j) for j in i])) for i in filtered_positions]
+
+    filtered_matrices = [np.exp(-4 * i.astype("float64")) for i in clustering_matrices]
     
     graphs = [Graph.Weighted_Adjacency(i.astype("float64").tolist(), mode=ADJ_MAX) for i in filtered_matrices]
     clusterings = [list(g.community_leiden(weights="weight", objective_function="modularity")) for g in graphs]
@@ -216,7 +223,7 @@ def group_measures_affinity_propagation_partial_positions(simulation, *, densiti
         densities = [i.density() for i in simulation]
     
     matrices = [difference_matrix(i, measure=edit_distance)/len(set.union(*[set(j) for j in i])) for i in simulation.positions]
-    filtered_matrices = [np.exp(-3 * i.astype("float64")) for i in matrices]
+    filtered_matrices = [np.exp(-4 * i.astype("float64")) for i in matrices]
 
     fits = [AffinityPropagation(affinity="precomputed", random_state=0).fit(i) for i in filtered_matrices]
     clusterings = [[[i[0] for i in enumerate(k.labels_) if i[1] == j] for j in range(len(k.cluster_centers_indices_))] for k in fits]

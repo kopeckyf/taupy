@@ -64,7 +64,7 @@ def variance_dispersion(simulation, *, measure=normalised_hamming_distance, dens
     else:
         return dispersions
 
-def variance_dispersion_partial_positions(simulation, *, measure=edit_distance, densities=True):
+def variance_dispersion_partial_positions(simulation, *, measure=normalised_edit_distance, densities=True):
     if densities:
         densities = [i.density() for i in simulation]
 

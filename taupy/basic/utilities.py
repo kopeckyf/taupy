@@ -76,7 +76,7 @@ def satisfiability_count(formula):
     diagram = BDD()
     diagram.declare(*variables)
     expression = diagram.add_expr(str(to_cnf(formula)))
-    return diagram.count(expression, nvars=len(formula.atoms()))
+    return int(diagram.count(expression, nvars=len(formula.atoms())))
 
 def satisfiability(formula, all_models = False):
     """

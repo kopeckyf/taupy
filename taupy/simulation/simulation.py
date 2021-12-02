@@ -57,7 +57,13 @@ class Simulation(list):
         list.__init__(self)
         # Initialise the Simulation with an empty debate. This is
         # necessary so that the initial positions can attach to some debate.
-        self.append(EmptyDebate()) if parent_debate == None else self.append(parent_debate)
+        if parent_debate == None:
+            self.append(EmptyDebate())
+        else:
+            self.append(parent_debate)
+            # Add premises in the parent debate to the used premise storage.
+            for i in parent_debate.args:
+                self.used_premises.append(i.args[0])
 
     def premise_candidates(self):
         return set(self.sentencepool + [Not(i) for i in self.sentencepool])

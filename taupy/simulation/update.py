@@ -8,10 +8,10 @@ import numpy as np
 from random import randrange, choice, choices
 from sympy import And, Not
 from sympy.logic.algorithms.dpll2 import dpll_satisfiable
-from taupy import (Argument, Debate, Position, satisfiability, closedness, 
+from taupy import (Argument, Debate, EmptyDebate, Position, satisfiability, closedness, 
                    satisfiable_extensions, dict_to_prop, next_neighbours,
-                   hamming_distance, edit_distance, fetch_premises,
-                   fetch_conclusion, select_premises, proposition_levels_from_debate)
+                   hamming_distance, edit_distance, fetch_conclusion, select_premises,
+                   proposition_levels_from_debate)
 import taupy.simulation.strategies as strategies
 
 from taupy.basic.positions import closedness
@@ -140,14 +140,16 @@ def introduce(_sim, source=None, target=None, strategy=None):
     if _found_valid_argument:
         _sim.log.append("Introduce argument with strategy '%s'. Premises: %s. Conclusion: %s. Source: %s. Target: %s." % (strategy["name"], And(*selected_premises), selected_conclusion, source_pos, target_pos))
 
-        if len(_sim) == 1:
-            # Initialise the Simulation with _argument
+        if type(_sim[-1]) == EmptyDebate:
+            # Are we just beginning the debate?
             _sim.append(Debate(Argument(And(*selected_premises), selected_conclusion)))
         else:
+            # If the previous debate stage was not empty, it's either a single Argument...
             if type(_sim[-1]) == Argument:
                 # If a Debate conists of just one Argument, the debate's type
                 # is changed to Argument b/c of inheritance from sympy cls.
                 _sim.append(Debate( _sim[-1], Argument(And(*selected_premises), selected_conclusion)))
+            # Or a Debate consisting of 1 or more Arguments
             else:
                 # Assuming type is Debate or And
                 _sim.append(Debate( *_sim[-1].args, Argument(And(*selected_premises), selected_conclusion)))

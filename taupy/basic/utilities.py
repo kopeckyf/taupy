@@ -212,7 +212,7 @@ def fetch_conclusion(*, sentencepool, exclude, strategy, source, target):
         possible_conclusions = list(set(possible_conclusions) - {Not(i) for i in dict_to_prop(source).args})
 
     if strategy["target_accepts_conclusion"] == "No":
-        possible_conclusions = list(set(possible_conclusions) & set([Not(i) for i in dict_to_prop(target).args]))
+        possible_conclusions = list(set(possible_conclusions) - set(dict_to_prop(target).args))
     
     return possible_conclusions
 

@@ -15,16 +15,15 @@ long_description = (here / 'README.md').read_text(encoding='utf-8')
 
 setup(
     name='taupy',
-    version='0.2.0',
+    version='0.3.0',
     description='A Python package to study the theory of dialectical \
                  structures',
     long_description=long_description,
     long_description_content_type='text/markdown', 
     url='https://github.com/kopeckyf/taupy',
     author='Felix Kopecky',
-    author_email='f.kopecky@kit.edu',
     classifiers=[
-        'Development Status :: 5 - Stable',
+        'Development Status :: 5 - Production/Stable',
 
         # Indicate who your project is intended for
         'Intended Audience :: Science/Research',
@@ -32,13 +31,14 @@ setup(
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
 
         # Pick your license as you wish
-        'License :: OSI Approved :: BSD-3 License',
+        'License :: OSI Approved :: BSD License',
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate you support Python 3. These classifiers are *not*
         # checked by 'pip install'. See instead 'python_requires' below.
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',        
         'Programming Language :: Python :: 3 :: Only',
     ],
 
@@ -80,7 +80,6 @@ setup(
     project_urls={
         'Source': 'https://github.com/kopeckyf/taupy/',
         'Bug Reports': 'https://github.com/kopeckyf/taupy/issues',
-        'Citation information': 'https://github.com/kopeckyf/taupy/',
-        'More info about scientific background': 'https://debatelab.philosophie.kit.edu/',
+        'Research group': 'https://debatelab.philosophie.kit.edu/',
     },
 )

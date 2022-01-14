@@ -14,12 +14,13 @@ import math
 def dict_to_prop(dictionary):
     """
     Helper function that converts a dictionary to a propositional formula,
-    acknowledging dictionary's truth-value attributions.
+    acknowledging the dictionary's truth-value attributions.
     """
     l = []
     for (k, v) in dictionary.items():
-        if v: l.append(k)
-        if not v: l.append(Not(k))
+        if v == True: l.append(k)
+        if v == False: l.append(Not(k))
+        if v == None: pass
     return And(*l)
 
 def dict_to_binary(dictionary):
@@ -29,8 +30,10 @@ def dict_to_binary(dictionary):
     """
     l = []
     for k in sorted(dictionary):
-        if dictionary[k]: l.append(1)
-        if not dictionary[k]: l.append(0)
+        if dictionary[k] == True: l.append(1)
+        if dictionary[k] == False: l.append(0)
+        if dictionary[k] == None:
+            raise ValueError("Position contains suspension and can't be represented in binary form.")
     return l
 
 def free_premises(debate):

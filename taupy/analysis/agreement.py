@@ -27,7 +27,9 @@ def normalised_hamming_distance(pos1, pos2):
     """
     return Fraction(len([k for k in pos1 if pos1[k] != pos2[k]]), len(pos1))
 
-def edit_distance(pos1, pos2):
+def edit_distance(pos1, pos2, weights = {"substitution": 1.0, 
+                                         "insertion": 1.0, 
+                                         "deletion": 1.0}):
     """
     A generalised distance measure that does not require that the positions
     share their domain. Compared to edit distances for ordered sequences (e.g. 
@@ -50,21 +52,43 @@ def edit_distance(pos1, pos2):
     
     In the following measure, these operations are all weighted with factor 1. 
     Another implementation is needed to factor in different weights.
-    """   
+    """ 
+    n_subsitutions = 0
+    n_insertions = 0
+    n_deletions = 0
 
-    return len([v for v in pos1.keys() | pos2.keys() if not (
-        v in pos1 and 
-        v in pos2 and 
-        pos1[v] == pos2[v])])
+    # We're doing the search “on foot”. This may seem a little pedestrian,
+    # but it's a good idea since we have to parse the dictionary only once.
+    for v in pos1.keys():
+        # Substituion: Neither position suspends on the proposition,
+        #              but they also don't agree.
+        if pos1[v] != None and pos2[v] != None and pos1[v] != pos2[v]:
+            n_subsitutions += 1
+        # Insertion: The first position suspends, the second doesn't.
+        if pos1[v] == None and pos2[v] != None: n_insertions += 1
+        # Deletion: The first position doesn't suspend, but the 
+        #           second does.
+        if pos1[v] != None and pos2[v] == None: n_deletions += 1
+    
+    return (n_subsitutions * weights["substitution"] 
+            + n_insertions * weights["insertion"] 
+            + n_deletions * weights["deletion"])
 
-def normalised_edit_distance(pos1, pos2):
+def normalised_edit_distance(pos1, pos2, weights = {"substitution": 1.0, 
+                                                    "insertion": 1.0, 
+                                                    "deletion": 1.0}):
     """
-    The edit distance, normalised by the power of the union of the two positions' domains.
-    """   
-    return Fraction(len([v for v in pos1.keys() | pos2.keys() if not (
-    v in pos1 and 
-    v in pos2 and 
-    pos1[v] == pos2[v])]), len(set(pos1.keys()).union(set(pos2.keys()))))
+    The (weighted) edit distance, normalised to return a value in [0,1].
+    Normalisation is understood as the relation between actual and maximal
+    difference. Maximal difference is achieved in the edit distance if the
+    most costly action is performed for all items.
+
+    ⚠ Warning: This interpretation of normalisation is not without alternatives ⚠
+    """
+    max_n_operations = (max(weights.values())
+                        * len(set(pos1.keys()).union(set(pos2.keys()))))
+
+    return edit_distance(pos1, pos2, weights=weights) / max_n_operations
 
 def kemeny_oppenheim(pos1, pos2):
     pass

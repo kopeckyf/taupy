@@ -1,4 +1,5 @@
 from taupy.basic.utilities import satisfiability, dict_to_prop
+from sympy.logic.algorithms.dpll2 import dpll_satisfiable
 from taupy.basic.core import Debate, Argument
 from copy import deepcopy
 from sympy import And, Not
@@ -67,10 +68,8 @@ def closedness(pos, debate=None, return_alternative=False):
     if `return_alternative` is `True`, the function will return a tuple containing
     the closedness value and an alternative. If the position is closed, the alternative
     will be the position itself, but in case of closeness violation, the function 
-    will close the position and return this alternative. 
-
-    (Note that finding the alternative is deterministic, i.e. there is a unique closed
-    alternative for a non-closed position.)
+    will close the position and return this alternative. If a position is not closed, 
+    there is exactly one alternative that is.
     """
     if debate == None:
         # Assume that the position is a Position object and use its associated
@@ -82,40 +81,26 @@ def closedness(pos, debate=None, return_alternative=False):
         d = debate
     
     position = deepcopy(pos)
-    # Let's default to a position being closed, unless we spot a violation. The code
-    # below loops through the arguments of the debate to spot whether there is a
-    # closedness violation. Otherwise, it says the position is closed.
-    closedness_status = True
+    suspended = [k for k in position if position[k] == None]
 
-    # We need to do type checking here, unfortunately, because a Debate with a single
-    # Argument reduces to an Argument object (owing to the underlying implementation).
-    # This type check will become obsolete in a future release.
-    if isinstance(d, Debate):
-        for argument in d.args:
-            # For each argument, check if all premises are accepted.
-            if all (premise in position and position[premise] == True for \
-                premise in argument.args[0].atoms() if premise in argument.args[0].args) and \
-                    all (premise in position and position[premise] == False for \
-                        premise in argument.args[0].atoms() if Not(premise) in argument.args[0].args):
-                            # Then make sure the conclusion is accepted as well.
-                            conclusion, = argument.args[1].atoms()
-                            if conclusion not in position:
-                                closedness_status = False
-                                if return_alternative:
-                                    position[conclusion] = False if Not(conclusion) in argument.args else True
-                                
-    if isinstance(d, Argument):
-        # The first debate stage of a Simulation needs different treatment, because the content then
-        # is an Argument, not a Debate.
-        if all (premise in position and position[premise] == True \
-            for premise in d.args[0].atoms() if premise in d.args[0].args) and \
-                all (premise in position and position[premise] == False \
-                    for premise in d.args[0].atoms() if Not(premise) in d.args[0].args):
-                        # Then make sure the conclusion is accepted as well.
-                        conclusion, = d.args[1].atoms()
-                        if conclusion not in position:
-                            closedness_status = False
-                            if return_alternative:
-                                position[conclusion] = False if Not(conclusion) in d.args else True
-    
+    # Defaulting to True here means that closedness is confirmed if the position
+    # does not suspend on any sentence.
+    if dpll_satisfiable(And(dict_to_prop(position), d)):
+        closedness_status = True
+    else:
+        closedness_status = False
+        print("taupy Warning: Incoherence in input, closedness undefined.")
+
+    for s in suspended:
+        sat_status_t = dpll_satisfiable(And(dict_to_prop(position), d, s))
+        sat_status_f = dpll_satisfiable(And(dict_to_prop(position), d, Not(s)))
+        
+        if not (sat_status_t and sat_status_f):
+            if sat_status_t and not sat_status_f:
+                position[s] = True
+                closedness_status = False
+            if not sat_status_t and sat_status_f:
+                position[s] = False
+                closedness_status = False                    
+
     return (closedness_status, position) if return_alternative else closedness_status

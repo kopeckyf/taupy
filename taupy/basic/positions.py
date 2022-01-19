@@ -62,27 +62,22 @@ def closedness(pos, debate=None, return_alternative=False):
     in the debate, it must also assign True to the conclusion of that argument.
 
     This function assumes that the input `pos` is coherent. If in doubt, you should
-    perform a coherence check first. This function can confirm closedness for non-
-    coherent positions!
+    perform a coherence check first. Incoherent positions *can* be labelled as closed
+    by this algorithm, although this is nonsensical.
 
     Returns a Boolean by default indicating the closedness status of `pos`. However,
     if `return_alternative` is `True`, the function will return a tuple containing
     the closedness value and an alternative. If the position is closed, the alternative
     will be the position itself, but in case of closeness violation, the function 
-    will close the position and return this alternative. If a position is not closed, 
-    there is exactly one alternative that is.
+    will close the position by filling up the position.
 
-    This function is not embedded as a method for the Position class so that it
-    can be applied to Position-like objects like dicts. A shortcut 
-    `Position.is_closed()` exists. 
+    A shortcut of this function exists under `Position.is_closed()`. 
     """
     if debate == None:
-        # Assume that the position is a Position object and use its associated
-        # debate.
+        # Assume that the position is a Position object.
         d = pos.debate
     else:
-        # The user gave a specific debate with respect to which closedness is
-        # analysed.
+        # The user gave a specific debate.
         d = debate
     
     position = deepcopy(pos)

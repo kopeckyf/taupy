@@ -67,9 +67,10 @@ def closedness(pos, debate=None, return_alternative=False):
 
     Returns a Boolean by default indicating the closedness status of `pos`. However,
     if `return_alternative` is `True`, the function will return a tuple containing
-    the closedness value and an alternative. If the position is closed, the alternative
+    the closedness value and an alternative. The alternative is obtained by checking if
+    the position follows entailment. If the position is closed, the alternative
     will be the position itself, but in case of closeness violation, the function 
-    will close the position by filling up the position.
+    will close the position by filling up the position via entailment.
 
     A shortcut of this function exists under `Position.is_closed()`. 
     """

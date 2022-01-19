@@ -61,8 +61,9 @@ def closedness(pos, debate=None, return_alternative=False):
     obligations: if a position assigns True to all of the premises of an argument
     in the debate, it must also assign True to the conclusion of that argument.
 
-    This function is not embedded as a method for the Position class so that it
-    can be applied to Position-like objects like dicts. 
+    This function assumes that the input `pos` is coherent. If in doubt, you should
+    perform a coherence check first. This function can confirm closedness for non-
+    coherent positions!
 
     Returns a Boolean by default indicating the closedness status of `pos`. However,
     if `return_alternative` is `True`, the function will return a tuple containing
@@ -70,6 +71,10 @@ def closedness(pos, debate=None, return_alternative=False):
     will be the position itself, but in case of closeness violation, the function 
     will close the position and return this alternative. If a position is not closed, 
     there is exactly one alternative that is.
+
+    This function is not embedded as a method for the Position class so that it
+    can be applied to Position-like objects like dicts. A shortcut 
+    `Position.is_closed()` exists. 
     """
     if debate == None:
         # Assume that the position is a Position object and use its associated
@@ -81,26 +86,32 @@ def closedness(pos, debate=None, return_alternative=False):
         d = debate
     
     position = deepcopy(pos)
-    suspended = [k for k in position if position[k] == None]
-
+    ignorant = {a for a in d.atoms() if a not in position} 
+    suspended = {k for k in position if position[k] == None}
+    
     # Defaulting to True here means that closedness is confirmed if the position
-    # does not suspend on any sentence.
-    if dpll_satisfiable(And(dict_to_prop(position), d)):
-        closedness_status = True
-    else:
-        closedness_status = False
-        print("taupy Warning: Incoherence in input, closedness undefined.")
+    # does not suspend on any sentence and isn't ignorant of any.
+    closedness_status = True
 
-    for s in suspended:
-        sat_status_t = dpll_satisfiable(And(dict_to_prop(position), d, s))
-        sat_status_f = dpll_satisfiable(And(dict_to_prop(position), d, Not(s)))
+    for s in ignorant | suspended:
+        sat_assume_true = dpll_satisfiable(And(dict_to_prop(position), d, s))
+        sat_assume_false = dpll_satisfiable(And(dict_to_prop(position), d, Not(s)))
         
-        if not (sat_status_t and sat_status_f):
-            if sat_status_t and not sat_status_f:
+        # Does the position depend on the proposition for closedness?
+        if not (sat_assume_true and sat_assume_false):
+            # Case 1: The position depends on the truth of s for closedness.
+            if sat_assume_true and not sat_assume_false:
                 position[s] = True
                 closedness_status = False
-            if not sat_status_t and sat_status_f:
+            # Case 2: The position depends on the falsehood of s.
+            if not sat_assume_true and sat_assume_false:
                 position[s] = False
-                closedness_status = False                    
+                closedness_status = False
+
+        # If the closedness status is settled after current s and no alternative 
+        # is requested, stop the search early to save some computation time.
+        # If an alternative is requested, we need to check all propositions.
+        if not return_alternative and closedness_status == False:
+            break                    
 
     return (closedness_status, position) if return_alternative else closedness_status

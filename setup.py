@@ -66,7 +66,8 @@ setup(
                       'python_igraph>=0.9.6',
                       'scikit_learn>=0.24.2',
                       'pandas>=1.2.2',
-                      'more_itertools>=8.8.0'],
+                      'more_itertools>=8.8.0',
+                      'z3-solver>=4.8.14.0'],
 
     # List additional URLs that are relevant to your project as a dict.
     #

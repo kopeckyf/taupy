@@ -30,8 +30,11 @@ class Position(dict):
         """
         Return the inverse of a position, that is the position that assigns 
         contradictory truth values.
+
+        Judgement suspension is not inverted.
         """
-        return {k: not self[k] for k in self}   
+        return {**{k: not self[k] for k in self if self[k] != None},
+                **{k: None for k in self if self[k] == None}}
 
 def position_compatibility(pos1, pos2, deep=False):
     """

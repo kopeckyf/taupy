@@ -2,19 +2,19 @@
 Functions to introduce Arguments into Debates and update Positions accordingly.
 """
 
-from itertools import combinations
 from copy import deepcopy
 import numpy as np
 from random import randrange, choice, choices
-from sympy import And, Not
+from sympy import And, Not, symbols
 from sympy.logic.algorithms.dpll2 import dpll_satisfiable
 from taupy import (Argument, Debate, EmptyDebate, Position, satisfiability, closedness, 
-                   satisfiable_extensions, dict_to_prop, next_neighbours,
+                   dict_to_prop, next_neighbours,
                    hamming_distance, edit_distance, fetch_conclusion, select_premises,
-                   proposition_levels_from_debate)
+                   proposition_levels_from_debate, subsequences_with_length,
+                   z3_assertion_from_argument, z3_soft_constraints_from_position, 
+                   z3_all_models)
 import taupy.simulation.strategies as strategies
-
-from taupy.basic.positions import closedness
+import z3
 
 def introduce(_sim, source=None, target=None, strategy=None):
     """
@@ -154,6 +154,10 @@ def introduce(_sim, source=None, target=None, strategy=None):
                 # Assuming type is Debate or And
                 _sim.append(Debate( *_sim[-1].args, Argument(And(*selected_premises), selected_conclusion)))
 
+        # Store the argument in the optimiser:
+        _sim.assertions.append(z3_assertion_from_argument(premises=selected_premises, 
+                                                          conclusion=selected_conclusion))
+
         return True
         # return Argument(And(*selected_premises), selected_conclusion)
     else:
@@ -163,9 +167,6 @@ def introduce(_sim, source=None, target=None, strategy=None):
 def response(_sim, method):
     """
     Updating Positions in a debate.
-
-    Currently, we only have one sensisble strategy, ``closest_coherent``.
-    Surely, many more remain to be discovered.
     """
 
     if method == "random":
@@ -221,73 +222,99 @@ def response(_sim, method):
         updated_positions = []
 
         for (idx, position) in enumerate(_sim.positions[-1]):
-
             # First, let's see whether the position has any chance wrt the updated debate:
             if dpll_satisfiable(And(dict_to_prop(position), _sim[-1])) and \
-                closedness(position, debate=_sim[-1]):
+               closedness(position, debate=_sim[-1]):
                     new_position = Position(_sim[-1],
                                             position,
                                             introduction_strategy=position.introduction_strategy,
                                             update_strategy=position.update_strategy)
-                    _sim.log.append("Position with index %d is still coherent and closed given the new debate." % (idx))
+                    _sim.log.append("Position with index %d is still coherent and closed given \
+                                     the new debate." % (idx))
+                
             else:
-                # The position needs other updates than for closure.
-                # Thank you, @thefourtheye
-                l = list({frozenset(model.items()):model for model in \
-                    [{j: i[j] for j in i if j in position} for i in \
-                        satisfiable_extensions(_sim[-1], position)]}.values())
+                _sim.log.append("Position with index %d needs an update." % (idx))
+                z3_current_sentences = [z3.Bool(str(i)) for i in _sim[-1].atoms()]
+                
+                # Collect constraints for the current position                
+                constraints = z3_soft_constraints_from_position(position)
+                # Build the assertions iteratively. This is equivalent to adding 
+                # soft constraints via z3.Optimize.add_soft().
+                assertions = z3.If(constraints[0], 1, 0)
+                for c in constraints[1:]:
+                    assertions += z3.If(c, 1, 0)
 
-                # The list l contains satisfiable and complete extensions of the position
-                # to be updated. We now check subsets of these satisfiable extensions to 
-                # find the satisfiable (partial) position with minimal edit distance to
-                # the position.
-                k = len(position)
-                while True:
-                    r = list({frozenset(model.items()):model for model in \
-                        [item for sublist in [[{i:j[i] for i in x} for x in \
-                            combinations(j, k)] for j in l] for item in sublist]}.values())
+                # MaxSAT iteration over k, the number of fulfilled constraints
+                k = len(constraints)
+                saved_candidates = []
+                while k > 0:
+                    o = z3.Optimize()
+                    o.set(priority="pareto")
+                    for a in _sim.assertions:
+                        o.add(a)
+                    o.add(assertions == k)
+                    o.maximize(assertions)
+                    
+                    # Loop over all candidates to determine possible Positions to move
+                    # to
+                    candidates = []
+                    for m in z3_all_models(o, z3_current_sentences):
+                        base_model = {symbols(str(i)): eval(str(m[i])) for i in m}
+                        differences = [k for k in base_model if base_model[k] != position[k]]
+                        # In what ways does the new model differ from the investigated position?
+                        # For all these differences, it is assumed that the position might have
+                        # suspended instead of doing the switch toward True or False.
+                        diff_tuples = subsequences_with_length(differences, len(constraints)-k+1)
+                        # (Includes the empty tuple, i.e. the empty switch set.)
+                        for d in diff_tuples:
+                            new_candidate = {l: position[l] for l in position if l not in differences} \
+                                             | {l: base_model[l] for l in base_model if l not in d} \
+                                             | {l: None for l in d}
+                            
+                            # Let's see in which cases suspesion is actually *really* an option
+                            # by checking closedness for all candidates. The present code can lead
+                            # to having dupliaces in `candidates`, but since we are looking for the 
+                            # min(), that's OK.
+                            candidates.append(closedness(new_candidate, 
+                                                         debate=_sim[-1], 
+                                                         return_alternative=True)[1])
 
-                    # Check all candidates for closedness and update if necessary.
-                    for (n, i) in enumerate(r):
-                        closedness_result = closedness(i, debate=_sim[-1], return_alternative=True)
-                        if closedness_result[0] == False:
-                            r[n] = closedness_result[1]
 
-                    # And then calculate the edit distance to all closed candidates
-                    a = np.array([edit_distance(i, position) for i in r])
+                    # Now calculate the ED() for the position to all candidates...
+                    curr_candidates = candidates + saved_candidates
+                    a = np.array([edit_distance(i, position) for i in curr_candidates])
 
                     if a.size > 0:
-                        # Are there any closed candidates given current k? If yes, choose one of them
+                        # ... and pick the one with minimum distance.
                         new_position = Position(_sim[-1],
-                                        r[choice(np.argwhere(a == np.amin(a)).flatten().tolist())],
+                                        curr_candidates[choice(np.argwhere(a == np.amin(a)).flatten().tolist())],
                                         introduction_strategy=position.introduction_strategy,
                                         update_strategy=position.update_strategy)
+                        
+                        if edit_distance(new_position, position) <= len(constraints)-k+1:
+                            # We found a candidate that is at least as good as could ever be 
+                            # achieved in the next iteration (k+1). This is why we break out 
+                            # here and settle for this candidate.
+                            break
+                        else:
+                            # We carry one of the optimal candidates from this iteration on
+                            # to the next iteration and let it compete there. 
+                            saved_candidates.append(new_position)
 
-                        break
-                    else:
-                        # But if there aren't, reduce k by 1. This will raise the distance of candidates
-                        # to the position and increase the number of candidates to be considered.
-                        k -= 1
-                        # We are moving k downward beginning with the length of the position, because a 
-                        # candidate is judged to be inept for two reasons: Either the position is unsat
-                        # or not closed. If unsat, then any extension of the position will be unsat as 
-                        # well. If sat but not closed, then the candidate with initial distance 0 plus
-                        # closedness can be a close neighbour.
+                    # Could not determine an optimal candidate while demanding k constraints. 
+                    # Decrease k and try again.
+                    k -= 1
+                else:
+                    # This is here purely for diagnostic purposes.
+                    _sim.log.append("!!!!! \
+                                     Fatal Error: Could not find a position to update to, even if \
+                                     zero constraints are demanded. There is something terribly \
+                                     wrong.\
+                                     !!!!! ")
 
                 _sim.log.append("Position with index %d updated to a new position, edit distance %d." % (idx, edit_distance(position, new_position)))
-
-            # Now that we have found a coherent version of the Position, let's check for closedness.
-            if len(_sim[-1].args) > 0:
-                # Only check closedness if the Simulation contains Arguments.
-                check_closedness = closedness(new_position, debate=_sim[-1], return_alternative=True)
-                if check_closedness[0] == False:
-                    new_position = check_closedness[1]
-                    _sim.log.append("Position with index %d needed to be closed." % (idx))
-
-            # A final check whether the new position is satisfiable.
-            if dpll_satisfiable(And(dict_to_prop(new_position), _sim[-1])):
-                    updated_positions.append(new_position)
-            else:
-                _sim.log.append("Uh oh, updated position was not satisfiable with the debate.")
-
+            # Found replacement for one position, continue loop with next position from
+            # previous debabte stage.
+            updated_positions.append(new_position)
+        # Found candidates for all positions in pop. of cur. deb. stage.
         _sim.positions.append(updated_positions)

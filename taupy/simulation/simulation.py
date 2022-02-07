@@ -6,6 +6,7 @@ from random import choice, choices, sample
 from copy import deepcopy
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import time
+import z3
 
 from taupy.basic.utilities import satisfiability_count
 from taupy import EmptyDebate
@@ -54,6 +55,7 @@ class Simulation(list):
         self.default_introduction_strategy = default_introduction_strategy
         self.default_update_strategy = default_update_strategy
         self.log = []
+        self.assertions = [] # assertions for z3.Solver and z3.Optimize
         list.__init__(self)
         # Initialise the Simulation with an empty debate. This is
         # necessary so that the initial positions can attach to some debate.
@@ -72,8 +74,7 @@ class Simulation(list):
         """
         Generate initial Positions. Optionally, the Positions may start off with
         explicit truth-value attributions. Positions are filled up with random
-        values for truth-value attributions they do not yet have, such that they
-        begin as complete positions.
+        values for truth-value attributions they do not yet have.
         """
         self.positions = []
 
@@ -88,7 +89,7 @@ class Simulation(list):
                     if s not in p and len(p) < target_length:
                         # While filling up a position, catch when it reaches the
                         # desired length.
-                        p[s] = choice([True, False])
+                        p[s] = choice([True, False, None])
 
         self.positions.append(positions)
 

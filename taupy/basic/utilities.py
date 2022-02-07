@@ -10,6 +10,7 @@ from random import sample, choice
 from itertools import chain, combinations
 from more_itertools import random_combination
 import math
+import z3
 
 def dict_to_prop(dictionary):
     """
@@ -311,3 +312,61 @@ def proposition_levels_from_debate(debate, key_statements=[]):
                did not have a connected argument map?")
 
     return levels
+
+def z3_assertion_from_argument(premises=[], conclusion=None):
+    """
+    A converter function from taupy Arguments, which take sympy 
+    Symbols, to a z3 Implies function, which takes z3 Bools. 
+    """
+    _z3_prems = []
+
+    for p in premises:
+        if p.is_Not:
+            _z3_prems.append(z3.Not(z3.Bool(str(*p.atoms()))))
+        else:
+            _z3_prems.append(z3.Bool(str(*p.atoms())))
+
+    if conclusion.is_Not:
+        _z3_conc = z3.Not(z3.Bool(str(*conclusion.atoms())))
+    else:
+        _z3_conc = z3.Bool(str(*conclusion.atoms()))
+
+    return z3.Implies(z3.And(*_z3_prems), _z3_conc)
+
+def z3_soft_constraints_from_position(position=dict()):
+    """
+    A converter function from Positions to z3.Optimizers
+    """
+    
+    _z3_constraints = []
+    
+    for p in position:
+        if position[p] == True:
+            _z3_constraints.append(z3.Bool(str(p)))
+        if position[p] == False:
+            _z3_constraints.append(z3.Not(z3.Bool(str(p))))
+
+    return _z3_constraints
+
+def z3_all_models(s, initial_terms):
+    """
+    The common function to extract all satisfying models of formula
+    with z3. See: 
+    http://theory.stanford.edu/~nikolaj/programmingz3.html#sec-blocking-evaluations
+    """
+    def block_term(s, m, t):
+        s.add(t != m.eval(t, model_completion=True))
+    def fix_term(s, m, t):
+        s.add(t == m.eval(t, model_completion=True))
+    def all_smt_rec(terms):
+        if z3.sat == s.check():
+           m = s.model()
+           yield m
+           for i in range(len(terms)):
+               s.push()
+               block_term(s, m, terms[i])
+               for j in range(i):
+                   fix_term(s, m, terms[j])
+               yield from all_smt_rec(terms[i:])
+               s.pop()
+    yield from all_smt_rec(list(initial_terms))

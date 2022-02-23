@@ -212,13 +212,19 @@ class Simulation(list):
             # Check for termination conditions in the Boolean case. 
             if len(self.stances) == 2:
                 if self[-1].density() >= max_density or i >= max_steps or satisfiability_count(self[-1]) <= min_sccp:
+                    # Delete objects that can't be pickled.
+                    del self.Solver
+                    del self.assertions
                     break
             
             # Check for termination conditions in the Kleenean case. The extension of the SCCP is 
             # too difficult to calculate, since its max is 3**20.
             if len(self.stances) == 3:
                 if i >= max_steps:
-                   break
+                    # Delete objects that can't be pickled.
+                    del self.Solver
+                    del self.assertions
+                    break
 
 
         self.log.append("Simulation ended. %d steps were taken. Density at end: %f. Extension of SCCP: %d." % (i, self[-1].density(),  satisfiability_count(self[-1])))

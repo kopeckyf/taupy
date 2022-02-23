@@ -7,7 +7,9 @@ from .utilities import (satisfiability_count, satisfiability, dict_to_prop,
                         subsequences_with_length, satisfiable_extensions,
                         fetch_premises, proposition_levels_from_debate,
                         fetch_conclusion, select_premises, z3_assertion_from_argument,
-                        z3_soft_constraints_from_position, z3_all_models)
+                        z3_soft_constraints_from_position, z3_all_models,
+                        z3_initialise_Kleenean, z3_Kleenean_from_iterator,
+                        z3_recover_truth_values)
 
 __all__ = [
             # core
@@ -22,5 +24,6 @@ __all__ = [
             'proposition_levels_from_debate', 'fetch_conclusion', 'select_premises',
             # z3 helper functions
             'z3_assertion_from_argument', 'z3_soft_constraints_from_position',
-            'z3_all_models'
+            'z3_all_models', 'z3_initialise_Kleenean', 'z3_Kleenean_from_iterator',
+            'z3_recover_truth_values'
           ]

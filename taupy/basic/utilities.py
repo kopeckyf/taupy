@@ -313,7 +313,7 @@ def proposition_levels_from_debate(debate, key_statements=[]):
 
     return levels
 
-def z3_assertion_from_argument(premises=[], conclusion=None):
+def z3_assertion_from_argument(premises=[], conclusion=None, format="Boolean"):
     """
     A converter function from taupy Arguments, which take sympy 
     Symbols, to a z3 Implies function, which takes z3 Bools. 
@@ -322,16 +322,32 @@ def z3_assertion_from_argument(premises=[], conclusion=None):
 
     for p in premises:
         if p.is_Not:
-            _z3_prems.append(z3.Not(z3.Bool(str(*p.atoms()))))
+            if format == "Boolean":
+                _z3_prems.append(z3.Not(z3.Bool(str(*p.atoms()))))
+            if format == "Kleenean":
+                _z3_prems.append(KleeneNot(z3.Const(str(*p.atoms()), Kleenean)))
         else:
-            _z3_prems.append(z3.Bool(str(*p.atoms())))
+            if format == "Boolean":
+                _z3_prems.append(z3.Bool(str(*p.atoms())))
+            if format == "Kleenean":
+                _z3_prems.append(z3.Const(str(*p.atoms()), Kleenean))
 
     if conclusion.is_Not:
-        _z3_conc = z3.Not(z3.Bool(str(*conclusion.atoms())))
-    else:
-        _z3_conc = z3.Bool(str(*conclusion.atoms()))
+        if format == "Boolean":
+            _z3_conc = z3.Not(z3.Bool(str(*conclusion.atoms())))
+        if format == "Kleenean":
+            _z3_conc = KleeneNot(z3.Const(str(*conclusion.atoms()), Kleenean))
 
-    return z3.Implies(z3.And(*_z3_prems), _z3_conc)
+    else:
+        if format == "Boolean":
+            _z3_conc = z3.Bool(str(*conclusion.atoms()))
+        if format == "Kleenean":
+            _z3_conc = z3.Const(str(*conclusion.atoms()), Kleenean)
+
+    if format == "Boolean":
+        return z3.Implies(z3.And(*_z3_prems), _z3_conc)
+    if format == "Kleenean":
+        return KleeneImplies(KleeneAnd(*_z3_prems), _z3_conc) == Tru
 
 def z3_soft_constraints_from_position(position=dict()):
     """
@@ -342,11 +358,18 @@ def z3_soft_constraints_from_position(position=dict()):
     
     for p in position:
         if position[p] == True:
-            _z3_constraints.append(z3.Bool(str(p)))
+            _z3_constraints.append(z3.Const(str(p), Kleenean) == Tru)
         if position[p] == False:
-            _z3_constraints.append(z3.Not(z3.Bool(str(p))))
+            _z3_constraints.append(z3.Const(str(p), Kleenean) == Fal)
+        if position[p] == None:
+            _z3_constraints.append(z3.Const(str(p), Kleenean) == Sus)
 
     return _z3_constraints
+
+def z3_recover_truth_values(v):
+    if v == Tru: return True
+    if v == Fal: return False
+    if v == Sus: return None
 
 def z3_all_models(s, initial_terms):
     """
@@ -370,3 +393,55 @@ def z3_all_models(s, initial_terms):
                yield from all_smt_rec(terms[i:])
                s.pop()
     yield from all_smt_rec(list(initial_terms))
+
+def z3_initialise_Kleenean():
+    """
+    Define “Kleenean” (analogous to “Boolean”) truth values to reason about
+    Kleene's three-valued logic.
+
+    The truth values Tru (True), Fal (False) and Sus (Suspension/Unknown) are
+    registered in taupy's global module namespace.
+    ----
+    References: Kleene, Stehen C. 1938. On notation for ordinal numbers. 
+                The Journal of Symbolic Logic, 3(4), pp. 150–155.
+    """
+    global Kleenean
+    Kleenean = z3.Datatype("Kleenean")
+    Kleenean.declare("Tru"); Kleenean.declare("Fal"); Kleenean.declare("Sus")
+    Kleenean = Kleenean.create()
+
+    global Tru; global Fal; global Sus
+    Tru = Kleenean.Tru; Fal = Kleenean.Fal; Sus = Kleenean.Sus
+
+def z3_Kleenean_from_iterator(iterable):
+    return [z3.Const(str(i), Kleenean) for i in iterable]
+
+def KleeneNot(bool):
+    """
+    Semantics for Kleenean negation. Note that z3.If implements an If-Then-Else 
+    function.
+    """
+    return z3.If(bool == Fal, Tru, z3.If(bool == Tru, Fal, Sus))
+
+def KleeneAnd(*args):
+    """
+    Restricted semantics for Kleenean Conjunction. This function returns Tru in 
+    case of SAT and Fal in case of Unsat. It never returns Sus.
+    """
+    l = [i == Tru for i in args]
+    return z3.If(z3.And(*l), Tru, Fal)
+
+def KleeneOr(*args): 
+    """
+    Restricted semantics for Kleenean Disjunction. This function returns Tru in 
+    case of SAT and Fal in case of Unsat. It never returns Sus.
+    """
+    l = [i == Tru for i in args]
+    return z3.If(z3.Or(*l), Tru, Fal)
+
+def KleeneImplies(a, b):
+    """
+    Restricted semantics for Kleenean Implication. This function returns Tru in 
+    case of SAT and Fal in case of Unsat. It never returns Sus.
+    """    
+    return z3.If(z3.Or(a == Fal, b==Tru), Tru, Fal)

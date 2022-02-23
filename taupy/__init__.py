@@ -10,7 +10,8 @@ from .basic import (satisfiability_count, satisfiability, dict_to_prop,
                     subsequences_with_length, satisfiable_extensions, fetch_premises,
                     proposition_levels_from_debate, select_premises, fetch_conclusion,
                     z3_assertion_from_argument, z3_soft_constraints_from_position,
-                    z3_all_models)
+                    z3_all_models, z3_Kleenean_from_iterator, z3_initialise_Kleenean,
+                    z3_recover_truth_values)
 
 from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, next_neighbours, 
                        edit_distance, normalised_edit_distance, switch_deletion_neighbourhood,
@@ -44,5 +45,6 @@ __all__ = [
             'subsequences_with_length', 'satisfiable_extensions', 'fetch_premises',
             'proposition_levels_from_debate', 'fetch_conclusion', 'select_premises',
             'z3_assertion_from_argument', 'z3_soft_constraints_from_position',
-            'z3_all_models'
+            'z3_all_models', 'z3_Kleenean_from_iterator', 'z3_initialise_Kleenean',
+            'z3_recover_truth_values'
           ]

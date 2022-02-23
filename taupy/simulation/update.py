@@ -4,15 +4,15 @@ Functions to introduce Arguments into Debates and update Positions accordingly.
 
 from copy import deepcopy
 import numpy as np
-from random import randrange, choice, choices
+from random import randrange, choice, choices, sample
 from sympy import And, Not, symbols
 from sympy.logic.algorithms.dpll2 import dpll_satisfiable
 from taupy import (Argument, Debate, EmptyDebate, Position, satisfiability, closedness, 
                    dict_to_prop, next_neighbours,
                    hamming_distance, edit_distance, fetch_conclusion, select_premises,
-                   proposition_levels_from_debate, subsequences_with_length,
+                   proposition_levels_from_debate,
                    z3_assertion_from_argument, z3_soft_constraints_from_position, 
-                   z3_all_models)
+                   z3_all_models, z3_Kleenean_from_iterator, z3_recover_truth_values)
 import taupy.simulation.strategies as strategies
 import z3
 
@@ -155,8 +155,20 @@ def introduce(_sim, source=None, target=None, strategy=None):
                 _sim.append(Debate( *_sim[-1].args, Argument(And(*selected_premises), selected_conclusion)))
 
         # Store the argument in the optimiser:
-        _sim.assertions.append(z3_assertion_from_argument(premises=selected_premises, 
-                                                          conclusion=selected_conclusion))
+        if len(_sim.stances) == 2:
+            _sim.assertions.append(z3_assertion_from_argument(premises=selected_premises, 
+                                                              conclusion=selected_conclusion))
+            
+            _sim.Solver.add(z3_assertion_from_argument(premises=selected_premises, 
+                                                       conclusion=selected_conclusion))
+        if len(_sim.stances) == 3:
+            _sim.Solver.add(z3_assertion_from_argument(premises=selected_premises, 
+                                                       conclusion=selected_conclusion,
+                                                       format="Kleenean"))
+            
+            _sim.assertions.append(z3_assertion_from_argument(premises=selected_premises, 
+                                                              conclusion=selected_conclusion,
+                                                              format="Kleenean"))
 
         return True
         # return Argument(And(*selected_premises), selected_conclusion)
@@ -213,31 +225,25 @@ def response(_sim, method):
                 _sim.log.append("Position with index %d was updated with strategy closest_coherent." % (i))
         _sim.positions.append(updated_positions)
 
-    if method == "closest_closed_partial_coherent":
-        """
-        This is a “poor man's Levenshtein automaton”: we are looking for all positions with a given
-        edit distance to the positions that need updating, and we then select the one with the least
-        distance to the original position.
-        """
+    if method == "closest_coherent_with_suspension":
         updated_positions = []
 
         for (idx, position) in enumerate(_sim.positions[-1]):
+            # Collect constraints for the current position                
+            constraints = z3_soft_constraints_from_position(position)
+
             # First, let's see whether the position has any chance wrt the updated debate:
-            if dpll_satisfiable(And(dict_to_prop(position), _sim[-1])) and \
-               closedness(position, debate=_sim[-1]):
-                    new_position = Position(_sim[-1],
-                                            position,
-                                            introduction_strategy=position.introduction_strategy,
-                                            update_strategy=position.update_strategy)
-                    _sim.log.append("Position with index %d is still coherent and closed given \
+            if _sim.Solver.check(constraints) == z3.sat:
+                new_position = Position(_sim[-1],
+                                        position,
+                                        introduction_strategy=position.introduction_strategy,
+                                        update_strategy=position.update_strategy)
+                _sim.log.append("Position with index %d is still coherent and closed given \
                                      the new debate." % (idx))
                 
             else:
                 _sim.log.append("Position with index %d needs an update." % (idx))
-                z3_current_sentences = [z3.Bool(str(i)) for i in _sim[-1].atoms()]
-                
-                # Collect constraints for the current position                
-                constraints = z3_soft_constraints_from_position(position)
+
                 # Build the assertions iteratively. This is equivalent to adding 
                 # soft constraints via z3.Optimize.add_soft().
                 assertions = z3.If(constraints[0], 1, 0)
@@ -245,8 +251,7 @@ def response(_sim, method):
                     assertions += z3.If(c, 1, 0)
 
                 # MaxSAT iteration over k, the number of fulfilled constraints
-                k = len(constraints)
-                saved_candidates = []
+                k = len(constraints)-1
                 while k > 0:
                     o = z3.Optimize()
                     o.set(priority="pareto")
@@ -255,52 +260,21 @@ def response(_sim, method):
                     o.add(assertions == k)
                     o.maximize(assertions)
                     
-                    # Loop over all candidates to determine possible Positions to move
-                    # to
-                    candidates = []
-                    for m in z3_all_models(o, z3_current_sentences):
-                        base_model = {symbols(str(i)): eval(str(m[i])) for i in m}
-                        differences = [k for k in base_model if base_model[k] != position[k]]
-                        # In what ways does the new model differ from the investigated position?
-                        # For all these differences, it is assumed that the position might have
-                        # suspended instead of doing the switch toward True or False.
-                        diff_tuples = subsequences_with_length(differences, len(constraints)-k+1)
-                        # (Includes the empty tuple, i.e. the empty switch set.)
-                        for d in diff_tuples:
-                            new_candidate = {l: position[l] for l in position if l not in differences} \
-                                             | {l: base_model[l] for l in base_model if l not in d} \
-                                             | {l: None for l in d}
-                            
-                            # Let's see in which cases suspesion is actually *really* an option
-                            # by checking closedness for all candidates. The present code can lead
-                            # to having dupliaces in `candidates`, but since we are looking for the 
-                            # min(), that's OK.
-                            candidates.append(closedness(new_candidate, 
-                                                         debate=_sim[-1], 
-                                                         return_alternative=True)[1])
-
+                    # Loop over all candidates to determine possible Positions to move to
+                    candidates = [{symbols(str(i)): z3_recover_truth_values(j[i]) for i in j} for j in list(z3_all_models(o, z3_Kleenean_from_iterator(_sim[-1].atoms())))]
 
                     # Now calculate the ED() for the position to all candidates...
-                    curr_candidates = candidates + saved_candidates
-                    a = np.array([edit_distance(i, position) for i in curr_candidates])
+                    #curr_candidates = candidates + saved_candidates
+                    a = np.array([edit_distance(i, position) for i in candidates])
 
                     if a.size > 0:
                         # ... and pick the one with minimum distance.
                         new_position = Position(_sim[-1],
-                                        curr_candidates[choice(np.argwhere(a == np.amin(a)).flatten().tolist())],
+                                        candidates[choice(np.argwhere(a == np.amin(a)).flatten().tolist())],
                                         introduction_strategy=position.introduction_strategy,
                                         update_strategy=position.update_strategy)
                         
-                        if edit_distance(new_position, position) <= len(constraints)-k+1:
-                            # We found a candidate that is at least as good as could ever be 
-                            # achieved in the next iteration (k+1). This is why we break out 
-                            # here and settle for this candidate.
-                            break
-                        else:
-                            # We carry one of the optimal candidates from this iteration on
-                            # to the next iteration and let it compete there. 
-                            saved_candidates.append(new_position)
-
+                        break
                     # Could not determine an optimal candidate while demanding k constraints. 
                     # Decrease k and try again.
                     k -= 1

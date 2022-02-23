@@ -8,7 +8,8 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 import time
 import z3
 
-from taupy.basic.utilities import satisfiability_count
+from taupy.basic.utilities import (satisfiability_count, z3_initialise_Kleenean,
+                                   z3_Kleenean_from_iterator, z3_all_models)
 from taupy import EmptyDebate
 from .update import introduce, response
 import taupy.simulation.strategies as strategies
@@ -25,6 +26,7 @@ class Simulation(list):
                  parent_debate = None,
                  argumentlength = 2,
                  positions = [],
+                 stances = [True, False, None],
                  copy_input_positions = True,
                  initial_position_size = None,
                  default_introduction_strategy = strategies.random,
@@ -41,6 +43,7 @@ class Simulation(list):
         self.key_statements = [i for i in symbols(key_statements)]
         self.events = events
         self.argumentlength = argumentlength
+        self.stances = stances
 
         if copy_input_positions == True:
             self.init_positions(deepcopy(positions), target_length=initial_position_size)
@@ -55,7 +58,8 @@ class Simulation(list):
         self.default_introduction_strategy = default_introduction_strategy
         self.default_update_strategy = default_update_strategy
         self.log = []
-        self.assertions = [] # assertions for z3.Solver and z3.Optimize
+        self.assertions = [] # assertions for z3.Optimize
+        self.Solver = z3.Solver()
         list.__init__(self)
         # Initialise the Simulation with an empty debate. This is
         # necessary so that the initial positions can attach to some debate.
@@ -66,6 +70,11 @@ class Simulation(list):
             # Add premises in the parent debate to the used premise storage.
             for i in parent_debate.args:
                 self.used_premises.append(i.args[0])
+
+        # Conditional initialisation of Kleene's three-valued logic in case three stances
+        # are allowed. This registers “Kleenean” Tru, Fal, Sus in the global name space.
+        if len(stances) == 3:
+            z3_initialise_Kleenean()
 
     def premise_candidates(self):
         return set(self.sentencepool + [Not(i) for i in self.sentencepool])
@@ -89,7 +98,7 @@ class Simulation(list):
                     if s not in p and len(p) < target_length:
                         # While filling up a position, catch when it reaches the
                         # desired length.
-                        p[s] = choice([True, False, None])
+                        p[s] = choice(self.stances)
 
         self.positions.append(positions)
 
@@ -189,12 +198,8 @@ class Simulation(list):
                     expanded_positions = []
                     for p in self.positions[-1]:
                         e = deepcopy(p)
-                        # There is a 2:1 chance that the position does not suspend judgement on the
-                        # new sentence.
-                        if choice([True, True, False]):
-                            # If the positions does no suspend, there is a 1:1 chance it will assign
-                            # either truth value.
-                            e[selected_sentence] = choice([True, False])
+                        # Randomly select a stance that the Position holds toward the new proposition.
+                        e[selected_sentence] = choice(self.stances)
                         expanded_positions.append(e)
 
                     self.positions.append(expanded_positions)
@@ -204,8 +209,17 @@ class Simulation(list):
                     self.log.append("Tried to insert a new sentence to the debate but maximum extension was reached.")
 
             i += 1
-            if self[-1].density() >= max_density or i >= max_steps or satisfiability_count(self[-1]) <= min_sccp:
-                break
+            # Check for termination conditions in the Boolean case. 
+            if len(self.stances) == 2:
+                if self[-1].density() >= max_density or i >= max_steps or satisfiability_count(self[-1]) <= min_sccp:
+                    break
+            
+            # Check for termination conditions in the Kleenean case. The extension of the SCCP is 
+            # too difficult to calculate, since its max is 3**20.
+            if len(self.stances) == 3:
+                if i >= max_steps:
+                   break
+
 
         self.log.append("Simulation ended. %d steps were taken. Density at end: %f. Extension of SCCP: %d." % (i, self[-1].density(),  satisfiability_count(self[-1])))
 

@@ -245,7 +245,9 @@ def response(_sim, method):
                     assertions += z3.If(c, 1, 0)
 
                 # MaxSAT iteration over k, the number of fulfilled constraints
-                k = len(constraints)
+                # When a position is UNSAT, at least one constraint can't be 
+                # fulfilled. Hence we start at len(constr)-1.
+                k = len(constraints)-1
                 saved_candidates = []
                 while k > 0:
                     o = z3.Optimize()
@@ -259,7 +261,7 @@ def response(_sim, method):
                     # to
                     candidates = []
                     for m in z3_all_models(o, z3_current_sentences):
-                        base_model = {symbols(str(i)): eval(str(m[i])) for i in m}
+                        base_model = {symbols(str(i)): eval(str(m[i])) for i in m if symbols(str(i)) in position}
                         differences = [k for k in base_model if base_model[k] != position[k]]
                         # In what ways does the new model differ from the investigated position?
                         # For all these differences, it is assumed that the position might have
@@ -268,8 +270,7 @@ def response(_sim, method):
                         # (Includes the empty tuple, i.e. the empty switch set.)
                         for d in diff_tuples:
                             new_candidate = {l: position[l] for l in position if l not in differences} \
-                                             | {l: base_model[l] for l in base_model if l not in d} \
-                                             | {l: None for l in d}
+                                             | {l: base_model[l] for l in base_model if l not in d}
                             
                             # Let's see in which cases suspesion is actually *really* an option
                             # by checking closedness for all candidates. The present code can lead
@@ -278,7 +279,6 @@ def response(_sim, method):
                             candidates.append(closedness(new_candidate, 
                                                          debate=_sim[-1], 
                                                          return_alternative=True)[1])
-
 
                     # Now calculate the ED() for the position to all candidates...
                     curr_candidates = candidates + saved_candidates
@@ -295,6 +295,8 @@ def response(_sim, method):
                             # We found a candidate that is at least as good as could ever be 
                             # achieved in the next iteration (k+1). This is why we break out 
                             # here and settle for this candidate.
+                            del o
+                            del base_model
                             break
                         else:
                             # We carry one of the optimal candidates from this iteration on

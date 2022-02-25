@@ -89,7 +89,7 @@ class Simulation(list):
                     if s not in p and len(p) < target_length:
                         # While filling up a position, catch when it reaches the
                         # desired length.
-                        p[s] = choice([True, False, None])
+                        p[s] = choice([True, False])
 
         self.positions.append(positions)
 
@@ -192,7 +192,7 @@ class Simulation(list):
                         # There is a 2:1 chance that the position does not suspend judgement on the
                         # new sentence.
                         if choice([True, True, False]):
-                            # If the positions does no suspend, there is a 1:1 chance it will assign
+                            # If the positions does not suspend, there is a 1:1 chance it will assign
                             # either truth value.
                             e[selected_sentence] = choice([True, False])
                         expanded_positions.append(e)
@@ -205,6 +205,8 @@ class Simulation(list):
 
             i += 1
             if self[-1].density() >= max_density or i >= max_steps or satisfiability_count(self[-1]) <= min_sccp:
+                # Delete objects that can't be pickled.
+                del self.assertions
                 break
 
         self.log.append("Simulation ended. %d steps were taken. Density at end: %f. Extension of SCCP: %d." % (i, self[-1].density(),  satisfiability_count(self[-1])))

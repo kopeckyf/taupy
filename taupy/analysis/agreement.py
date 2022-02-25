@@ -62,14 +62,13 @@ def edit_distance(pos1, pos2, weights = {"substitution": 1.0,
     for v in set(pos1.keys()) | set(pos2.keys()):
         # Substituion: Neither position suspends on the proposition,
         #              but they also don't agree.
-        if (v in pos1 and pos1[v] != None and v in pos2 and pos2[v] != None 
-            and pos1[v] != pos2[v]):
+        if v in pos1 and v in pos2 and pos1[v] != pos2[v]:
             n_subsitutions += 1
         # Insertion: The first position suspends, the second doesn't.
-        if pos1[v] == None and pos2[v] != None: n_insertions += 1
+        if v not in pos1 and v in pos2: n_insertions += 1
         # Deletion: The first position doesn't suspend, but the 
         #           second does.
-        if pos1[v] != None and pos2[v] == None: n_deletions += 1
+        if v in pos1 and v not in pos2: n_deletions += 1
     
     return (n_subsitutions * weights["substitution"] 
             + n_insertions * weights["insertion"] 

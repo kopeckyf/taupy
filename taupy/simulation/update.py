@@ -4,6 +4,7 @@ Functions to introduce Arguments into Debates and update Positions accordingly.
 
 from copy import deepcopy
 import numpy as np
+from more_itertools import random_combination
 from random import randrange, choice, choices
 from sympy import And, Not, symbols
 from sympy.logic.algorithms.dpll2 import dpll_satisfiable
@@ -215,9 +216,20 @@ def response(_sim, method):
 
     if method == "closest_closed_partial_coherent":
         """
-        This is a “poor man's Levenshtein automaton”: we are looking for all positions with a given
-        edit distance to the positions that need updating, and we then select the one with the least
-        distance to the original position.
+        Find a close, closed, coherent, partial neighbour for the positions.
+
+        In case a position is not coherent or not closed, the search takes three routes:
+
+        Route 1: 
+          Find a MaxSAT neighbour through substitutions + closedness
+        Route 2:
+          Find a neighbour through deletions + substitutions + closedness
+        Route 3:
+          Find a neighbour through deletions + closedness.
+
+        All routes are pursued iteratively with rising distance to the current position.
+        For each route, exactly one alternative is chosen. This limits the influence of 
+        the invidual routes so that each route has the same chance of being taken.
         """
         updated_positions = []
 
@@ -234,10 +246,14 @@ def response(_sim, method):
                 
             else:
                 _sim.log.append("Position with index %d needs an update." % (idx))
-                z3_current_sentences = [z3.Bool(str(i)) for i in _sim[-1].atoms()]
                 
-                # Collect constraints for the current position                
-                constraints = z3_soft_constraints_from_position(position)
+                # Collect constraints for the current position. Empty positions pick a random 
+                # singular position for bootstrapping (otherwise they'd stay empty).
+                if len(position) > 0:                
+                    constraints = z3_soft_constraints_from_position(position)
+                else:
+                    constraints = choice([z3.Bool(str(i)) for i in _sim[-1].atoms()] \
+                                         + [z3.Not(z3.Bool(str(i))) for i in _sim[-1].atoms()])
                 # Build the assertions iteratively. This is equivalent to adding 
                 # soft constraints via z3.Optimize.add_soft().
                 assertions = z3.If(constraints[0], 1, 0)
@@ -246,10 +262,10 @@ def response(_sim, method):
 
                 # MaxSAT iteration over k, the number of fulfilled constraints
                 # When a position is UNSAT, at least one constraint can't be 
-                # fulfilled. Hence we start at len(constr)-1.
+                # fulfilled. Hence we start at len(constraints)-1.
                 k = len(constraints)-1
                 saved_candidates = []
-                while k > 0:
+                while k >= 0:
                     o = z3.Optimize()
                     o.set(priority="pareto")
                     for a in _sim.assertions:
@@ -257,51 +273,50 @@ def response(_sim, method):
                     o.add(assertions == k)
                     o.maximize(assertions)
                     
-                    # Loop over all candidates to determine possible Positions to move
-                    # to
+                    # Loop over all the solutions to the MaxSAT problem. For each solution,
+                    # generate one candidate for each of the three routes.
+                    # Note that closedness(model,return_alternative=True)[1] stores the closed
+                    # version of a model.
                     candidates = []
-                    for m in z3_all_models(o, z3_current_sentences):
+                    for m in z3_all_models(o, [z3.Bool(str(i)) for i in _sim[-1].atoms()]):
                         base_model = {symbols(str(i)): eval(str(m[i])) for i in m if symbols(str(i)) in position}
+                        candidates.append(closedness(base_model,
+                                                     debate=_sim[-1],
+                                                     return_alternative=True)[1])
                         differences = [k for k in base_model if base_model[k] != position[k]]
                         # In what ways does the new model differ from the investigated position?
-                        # For all these differences, it is assumed that the position might have
+                        # For a random set of diffs, it is assumed that the position might have
                         # suspended instead of doing the switch toward True or False.
-                        diff_tuples = subsequences_with_length(differences, len(constraints)-k+1)
-                        # (Includes the empty tuple, i.e. the empty switch set.)
-                        for d in diff_tuples:
-                            new_candidate = {l: position[l] for l in position if l not in differences} \
-                                             | {l: base_model[l] for l in base_model if l not in d}
+                        pick_diffs = random_combination(differences, choice(range(len(differences))))
+                        route_2_candidate = {l: position[l] for l in position if l not in differences} \
+                                            | {l: base_model[l] for l in base_model if l not in pick_diffs}
                             
-                            # Let's see in which cases suspesion is actually *really* an option
-                            # by checking closedness for all candidates. The present code can lead
-                            # to having dupliaces in `candidates`, but since we are looking for the 
-                            # min(), that's OK.
-                            candidates.append(closedness(new_candidate, 
-                                                         debate=_sim[-1], 
-                                                         return_alternative=True)[1])
+                        candidates.append(closedness(route_2_candidate, 
+                                                     debate=_sim[-1], 
+                                                     return_alternative=True)[1])
+
+                        # The route 3 candidate only considers deletions.
+                        route_3_candidate = {l: position[l] for l in position if l not in differences}
+                        candidates.append(closedness(route_3_candidate, 
+                                                     debate=_sim[-1], 
+                                                     return_alternative=True)[1])
 
                     # Now calculate the ED() for the position to all candidates...
                     curr_candidates = candidates + saved_candidates
                     a = np.array([edit_distance(i, position) for i in curr_candidates])
-
+                    
+                    # ... and pick the min of distances, if the distance, but ...
                     if a.size > 0:
-                        # ... and pick the one with minimum distance.
                         new_position = Position(_sim[-1],
-                                        curr_candidates[choice(np.argwhere(a == np.amin(a)).flatten().tolist())],
-                                        introduction_strategy=position.introduction_strategy,
-                                        update_strategy=position.update_strategy)
+                                            curr_candidates[choice(np.argwhere(a == np.amin(a)).flatten().tolist())],
+                                            introduction_strategy=position.introduction_strategy,
+                                            update_strategy=position.update_strategy)
                         
-                        if edit_distance(new_position, position) <= len(constraints)-k+1:
-                            # We found a candidate that is at least as good as could ever be 
-                            # achieved in the next iteration (k+1). This is why we break out 
-                            # here and settle for this candidate.
-                            del o
-                            del base_model
-                            break
-                        else:
-                            # We carry one of the optimal candidates from this iteration on
-                            # to the next iteration and let it compete there. 
+                        # ... if it is better then what would be expected at the next iteration.
+                        if np.amin(a) > len(constraints)-k+1:
                             saved_candidates.append(new_position)
+                        else:
+                            break
 
                     # Could not determine an optimal candidate while demanding k constraints. 
                     # Decrease k and try again.

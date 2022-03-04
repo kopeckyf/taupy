@@ -252,8 +252,8 @@ def response(_sim, method):
                 if len(position) > 0:                
                     constraints = z3_soft_constraints_from_position(position)
                 else:
-                    constraints = choice([z3.Bool(str(i)) for i in _sim[-1].atoms()] \
-                                         + [z3.Not(z3.Bool(str(i))) for i in _sim[-1].atoms()])
+                    constraints = [choice([z3.Bool(str(i)) for i in _sim[-1].atoms()] \
+                                         + [z3.Not(z3.Bool(str(i))) for i in _sim[-1].atoms()])]
                 # Build the assertions iteratively. This is equivalent to adding 
                 # soft constraints via z3.Optimize.add_soft().
                 assertions = z3.If(constraints[0], 1, 0)

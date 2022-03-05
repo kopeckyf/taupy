@@ -260,9 +260,7 @@ def response(_sim, method):
                 for c in constraints[1:]:
                     assertions += z3.If(c, 1, 0)
 
-                # MaxSAT iteration over k, the number of fulfilled constraints
-                # When a position is UNSAT, at least one constraint can't be 
-                # fulfilled. Hence we start at len(constraints)-1.
+                # MaxSAT iteration over k, the number of fulfilled constraints.
                 k = len(constraints)
                 saved_candidates = []
                 while k >= 0:

@@ -263,7 +263,7 @@ def response(_sim, method):
                 # MaxSAT iteration over k, the number of fulfilled constraints
                 # When a position is UNSAT, at least one constraint can't be 
                 # fulfilled. Hence we start at len(constraints)-1.
-                k = len(constraints)-1
+                k = len(constraints)
                 saved_candidates = []
                 while k >= 0:
                     o = z3.Optimize()
@@ -313,7 +313,7 @@ def response(_sim, method):
                                             update_strategy=position.update_strategy)
                         
                         # ... if it is better then what would be expected at the next iteration.
-                        if np.amin(a) > len(constraints)-k+1:
+                        if np.amin(a) > len(constraints)-k+1 and k > 0:
                             saved_candidates.append(new_position)
                         else:
                             break

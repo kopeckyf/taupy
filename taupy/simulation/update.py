@@ -282,22 +282,24 @@ def response(_sim, method):
                                                      debate=_sim[-1],
                                                      return_alternative=True)[1])
                         differences = [k for k in base_model if base_model[k] != position[k]]
-                        # In what ways does the new model differ from the investigated position?
-                        # For a random set of diffs, it is assumed that the position might have
-                        # suspended instead of doing the switch toward True or False.
-                        pick_diffs = random_combination(differences, choice(range(len(differences))))
-                        route_2_candidate = {l: position[l] for l in position if l not in differences} \
-                                            | {l: base_model[l] for l in base_model if l not in pick_diffs}
-                            
-                        candidates.append(closedness(route_2_candidate, 
-                                                     debate=_sim[-1], 
-                                                     return_alternative=True)[1])
+                        # If the candidate model only closes, do not take routes 2 and 3.
+                        if len(differences) > 0:
+                            # In what ways does the new model differ from the investigated position?
+                            # For a random set of diffs, it is assumed that the position might have
+                            # suspended instead of doing the switch toward True or False.
+                            pick_diffs = random_combination(differences, choice(range(len(differences))))
+                            route_2_candidate = {l: position[l] for l in position if l not in differences} \
+                                                | {l: base_model[l] for l in base_model if l not in pick_diffs}
+                                
+                            candidates.append(closedness(route_2_candidate, 
+                                                        debate=_sim[-1], 
+                                                        return_alternative=True)[1])
 
-                        # The route 3 candidate only considers deletions.
-                        route_3_candidate = {l: position[l] for l in position if l not in differences}
-                        candidates.append(closedness(route_3_candidate, 
-                                                     debate=_sim[-1], 
-                                                     return_alternative=True)[1])
+                            # The route 3 candidate only considers deletions.
+                            route_3_candidate = {l: position[l] for l in position if l not in differences}
+                            candidates.append(closedness(route_3_candidate, 
+                                                        debate=_sim[-1], 
+                                                        return_alternative=True)[1])
 
                     # Now calculate the ED() for the position to all candidates...
                     curr_candidates = candidates + saved_candidates

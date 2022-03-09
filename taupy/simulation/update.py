@@ -4,14 +4,15 @@ Functions to introduce Arguments into Debates and update Positions accordingly.
 
 from copy import deepcopy
 import numpy as np
-from more_itertools import random_combination
-from random import randrange, choice, choices
+from more_itertools import powerset
+from iteration_utilities import unique_everseen
+from random import randrange, choice, choices, shuffle
 from sympy import And, Not, symbols
 from sympy.logic.algorithms.dpll2 import dpll_satisfiable
 from taupy import (Argument, Debate, EmptyDebate, Position, satisfiability, closedness, 
                    dict_to_prop, next_neighbours,
                    hamming_distance, edit_distance, fetch_conclusion, select_premises,
-                   proposition_levels_from_debate, subsequences_with_length,
+                   proposition_levels_from_debate,
                    z3_assertion_from_argument, z3_soft_constraints_from_position, 
                    z3_all_models)
 import taupy.simulation.strategies as strategies
@@ -217,19 +218,6 @@ def response(_sim, method):
     if method == "closest_closed_partial_coherent":
         """
         Find a close, closed, coherent, partial neighbour for the positions.
-
-        In case a position is not coherent or not closed, the search takes three routes:
-
-        Route 1: 
-          Find a MaxSAT neighbour through substitutions + closedness
-        Route 2:
-          Find a neighbour through deletions + substitutions + closedness
-        Route 3:
-          Find a neighbour through deletions + closedness.
-
-        All routes are pursued iteratively with rising distance to the current position.
-        For each route, exactly one alternative is chosen. This limits the influence of 
-        the invidual routes so that each route has the same chance of being taken.
         """
         updated_positions = []
 
@@ -245,7 +233,7 @@ def response(_sim, method):
                                      the new debate." % (idx))
                 
             else:
-                _sim.log.append("Position with index %d needs an update." % (idx))
+                _sim.log.append(f"Position with index {idx} needs an update.")
                 
                 # Collect constraints for the current position. Empty positions pick a random 
                 # singular position for bootstrapping (otherwise they'd stay empty).
@@ -271,35 +259,23 @@ def response(_sim, method):
                     o.add(assertions == k)
                     o.maximize(assertions)
                     
-                    # Loop over all the solutions to the MaxSAT problem. For each solution,
-                    # generate one candidate for each of the three routes.
-                    # Note that closedness(model,return_alternative=True)[1] stores the closed
-                    # version of a model.
+                    # Loop over all the solutions to the MaxSAT problem. Note that 
+                    # closedness(model,return_alternative=True)[1] stores the closed version of a model.
                     candidates = []
-                    for m in z3_all_models(o, [z3.Bool(str(i)) for i in _sim[-1].atoms()]):
-                        base_model = {symbols(str(i)): eval(str(m[i])) for i in m if symbols(str(i)) in position}
-                        candidates.append(closedness(base_model,
-                                                     debate=_sim[-1],
-                                                     return_alternative=True)[1])
-                        differences = [k for k in base_model if base_model[k] != position[k]]
-                        # If the candidate model only closes, do not take routes 2 and 3.
-                        if len(differences) > 0:
-                            # In what ways does the new model differ from the investigated position?
-                            # For a random set of diffs, it is assumed that the position might have
-                            # suspended instead of doing the switch toward True or False.
-                            pick_diffs = random_combination(differences, choice(range(len(differences))))
-                            route_2_candidate = {l: position[l] for l in position if l not in differences} \
-                                                | {l: base_model[l] for l in base_model if l not in pick_diffs}
-                                
-                            candidates.append(closedness(route_2_candidate, 
-                                                        debate=_sim[-1], 
-                                                        return_alternative=True)[1])
+                    base_models = [{symbols(str(i)): eval(str(m[i])) for i in m if symbols(str(i)) in position} \
+                                    for m in z3_all_models(o, [z3.Bool(str(i)) for i in _sim[-1].atoms()])]
+                    unique_base_models = list(unique_everseen(base_models, key=lambda item: frozenset(item.items())))
 
-                            # The route 3 candidate only considers deletions.
-                            route_3_candidate = {l: position[l] for l in position if l not in differences}
-                            candidates.append(closedness(route_3_candidate, 
-                                                        debate=_sim[-1], 
-                                                        return_alternative=True)[1])
+                    for m in unique_base_models:
+                        candidates.append(closedness(m, debate=_sim[-1], return_alternative=True)[1])
+                        differences = [k for k in m if m[k] != position[k]]
+                        diff_samples = list(powerset(differences)); shuffle(diff_samples)
+
+                        for d in diff_samples[:min(len(diff_samples), _sim.partial_neighbour_search_radius)]:
+                            c = {l: position[l] for l in position if l not in differences} \
+                                 | {l: m[l] for l in m if l in d}
+                            
+                            candidates.append(closedness(c, debate=_sim[-1], return_alternative=True)[1])
 
                     # Now calculate the ED() for the position to all candidates...
                     curr_candidates = candidates + saved_candidates
@@ -323,11 +299,7 @@ def response(_sim, method):
                     k -= 1
                 else:
                     # This is here purely for diagnostic purposes.
-                    _sim.log.append("!!!!! \
-                                     Fatal Error: Could not find a position to update to, even if \
-                                     zero constraints are demanded. There is something terribly \
-                                     wrong.\
-                                     !!!!! ")
+                    raise Exception(f"Could not find a neighbour for position {position}.")
 
                 _sim.log.append("Position with index %d updated to a new position, edit distance %d." % (idx, edit_distance(position, new_position)))
             # Found replacement for one position, continue loop with next position from

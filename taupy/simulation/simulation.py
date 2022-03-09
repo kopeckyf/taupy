@@ -28,7 +28,8 @@ class Simulation(list):
                  copy_input_positions = True,
                  initial_position_size = None,
                  default_introduction_strategy = strategies.random,
-                 default_update_strategy = "closest_coherent"):
+                 default_update_strategy = "closest_coherent",
+                 partial_neighbour_search_radius = 50):
 
         if sentencepool == "inherit": # import from parent debate
             self.sentencepool = [i for i in parent_debate.atoms()]
@@ -41,6 +42,7 @@ class Simulation(list):
         self.key_statements = [i for i in symbols(key_statements)]
         self.events = events
         self.argumentlength = argumentlength
+        self.partial_neighbour_search_radius = partial_neighbour_search_radius
 
         if copy_input_positions == True:
             self.init_positions(deepcopy(positions), target_length=initial_position_size)

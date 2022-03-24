@@ -236,5 +236,11 @@ def experiment(n, executor={}, simulations={}, runs={}):
 
         for count, future in enumerate(as_completed(results), start=1):
             print(f"Simulation {count}/{n} completed at {time.ctime()}.")
-
-    return [i.result() for i in results]
+    
+    r = []
+    for idx, i in enumerate(results):
+        try:
+            r.append(i.result())
+        except:
+            print(f"Failed to save simulation {idx}")
+    return r

@@ -15,7 +15,7 @@ long_description = (here / 'README.md').read_text(encoding='utf-8')
 
 setup(
     name='taupy',
-    version='0.3.0',
+    version='0.4.0',
     description='A Python package to study the theory of dialectical \
                  structures',
     long_description=long_description,

@@ -33,6 +33,15 @@ def position_changes(simulation, *, measure=hamming_distance, densities=True):
         return pd.DataFrame(list(zip(density_pairs, averages)), columns=["avg density in pair", "position difference"])
     else:
         return averages
+
+def len_of_positions(simulation):
+    sim_ids = [idx for idx, s in enumerate(simulation)]
+
+    int1 = len([p for p in simulation.positions[-1] if len(p) in list(range(0,7))])
+    int2 = len([p for p in simulation.positions[-1] if len(p) in list(range(7,14))])
+    int3 = len([p for p in simulation.positions[-1] if len(p) in list(range(14,21))])
+
+    return pd.DataFrame(list(zip(sim_ids, int1, int2, int3)), columns=["id", "0–6", "7–13", "14–20"])
     
 
 def mean_population_wide_agreement(simulation, *, densities=True):

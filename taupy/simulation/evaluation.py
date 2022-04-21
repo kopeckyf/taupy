@@ -4,8 +4,9 @@ from concurrent.futures import ProcessPoolExecutor
 from taupy import (difference_matrix, group_divergence, group_consensus, group_size_parity,
                    normalised_hamming_distance, hamming_distance, edit_distance, 
                    normalised_edit_distance, pairwise_dispersion, number_of_groups, 
-                   bna, satisfiability_count)
+                   bna, satisfiability_count, Position)
 from statistics import mean
+from collections import Counter
 import numpy as np
 import pandas as pd
 
@@ -14,6 +15,43 @@ def evaluate_experiment(experiment, *, function=None, densities=True, executor={
         results = [executor.submit(function, simulation=i, **arguments) for i in experiment]
     
     return pd.concat([i.result() for i in results], keys=[n for n, _ in enumerate(results)])
+
+def majority_voting(simulation, *, densities=True):
+    if densities:
+        densities = [i.density() for i in simulation[1:]]
+
+    majority_closed = []
+    majority_coherent = []
+
+    for stage, plist in enumerate(simulation.positions[1:]):
+        vote_none = Counter([x for l in [[s for s in simulation.sentencepool if s not in i] for i in plist] for x in l])
+        vote_true = Counter([x for l in [[s for s in i if i[s]==True] for i in plist] for x in l])
+        vote_false = Counter([x for l in [[s for s in i if i[s]==False] for i in plist] for x in l])
+
+        v = pd.merge(pd.DataFrame.from_dict(vote_none, orient="index", columns=["None"]),
+                     pd.merge(pd.DataFrame.from_dict(vote_true, orient="index", columns=["True"]),
+                              pd.DataFrame.from_dict(vote_false, 
+                                                     orient="index", 
+                                                     columns=["False"]), 
+                              how="outer", 
+                              left_index=True, 
+                              right_index=True), 
+                     how="outer", 
+                     left_index=True, 
+                     right_index=True).fillna(0)
+        
+        d = v.apply("idxmax",axis=1).to_dict()
+        pos = Position(simulation[stage+1], 
+                       {k: True for k in d if d[k] == "True"} | {k: False for k in d if d[k] == "False"})
+        
+        majority_closed.append(pos.is_closed())
+        majority_coherent.append(pos.is_coherent())
+
+    if densities:
+        return pd.DataFrame(list(zip(densities, majority_closed, majority_coherent)),
+                            columns=["density", "majority is closed", "majority is coherent"])
+    else:
+        return pd.DataFrame(list(zip(majority_closed, majority_coherent)))
 
 def position_changes(simulation, *, measure=hamming_distance, densities=True):
     if densities:

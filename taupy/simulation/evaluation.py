@@ -16,7 +16,7 @@ def evaluate_experiment(experiment, *, function=None, densities=True, executor={
     
     return pd.concat([i.result() for i in results], keys=[n for n, _ in enumerate(results)])
 
-def majority_voting(simulation, *, densities=True):
+def majority_voting(simulation, *, densities=True, method="all"):
     if densities:
         densities = [i.density() for i in simulation[1:]]
 
@@ -24,15 +24,24 @@ def majority_voting(simulation, *, densities=True):
     majority_coherent = []
 
     for stage, plist in enumerate(simulation.positions[1:]):
-        vote_none = Counter([x for l in [[s for s in simulation.sentencepool if s not in i] for i in plist] for x in l])
-        vote_true = Counter([x for l in [[s for s in i if i[s]==True] for i in plist] for x in l])
-        vote_false = Counter([x for l in [[s for s in i if i[s]==False] for i in plist] for x in l])
+        if method == "all":
+            vote_none = Counter([x for l in [[s for s in simulation.sentencepool if s not in i] for i in plist] for x in l])
+            vote_true = Counter([x for l in [[s for s in i if i[s]==True] for i in plist] for x in l])
+            vote_false = Counter([x for l in [[s for s in i if i[s]==False] for i in plist] for x in l])
+        
+        if method == "sud":
+            vote_none = Counter([x for l in [[s for s in simulation[stage+1].atoms() if s not in i] for i in plist] for x in l])
+            vote_true = Counter([x for l in [[s for s in simulation[stage+1].atoms() if s in i and i[s]==True] for i in plist] for x in l])
+            vote_false = Counter([x for l in [[s for s in simulation[stage+1].atoms() if s in i and i[s]==False] for i in plist] for x in l])
+
+        if method == "key":
+            vote_none = Counter([x for l in [[s for s in simulation.key_statements if s not in i] for i in plist] for x in l])
+            vote_true = Counter([x for l in [[s for s in simulation.key_statements if s in i and i[s]==True] for i in plist] for x in l])
+            vote_false = Counter([x for l in [[s for s in simulation.key_statements if s in i and  i[s]==False] for i in plist] for x in l])
 
         v = pd.merge(pd.DataFrame.from_dict(vote_none, orient="index", columns=["None"]),
                      pd.merge(pd.DataFrame.from_dict(vote_true, orient="index", columns=["True"]),
-                              pd.DataFrame.from_dict(vote_false, 
-                                                     orient="index", 
-                                                     columns=["False"]), 
+                              pd.DataFrame.from_dict(vote_false, orient="index", columns=["False"]), 
                               how="outer", 
                               left_index=True, 
                               right_index=True), 

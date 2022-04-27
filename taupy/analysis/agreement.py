@@ -90,6 +90,9 @@ def normalised_edit_distance(pos1, pos2, weights = {"substitution": 1.0,
 
     return edit_distance(pos1, pos2, weights=weights) / max_n_operations
 
+def normalised_edit_agreement(pos1, pos2):
+    return 1 - normalised_edit_distance(pos1, pos2)
+
 def kemeny_oppenheim(pos1, pos2):
     pass
         

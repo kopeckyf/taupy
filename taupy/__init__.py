@@ -16,7 +16,8 @@ from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, 
                        edit_distance, normalised_edit_distance, switch_deletion_neighbourhood,
                        groups_from_stance_toward_single_proposition,
                        difference_matrix, spread, lauka, number_of_groups,
-                       pairwise_dispersion, group_divergence, group_consensus, group_size_parity)
+                       pairwise_dispersion, group_divergence, group_consensus, group_size_parity,
+                       normalised_edit_agreement)
 
 from .simulation import (Simulation, experiment, introduce, response, 
                          evaluate_experiment)

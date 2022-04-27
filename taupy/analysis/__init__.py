@@ -1,7 +1,8 @@
 from .doj import doj
 from .agreement import (hamming_distance, bna, next_neighbours, 
                         edit_distance, switch_deletion_neighbourhood,
-                        normalised_hamming_distance, normalised_edit_distance)
+                        normalised_hamming_distance, normalised_edit_distance,
+                        normalised_edit_agreement)
 from .polarisation import (groups_from_stance_toward_single_proposition,
                            difference_matrix, spread, lauka,
                            pairwise_dispersion, group_divergence, group_consensus,

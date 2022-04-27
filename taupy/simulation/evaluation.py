@@ -91,11 +91,11 @@ def len_of_positions(simulation):
     return pd.DataFrame(list(zip(sim_ids, int1, int2, int3)), columns=["id", "0–6", "7–13", "14–20"])
     
 
-def mean_population_wide_agreement(simulation, *, densities=True):
+def mean_population_wide_agreement(simulation, *, densities=True, measure=bna):
     if densities:
         densities = [i.density() for i in simulation]
     
-    matrices = [difference_matrix(i, measure=bna) for i in simulation.positions]
+    matrices = [difference_matrix(i, measure=measure) for i in simulation.positions]
     agreement = [i[np.triu_indices(len(simulation.positions[0]), k=1)].mean() for i in matrices]
     
     if densities:

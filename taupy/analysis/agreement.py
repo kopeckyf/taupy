@@ -85,10 +85,15 @@ def normalised_edit_distance(pos1, pos2, weights = {"substitution": 1.0,
 
     ⚠ Warning: This interpretation of normalisation is not without alternatives ⚠
     """
-    max_n_operations = (max(weights.values())
-                        * len(set(pos1.keys()).union(set(pos2.keys()))))
 
-    return edit_distance(pos1, pos2, weights=weights) / max_n_operations
+    # Special case: The edit distance between two empty positions
+    if 0 == len(set(pos1.keys()).union(set(pos2.keys()))):
+        return 0
+    else: 
+        max_n_operations = (max(weights.values())
+                            * len(set(pos1.keys()).union(set(pos2.keys()))))
+
+        return edit_distance(pos1, pos2, weights=weights) / max_n_operations
 
 def normalised_edit_agreement(pos1, pos2):
     return 1 - normalised_edit_distance(pos1, pos2)

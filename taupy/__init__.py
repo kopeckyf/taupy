@@ -8,7 +8,8 @@ from .basic import (satisfiability_count, satisfiability, dict_to_prop,
                     dict_to_binary, pick_random_positions_from_debate,
                     free_premises, graph_from_positions, ari,
                     subsequences_with_length, satisfiable_extensions, fetch_premises,
-                    proposition_levels_from_debate, select_premises, fetch_conclusion,
+                    proposition_levels_from_debate, premise_usage_count,
+                    select_premises, fetch_conclusion,
                     z3_assertion_from_argument, z3_soft_constraints_from_position,
                     z3_all_models)
 
@@ -21,6 +22,8 @@ from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, 
 
 from .simulation import (Simulation, experiment, introduce, response, 
                          evaluate_experiment)
+
+from .generators import generate_hierarchical_argument_map
 
 __all__ = [
             # Core ontology
@@ -43,7 +46,10 @@ __all__ = [
             'dict_to_binary', 'pick_random_positions_from_debate',
             'free_premises', 'graph_from_positions', 'ari', 
             'subsequences_with_length', 'satisfiable_extensions', 'fetch_premises',
-            'proposition_levels_from_debate', 'fetch_conclusion', 'select_premises',
+            'proposition_levels_from_debate', 'premise_usage_count',
+            'fetch_conclusion', 'select_premises',
             'z3_assertion_from_argument', 'z3_soft_constraints_from_position',
-            'z3_all_models'
+            'z3_all_models',
+            # Generators
+            'generate_hierarchical_argument_map'
           ]

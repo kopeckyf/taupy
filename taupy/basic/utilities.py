@@ -3,12 +3,14 @@ try: # Assume that CUDD is installed on the system and bindings present.
 except ModuleNotFoundError:
     from dd.autoref import BDD
     print("taupy Info: Module dd.cudd not found, reverting to dd.autoref")
-from sympy.logic import to_cnf, And, Implies, Not
+from sympy.logic import to_cnf, And, Not
 from sympy import symbols
 import numpy as np
 from random import sample, choice
 from itertools import chain, combinations
 from more_itertools import random_combination
+from collections import Counter
+import taupy.basic.core as tpc
 import math
 import z3
 
@@ -312,6 +314,23 @@ def proposition_levels_from_debate(debate, key_statements=[]):
                did not have a connected argument map?")
 
     return levels
+
+def premise_usage_count(debate, premises=set()):
+    """
+    Counts the number of times each premise is used in the arguments of a Debate. 
+
+    A set `premises` can be passed to this function to account for premises that are
+    not yet used in any argument, althought they might be in a Debate's sentence pool.
+    They will be returned with count 0.
+    """
+    if isinstance(debate, tpc.Argument):
+        c = Counter([i for i in debate.args[0].args])
+    else:
+        c = Counter([x for x in [i.args[0].args for i in debate.args] for x in x])
+    
+    unused = [j for j in list(set(premises) | set([Not(i) for i in premises])) if j not in c]
+    c = c | {u: 0 for u in unused}
+    return c
 
 def z3_assertion_from_argument(premises=[], conclusion=None):
     """

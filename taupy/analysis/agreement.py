@@ -1,10 +1,5 @@
 from fractions import Fraction
-from taupy.basic.utilities import satisfiability, dict_to_prop, subsequences_with_length
-from sympy import And
-from sympy.logic.algorithms.dpll2 import dpll_satisfiable
-from itertools import combinations, product, chain
-from random import shuffle, choice
-from math import comb
+from taupy.basic.utilities import subsequences_with_length
 import numpy as np
 
 def hamming_distance(pos1, pos2):

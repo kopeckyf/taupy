@@ -1,6 +1,5 @@
 from taupy.basic.utilities import satisfiability, dict_to_prop
 from sympy.logic.algorithms.dpll2 import dpll_satisfiable
-from taupy.basic.core import Debate, Argument
 from copy import deepcopy
 from sympy import And, Not
 

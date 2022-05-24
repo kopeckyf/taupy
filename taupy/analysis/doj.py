@@ -1,5 +1,5 @@
 from taupy.basic.utilities import satisfiability_count, dict_to_prop
-from sympy.logic import (And, Implies, Not)
+from sympy.logic import And
 from fractions import Fraction
 
 def doj(pos, debate=None, conditional=None):

@@ -1,10 +1,7 @@
 import numpy as np
 import numpy.ma as ma
-from fractions import Fraction
 from math import sqrt, log
 from sympy import symbols
-from taupy.basic.utilities import (neighbours_of_list, iter_to_string, 
-                                   graph_from_positions)
 
 
 def groups_from_stance_toward_single_proposition(positions, proposition):

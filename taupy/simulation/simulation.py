@@ -6,10 +6,9 @@ from random import choice, choices, sample
 from copy import deepcopy
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import time
-import z3
 
-from taupy.basic.utilities import satisfiability_count
-from taupy import EmptyDebate
+from basic.utilities import satisfiability_count
+from basic.core import EmptyDebate, Debate
 from .update import introduce, response
 import taupy.simulation.strategies as strategies
 
@@ -217,6 +216,15 @@ class Simulation(list):
             return self.log[-1]
         else:
             return self
+
+
+class FixedDebateSimulation(Debate):
+
+    def __init__(self,
+                 positions = [],
+                 debate_construction = {}):
+
+        pass
 
 def experiment(n, executor={}, simulations={}, runs={}):
     """

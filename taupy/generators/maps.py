@@ -2,8 +2,8 @@
 Generators for argument maps.
 """
 
-from basic.core import EmptyDebate, Debate, Argument
-from basic.utilities import proposition_levels_from_debate, premise_usage_count
+from taupy.basic.core import EmptyDebate, Debate, Argument
+from taupy.basic.utilities import proposition_levels_from_debate, premise_usage_count
 from sympy import Not, And, symbols
 from sympy import satisfiable as dpll_satisfiability
 from random import choices

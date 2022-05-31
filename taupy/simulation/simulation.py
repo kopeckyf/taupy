@@ -7,12 +7,17 @@ from copy import deepcopy
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import time
 
-from basic.utilities import satisfiability_count
-from basic.core import EmptyDebate, Debate
+from taupy.basic.utilities import satisfiability_count
+from taupy.basic.core import EmptyDebate, Debate
 from .update import introduce, response
+from taupy.generators.maps import generate_hierarchical_argument_map
 import taupy.simulation.strategies as strategies
 
 class Simulation(list):
+    """
+    A simulation in which agents introduce new arguments bit by bit. 
+    For historic reasons, this kind of simulation bears the generic name.
+    """
 
     def __init__(self,
                  directed = True,
@@ -216,15 +221,7 @@ class Simulation(list):
             return self.log[-1]
         else:
             return self
-
-
-class FixedDebateSimulation(Debate):
-
-    def __init__(self,
-                 positions = [],
-                 debate_construction = {}):
-
-        pass
+            
 
 def experiment(n, executor={}, simulations={}, runs={}):
     """

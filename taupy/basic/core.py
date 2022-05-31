@@ -113,16 +113,25 @@ class Base():
         return [p for p in satisfiability(self, all_models=True)]
 
 class Argument(Implies, Base):
-    """
-    TODO: Must protect against Inputs like Argument((a,b),c)!
-    """
-    pass
+
+    def __init__(self, *args):
+        # Check for bad premise input
+        if not self.args[0].is_Boolean:
+            raise ValueError("Argument requires Boolean input for premises. Normally, this"
+                             + " will be either a single premise or a conjunction of premises"
+                             + " marked with sympy's And() or the & operator."
+                             + " Tuples, lists, etc. do not currently work.")
+
+        self.premises = list(self.args[0].args)
+        self.conclusion = next(iter(self.args[1].atoms()))
+        self.requirements = {p: False if Not(p) in self.args[0].args else True for p in self.args[0].atoms()} \
+                            | {next(iter(self.args[1].atoms())): False if self.args[1].is_Not else True}
     
 class Debate(And, Base):
     """
     Debates
     """
-    def __init__(self, *args): # Check *args
+    def __init__(self, *args):
         And.__init__(self)
         self.actual_positions = []
         

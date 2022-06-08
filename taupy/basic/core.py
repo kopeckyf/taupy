@@ -134,7 +134,13 @@ class Debate(And, Base):
     def __init__(self, *args):
         And.__init__(self)
         self.actual_positions = []
-        
+    
+    def __len__(self):
+        """
+        The length of a debate is the number of arguments in it.
+        """
+        return len(self.args)
+
 class EmptyDebate(BooleanTrue, Base):
     """
     An empty debate dummy object. Useful places include:

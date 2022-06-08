@@ -13,7 +13,36 @@ from .update import introduce, response
 from taupy.generators.maps import generate_hierarchical_argument_map
 import taupy.simulation.strategies as strategies
 
-class Simulation(list):
+
+class SimulationBase:
+    """
+    A super class for simulations.
+    """
+    def init_positions(self, positions, target_length):
+        """
+        Generate initial Positions. Optionally, the Positions may start off with
+        explicit truth-value attributions. Positions are filled up with random
+        values for truth-value attributions they do not yet have.
+        """
+        self.positions = []
+
+        if target_length == None:
+            target_length = len(self.sentencepool)
+
+        for p in positions:
+            if len(p) < target_length:
+                # Only fill up positions that do not have the desired length.
+                pool = sample(self.sentencepool, k=target_length)
+                for s in pool:
+                    if s not in p and len(p) < target_length:
+                        # While filling up a position, catch when it reaches the
+                        # desired length.
+                        p[s] = choice([True, False])
+
+        self.positions.append(positions)
+
+
+class Simulation(list, SimulationBase):
     """
     A simulation in which agents introduce new arguments bit by bit. 
     For historic reasons, this kind of simulation bears the generic name.
@@ -76,29 +105,6 @@ class Simulation(list):
     def premise_candidates(self):
         return set(self.sentencepool + [Not(i) for i in self.sentencepool])
 
-    def init_positions(self, positions, target_length):
-        """
-        Generate initial Positions. Optionally, the Positions may start off with
-        explicit truth-value attributions. Positions are filled up with random
-        values for truth-value attributions they do not yet have.
-        """
-        self.positions = []
-
-        if target_length == None:
-            target_length = len(self.sentencepool)
-
-        for p in positions:
-            if len(p) < target_length:
-                # Only fill up positions that do not have the desired length.
-                pool = sample(self.sentencepool, k=target_length)
-                for s in pool:
-                    if s not in p and len(p) < target_length:
-                        # While filling up a position, catch when it reaches the
-                        # desired length.
-                        p[s] = choice([True, False])
-
-        self.positions.append(positions)
-
     def run(self, max_density=0.8, max_steps=1000, min_sccp=1, quiet=True):
         """
         Run a Simulation using ``introduction_method`` and ``update_mechanism``
@@ -152,24 +158,34 @@ class Simulation(list):
                         else:
                             # An argument was found, break out of the loop.
                             # (implies argument_introduced == True)
-                            self.log.append("Argument introduction suceeded after %d attempts." % (j+1))
+                            self.log.append(
+                                f"Argument introduction suceeded after {j+1} attempts.")
                             break
                     else:
                         # There have been more tries equal to half of the population
                         # size, but an argument could not be found. This is enough
                         # grounds to terminate the simulation run.
-                        self.log.append("Argument introduction did not succeed, even after %d attempts." % (j+1))
+                        self.log.append(
+                            f"Argument introduction did not succeed, even after {j+1} attempts.")
                         argument_introduced = False
 
                     if argument_introduced:
                         # Check if introduction was succesful before attempting response.
-                        response(self, method=self.default_update_strategy)
+                        response(simulation=self,
+                                 debate=self[-1], 
+                                 positions=self.positions[-1],
+                                 method=self.default_update_strategy,
+                                 sentences=self.sentencepool)
                 else:
                     # The user did not ask for a directed simulation and/or provided less than 2 positions.
                     # In this case, we're investing less work.
                     argument_introduced = introduce(self, strategy=self.default_introduction_strategy)
                     if argument_introduced:
-                        response(self, method=self.default_update_strategy)
+                        response(simulation=self,
+                                 debate=self[-1],
+                                 positions=self.positions[-1], 
+                                 method=self.default_update_strategy,
+                                 sentences=self.sentencepool)
 
                 if not argument_introduced:
                     # Break out of the Simulation if no argument could be inserted.
@@ -206,8 +222,10 @@ class Simulation(list):
                     self.positions.append(expanded_positions)
 
                 else:
-                    # Failure to insert a sentence does not end the simulation, but we take note if it in the log.
-                    self.log.append("Tried to insert a new sentence to the debate but maximum extension was reached.")
+                    # Failure to insert a sentence does not end the simulation, 
+                    # but we take note of it in the log.
+                    self.log.append(
+                        "Tried to insert a new sentence to the debate but maximum extension was reached.")
 
             i += 1
             if self[-1].density() >= max_density or i >= max_steps or satisfiability_count(self[-1]) <= min_sccp:
@@ -215,13 +233,17 @@ class Simulation(list):
                 del self.assertions
                 break
 
-        self.log.append("Simulation ended. %d steps were taken. Density at end: %f. Extension of SCCP: %d." % (i, self[-1].density(),  satisfiability_count(self[-1])))
+        self.log.append(
+            "Simulation ended. "
+            + str(f"{i} steps were taken. ")
+            + str(f"Density at end: {self[-1].density()}. ")
+            + str(f"Extension of SCCP: {satisfiability_count(self[-1])}.")
+            )
 
         if quiet:
             return self.log[-1]
         else:
             return self
-            
 
 def experiment(n, executor={}, simulations={}, runs={}):
     """

@@ -166,54 +166,73 @@ def introduce(_sim, source=None, target=None, strategy=None):
         _sim.log.append("Introduction with strategy '%s' failed. No valid combinations left in the premise pool." % (strategy["name"]) )
         return False
 
-def response(_sim, method):
+def response(*, 
+             simulation, 
+             method,
+             debate=None, 
+             positions=None,  
+             sentences=None):
     """
     Updating Positions in a debate.
     """
 
+    # Defaults
+    if debate == None:
+        debate = simulation[-1]
+    
+    if positions == None:
+        positions = simulation.positions[-1]
+
+    if sentences == None:
+        sentences = simulation.sentencepool
+
     if method == "random":
         updated_positions = []
-        for p in _sim.positions[-1]:
-            if satisfiability(And(dict_to_prop(p), _sim[-1])):
+        for p in positions:
+            if satisfiability(And(dict_to_prop(p), debate)):
                 updated_positions.append(p)
             else:
                 u = deepcopy(p)
-                u |= choice(satisfiability(And(*_sim.sentencepool, _sim[-1]),all_models=True))
+                u |= choice(satisfiability(And(*sentences, debate), all_models=True))
                 updated_positions.append(u)
-        _sim.positions.append(updated_positions)
+        simulation.positions.append(updated_positions)
 
     if method == "closest_coherent_complete_search":
         updated_positions = []
-        models = list(satisfiability(_sim[-1], all_models="True"))
-        examinees = [{k: i[k] for k in i if k in _sim[-1].atoms()} for i in _sim.positions[-1]]
+        models = list(satisfiability(debate, all_models="True"))
+        examinees = [{k: i[k] for k in i if k in debate.atoms()} for i in positions]
         distances = np.array([[hamming_distance(i, j) for i in models] for j in examinees])
 
         for i in range(distances.shape[0]):
             if np.min(distances[i]) == 0:
-                updated_positions.append(_sim.positions[-1][i])
-                _sim.log.append("Position with index %d did not need an update." % (i))
+                updated_positions.append(positions[i])
+                simulation.log.append(
+                    f"Position with index {i} did not need an update.")
             else:
-                u = deepcopy(_sim.positions[-1][i])
+                u = deepcopy(positions[i])
                 update_index = choice(np.where(distances[i] == distances[i].min())[0].tolist())
                 u |= models[update_index]
                 updated_positions.append(u)
-                _sim.log.append("Position with index %d was updated with strategy closest_coherent." % (i))
+                simulation.log.append(
+                    f"Position with index {i} was updated with strategy closest_coherent.")
 
-        _sim.positions.append(updated_positions)
+        simulation.positions.append(updated_positions)
 
     if method == "closest_coherent":
         updated_positions = []
-        list_of_models = list(satisfiability(_sim[-1], all_models=True))
-        for (i, p) in enumerate(_sim.positions[-1]):
-            if dpll_satisfiable(And(dict_to_prop(p), _sim[-1])):
+        list_of_models = list(satisfiability(debate, all_models=True))
+        for (i, p) in enumerate(positions):
+            if dpll_satisfiable(And(dict_to_prop(p), debate)):
                 updated_positions.append(p)
-                _sim.log.append("Position with index %d did not need an update." % (i))
+                simulation.log.append(
+                    f"Position with index {i} did not need an update.")
             else:
                 u = deepcopy(p)
-                u |= choice(next_neighbours(p, debate=_sim[-1], models=list_of_models))
+                u |= choice(next_neighbours(p, debate=debate, models=list_of_models))
                 updated_positions.append(u)
-                _sim.log.append("Position with index %d was updated with strategy closest_coherent." % (i))
-        _sim.positions.append(updated_positions)
+                simulation.log.append(
+                    f"Position with index {i} was updated with strategy closest_coherent.")
+        simulation.positions.append(updated_positions)
 
     if method == "closest_closed_partial_coherent":
         """
@@ -221,27 +240,28 @@ def response(_sim, method):
         """
         updated_positions = []
 
-        for (idx, position) in enumerate(_sim.positions[-1]):
+        for (idx, position) in enumerate(positions):
             # First, let's see whether the position has any chance wrt the updated debate:
-            if dpll_satisfiable(And(dict_to_prop(position), _sim[-1])) and \
-               closedness(position, debate=_sim[-1]):
-                    new_position = Position(_sim[-1],
+            if dpll_satisfiable(And(dict_to_prop(position), debate)) and \
+               closedness(position, debate=debate):
+                    new_position = Position(debate,
                                             position,
                                             introduction_strategy=position.introduction_strategy,
                                             update_strategy=position.update_strategy)
-                    _sim.log.append("Position with index %d is still coherent and closed given \
-                                     the new debate." % (idx))
+                    simulation.log.append(
+                        f"Position with index {idx} is still coherent and closed given the new debate.")
                 
             else:
-                _sim.log.append(f"Position with index {idx} needs an update.")
+                simulation.log.append(
+                    f"Position with index {idx} needs an update.")
                 
                 # Collect constraints for the current position. Empty positions pick a random 
                 # singular position for bootstrapping (otherwise they'd stay empty).
                 if len(position) > 0:                
                     constraints = z3_soft_constraints_from_position(position)
                 else:
-                    constraints = [choice([z3.Bool(str(i)) for i in _sim[-1].atoms()] \
-                                         + [z3.Not(z3.Bool(str(i))) for i in _sim[-1].atoms()])]
+                    constraints = [choice([z3.Bool(str(i)) for i in debate.atoms()] \
+                                         + [z3.Not(z3.Bool(str(i))) for i in debate.atoms()])]
                 # Build the assertions iteratively. This is equivalent to adding 
                 # soft constraints via z3.Optimize.add_soft().
                 assertions = z3.If(constraints[0], 1, 0)
@@ -254,7 +274,7 @@ def response(_sim, method):
                 while k >= 0:
                     o = z3.Optimize()
                     o.set(priority="pareto")
-                    for a in _sim.assertions:
+                    for a in simulation.assertions:
                         o.add(a)
                     o.add(assertions == k)
                     o.maximize(assertions)
@@ -263,19 +283,19 @@ def response(_sim, method):
                     # closedness(model,return_alternative=True)[1] stores the closed version of a model.
                     candidates = []
                     base_models = [{symbols(str(i)): eval(str(m[i])) for i in m if symbols(str(i)) in position} \
-                                    for m in z3_all_models(o, [z3.Bool(str(i)) for i in _sim[-1].atoms()])]
+                                    for m in z3_all_models(o, [z3.Bool(str(i)) for i in debate.atoms()])]
                     unique_base_models = list(unique_everseen(base_models, key=lambda item: frozenset(item.items())))
 
                     for m in unique_base_models:
-                        candidates.append(closedness(m, debate=_sim[-1], return_alternative=True)[1])
+                        candidates.append(closedness(m, debate=debate, return_alternative=True)[1])
                         differences = [k for k in m if m[k] != position[k]]
                         diff_samples = list(powerset(differences)); shuffle(diff_samples)
 
-                        for d in diff_samples[:min(len(diff_samples), _sim.partial_neighbour_search_radius)]:
+                        for d in diff_samples[:min(len(diff_samples), simulation.partial_neighbour_search_radius)]:
                             c = {l: position[l] for l in position if l not in differences} \
                                  | {l: m[l] for l in m if l in d}
                             
-                            candidates.append(closedness(c, debate=_sim[-1], return_alternative=True)[1])
+                            candidates.append(closedness(c, debate=debate, return_alternative=True)[1])
 
                     # Now calculate the ED() for the position to all candidates...
                     curr_candidates = candidates + saved_candidates
@@ -283,7 +303,7 @@ def response(_sim, method):
                     
                     # ... and pick the min of distances, if the distance, but ...
                     if a.size > 0:
-                        new_position = Position(_sim[-1],
+                        new_position = Position(debate,
                                             curr_candidates[choice(np.argwhere(a == np.amin(a)).flatten().tolist())],
                                             introduction_strategy=position.introduction_strategy,
                                             update_strategy=position.update_strategy)
@@ -301,9 +321,11 @@ def response(_sim, method):
                     # This is here purely for diagnostic purposes.
                     raise Exception(f"Could not find a neighbour for position {position}.")
 
-                _sim.log.append("Position with index %d updated to a new position, edit distance %d." % (idx, edit_distance(position, new_position)))
+                simulation.log.append(
+                    str(f"Position with index {idx} updated to a new position, ")
+                    + str(f"edit distance {edit_distance(position, new_position)}."))
             # Found replacement for one position, continue loop with next position from
             # previous debabte stage.
             updated_positions.append(new_position)
         # Found candidates for all positions in pop. of cur. deb. stage.
-        _sim.positions.append(updated_positions)
+        simulation.positions.append(updated_positions)

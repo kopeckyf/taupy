@@ -24,6 +24,14 @@ introduce arguments that are valid given the current debate stage.
     A valid argument is constructed with premises that the target accepts. The
     source at least tolerates the conclusion. The conclusion however is not 
     accepted by the target.
+
+:py:obj:`unrestricted_undercut`
+    Like `undercut`, but does not require the source agent to tolerate the 
+    conclusion.
+
+:py:obj:`unrestricted_attack`
+    Like `attack`, but does not require the source agent to tolerate the 
+    conclusion.
 """
 
 random = {"source": False,
@@ -66,11 +74,11 @@ unrestricted_attack = {"source": True,
                        "pick_premises_from": "source",
                        "source_accepts_conclusion": "NA",
                        "target_accepts_conclusion": "No",
-                       "name": "attack"}
+                       "name": "unrestricted attack"}
 
 unrestricted_undercut = {"source": True,
                          "target": True,
                          "pick_premises_from": "target",
                          "source_accepts_conclusion": "NA",
                          "target_accepts_conclusion": "No",
-                         "name": "undercut"}
+                         "name": "unrestricted undercut"}

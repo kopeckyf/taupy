@@ -54,10 +54,10 @@ class Simulation(list, SimulationBase):
                  events = {"introduction": 9, "new_sentence": 1},
                  sentencepool = "p:10",
                  max_sentencepool = None,
-                 key_statements = [],
+                 key_statements = None,
                  parent_debate = None,
                  argumentlength = 2,
-                 positions = [],
+                 positions = None,
                  copy_input_positions = True,
                  initial_position_size = None,
                  default_introduction_strategy = strategies.random,
@@ -72,15 +72,23 @@ class Simulation(list, SimulationBase):
             self.used_premises = []
 
         self.max_sentencepool = [i for i in symbols(max_sentencepool)] if max_sentencepool else self.sentencepool
-        self.key_statements = [i for i in symbols(key_statements)]
+        
+        if key_statements is None:
+            self.key_statements = list()
+        else:
+            self.key_statements = [i for i in symbols(key_statements)]
+
         self.events = events
         self.argumentlength = argumentlength
         self.partial_neighbour_search_radius = partial_neighbour_search_radius
 
-        if copy_input_positions == True:
-            self.init_positions(deepcopy(positions), target_length=initial_position_size)
+        if positions is not None:
+            if copy_input_positions == True:
+                self.init_positions(deepcopy(positions), target_length=initial_position_size)
+            else:
+                self.init_positions(positions, target_length=initial_position_size)
         else:
-            self.init_positions(positions, target_length=initial_position_size)
+            self.init_positions([], target_length=0)
 
         if debate_growth not in ["random", "tree"]:
             raise NotImplementedError("The requested growth method is not implemented. Available methods are `random`  and `tree`.")

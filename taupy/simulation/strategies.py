@@ -60,3 +60,17 @@ undercut = {"source": True,
             "source_accepts_conclusion": "Toleration",
             "target_accepts_conclusion": "No",
             "name": "undercut"}
+
+unrestricted_attack = {"source": True,
+                       "target": True,
+                       "pick_premises_from": "source",
+                       "source_accepts_conclusion": "NA",
+                       "target_accepts_conclusion": "No",
+                       "name": "attack"}
+
+unrestricted_undercut = {"source": True,
+                         "target": True,
+                         "pick_premises_from": "target",
+                         "source_accepts_conclusion": "NA",
+                         "target_accepts_conclusion": "No",
+                         "name": "undercut"}

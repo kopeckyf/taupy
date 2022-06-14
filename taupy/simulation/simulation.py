@@ -7,7 +7,8 @@ from copy import deepcopy
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import time
 
-from taupy.basic.utilities import satisfiability_count
+from taupy.basic.utilities import (satisfiability_count, 
+                                   z3_assertion_from_argument)
 from taupy.basic.core import EmptyDebate, Debate
 from .update import introduce, response
 from taupy.generators.maps import generate_hierarchical_argument_map
@@ -250,6 +251,198 @@ class Simulation(list, SimulationBase):
 
         if quiet:
             return self.log[-1]
+        else:
+            return self
+
+class FixedDebateSimulation(SimulationBase):
+    """
+    A simulation that begins with a pre-defined debate. Agents uncover arguments
+    from the debate in each simulation step. The pre-defined debate follows the
+    argument map generation algorithm from Betz et al (2021).
+
+    Warning: This Simulation class is not compatible to multiprocessing as 
+             implemented in concurrent.futures. It can not currently be used
+             together with the experiment() function of this module.
+    -----
+    References:
+    Betz, Gregor, Vera Chekan & Tamara Mchedlidze. 2021. Heuristic algorithms for 
+          the approximation of mutual coherence.
+    """
+
+    def __init__(self,
+                 debate_generation = {"max_density": 1.0},
+                 initial_arguments = None,
+                 positions = None,
+                 initial_position_size = None,
+                 default_update_strategy = "closest_coherent",
+                 argument_selection_strategy = "any",
+                 sentencepool = "p:10",
+                 num_key_statements = 1,
+                 partial_neighbour_search_radius = 100
+                 ):
+
+        self.log = []
+        self.assertions = []
+        self.partial_neighbour_search_radius = partial_neighbour_search_radius
+        self.sentencepool = [i for i in symbols(sentencepool)]
+        self.debate = generate_hierarchical_argument_map(N = len(self.sentencepool),
+                                                         k = int(num_key_statements),
+                                                         **debate_generation)
+        
+        if positions is None:
+            self.init_positions([], target_length=0)
+        else:
+            self.init_positions(deepcopy(positions), target_length=initial_position_size)
+
+        self.updating_strategy = default_update_strategy
+        
+        if initial_arguments is None:
+            self.uncovered_arguments = list()
+        else:
+            self.uncovered_arguments = initial_arguments
+
+        self.argument_selection_strategy = argument_selection_strategy
+        
+        if self.argument_selection_strategy not in ["any", "max"]:
+            raise NotImplementedError("The selected argument selection strategy "
+                                      + str(self.argument_selection_strategy)
+                                      + " is unknown.")
+
+        if self.updating_strategy not in ["closest_coherent", 
+                                          "closest_closed_partial_coherent"]:
+            raise NotImplementedError("The selected default updating strategy "
+                                      + str(self.updating_strategy)
+                                      + " is unkown.")
+
+    def __repr__(self):
+        """
+        Control the display of individual Simulation objects
+        """
+        return str(f"Simulation with {len(self.debate)} arguments, of which "
+                   + f"{len(self.uncovered_arguments)} are uncovered.")
+
+    def step(self):
+        """
+        Advance Simulation by one step.
+        """
+        # uncovering
+
+        if len(self.positions[-1]) > 1:
+            enum_pos = list(enumerate(self.positions[-1])) # Cache to reduce calls to enumerate()
+            seen_positions = []
+            argument_available = False
+
+            while True:
+                c = dict()
+                available_positions = [(i, p) for (i, p) in enum_pos if i not in seen_positions]
+                if len(available_positions) == 0:
+                    new_argument = False
+                    break
+
+                source_id, source = choice(available_positions)
+                seen_positions.append(source_id)
+                strategy = source.introduction_strategy
+
+                for argument in [a for a in self.debate.args if a not in self.uncovered_arguments]:
+                    try:
+                        premise_reqs = {k: argument.requirements[k] for k in argument.requirements if k in argument.args[0].atoms()}
+                        conclusion_reqs = {k: argument.requirements[k] for k in argument.requirements if k in argument.args[1].atoms()}
+                    except:
+                        raise Exception(f"Could not retrieve reqs from argument: {argument}. Arguments uncovered so far: {len(self.uncovered_arguments)}")
+                    
+                    if strategy["pick_premises_from"] == "target":                    
+                        premise_ids = [i for (i, p) in enum_pos if premise_reqs.items() <= p.items()]                
+                    
+                    if strategy["pick_premises_from"] == "source":
+                        premise_ids = [i for (i, p) in enum_pos if premise_reqs.items() <= source.items()]
+
+                    if strategy["source_accepts_conclusion"] == "Yes":
+                        conclusion_source_ids = [i for (i, p) in enum_pos if conclusion_reqs.items() <= source.items()]
+
+                    if strategy["source_accepts_conclusion"] == "Toleration":
+                        suspend_conclusion = {k: None for k in conclusion_reqs}
+                        conclusion_source_ids = [i for (i, p) in enum_pos if conclusion_reqs.items() <= source.items()] \
+                                                + [i for (i, p) in enum_pos if conclusion_reqs.items() <= suspend_conclusion.items()]
+
+                    if strategy["source_accepts_conclusion"] == "NA":
+                        conclusion_source_ids = [i for (i, p) in enum_pos if i != source_id]
+
+                    if strategy["target_accepts_conclusion"] == "No":
+                        conclusion_target_ids = [i for (i, p) in enum_pos if not conclusion_reqs.items() <= p.items() and i != source_id]
+
+                    if strategy["target_accepts_conclusion"] == "NA":
+                        conclusion_target_ids = [i for (i, p) in enum_pos if i != source_id]
+
+                    possible_targets = set(premise_ids) \
+                                       & set(conclusion_source_ids) \
+                                       & set (conclusion_target_ids)
+
+                    if len(possible_targets) > 0:
+                        argument_available = True
+                    
+                    c[argument] = len(possible_targets)
+
+                if argument_available:
+                    if self.argument_selection_strategy == "any":
+                        # list of all arguments with at least one match
+                        new_argument = choice([k for k in c if c[k] > 0])
+
+                    if self.argument_selection_strategy == "max":
+                        # list of all arguments that maximise the matches
+                        new_argument = choice([k for k in c if c[k] == c[max(c, key=c.get)]])
+
+                    self.log.append(
+                        str(f"Agent with id {source_id} introduced {new_argument}, ")
+                        + str(f"which targets {c[new_argument]} other agents.")
+                    )
+                    
+                    break
+
+                else:
+                    self.log.append(
+                        f"No {strategy} argument available for position {source}."
+                    )
+
+        else:
+            new_argument = choice([i for i in self.debate.args if i not in self.uncovered_arguments])
+
+        if new_argument:
+            self.uncovered_arguments.append(new_argument)
+            self.assertions.append(
+                z3_assertion_from_argument(premises=new_argument.args[0].args, 
+                                           conclusion=new_argument.args[1]))
+
+            # updating
+            response(simulation = self,
+                     debate = Debate(*self.uncovered_arguments),
+                     positions = self.positions[-1],
+                     method = self.updating_strategy,
+                     sentences = self.sentencepool)
+
+            return True
+
+        else:
+            return False
+
+
+    def run(self, max_density=0.8, max_steps=200, min_sccp=1, quiet=True):
+        """
+        Run Simulation steps until targets are reached
+        """
+
+        while True:
+            if (len(self.uncovered_arguments) > max_steps 
+                and satisfiability_count(Debate(*self.uncovered_arguments)) <= min_sccp) \
+               or (len(self.uncovered_arguments) > 1 
+                   and Debate(*self.uncovered_arguments).density() > max_density):
+               break
+
+            introduced = self.step()
+            if not introduced:
+                break
+        
+        if not quiet:
+            return f"Simulation ended. {len(self.uncovered_arguments)} steps taken."
         else:
             return self
 

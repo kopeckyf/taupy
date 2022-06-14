@@ -20,7 +20,8 @@ from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, 
                        pairwise_dispersion, group_divergence, group_consensus, group_size_parity,
                        normalised_edit_agreement)
 
-from .simulation import (Simulation, experiment, introduce, response, 
+from .simulation import (Simulation, FixedDebateSimulation,
+                         experiment, introduce, response, 
                          evaluate_experiment)
 
 from .generators import generate_hierarchical_argument_map
@@ -37,8 +38,8 @@ __all__ = [
             'difference_matrix', 'spread', 'lauka', 'pairwise_dispersion',
             'group_divergence', 'group_consensus', 'group_size_parity',
             # .simulation
-            'Simulation', 'experiment',
-            'evaluate_experiment',
+            'Simulation', 'FixedDebateSimulation',
+            'experiment', 'evaluate_experiment',
             # Update mechanisms
             'introduce', 'response',
             # Common utilities

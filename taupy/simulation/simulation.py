@@ -441,10 +441,17 @@ class FixedDebateSimulation(SimulationBase):
             if not introduced:
                 break
         
-        if not quiet:
+        if quiet:
             return f"Simulation ended. {len(self.uncovered_arguments)} steps taken."
         else:
-            return self
+            # Generate a return object that only contains pickable data.
+            return {
+                "positions": self.positions,
+                "uncovered_arguments": self.uncovered_arguments,
+                "debate": self.debate,
+                "sentencepool": self.sentencepool,
+                "log": self.log
+            }
 
 def experiment(n, executor={}, simulations={}, runs={}):
     """

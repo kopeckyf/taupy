@@ -28,10 +28,6 @@ introduce arguments that are valid given the current debate stage.
 :py:obj:`unrestricted_undercut`
     Like `undercut`, but does not require the source agent to tolerate the 
     conclusion.
-
-:py:obj:`unrestricted_attack`
-    Like `attack`, but does not require the source agent to tolerate the 
-    conclusion.
 """
 
 random = {"source": False,
@@ -68,13 +64,6 @@ undercut = {"source": True,
             "source_accepts_conclusion": "Toleration",
             "target_accepts_conclusion": "No",
             "name": "undercut"}
-
-unrestricted_attack = {"source": True,
-                       "target": True,
-                       "pick_premises_from": "source",
-                       "source_accepts_conclusion": "NA",
-                       "target_accepts_conclusion": "No",
-                       "name": "unrestricted attack"}
 
 unrestricted_undercut = {"source": True,
                          "target": True,

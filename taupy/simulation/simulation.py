@@ -341,7 +341,16 @@ class FixedDebateSimulation(SimulationBase):
 
                 source_id, source = choice(available_positions)
                 seen_positions.append(source_id)
-                strategy = source.introduction_strategy
+
+                # Support for positions with multiple introduction strategies.
+                # First, try to pick a random element from the list of introduction
+                # strategies of a position. If that fails, assume that the strategy
+                # preference of a position is not given as a list, but as a single
+                # item.
+                try:
+                    strategy = choice(source.introduction_strategy)
+                except KeyError:
+                    strategy = source.introduction_strategy
 
                 for argument in [a for a in self.debate.args if a not in self.uncovered_arguments]:
                     try:

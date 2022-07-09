@@ -20,7 +20,8 @@ from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, 
                        pairwise_dispersion, group_divergence, group_consensus, group_size_parity,
                        normalised_edit_agreement)
 
-from .simulation import (Simulation, FixedDebateSimulation,
+from .simulation import (Simulation, FixedDebateSimulation, 
+                         SocialInfluenceSimulation,
                          experiment, introduce, response, 
                          evaluate_experiment)
 
@@ -38,7 +39,7 @@ __all__ = [
             'difference_matrix', 'spread', 'lauka', 'pairwise_dispersion',
             'group_divergence', 'group_consensus', 'group_size_parity',
             # .simulation
-            'Simulation', 'FixedDebateSimulation',
+            'Simulation', 'FixedDebateSimulation', 'SocialInfluenceSimulation',
             'experiment', 'evaluate_experiment',
             # Update mechanisms
             'introduce', 'response',

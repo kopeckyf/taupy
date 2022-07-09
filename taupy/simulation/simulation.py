@@ -6,10 +6,15 @@ from random import choice, choices, sample
 from copy import deepcopy
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import time
+import numpy as np
 
+from taupy.analysis.polarisation import difference_matrix
+from taupy.analysis.agreement import (normalised_edit_distance, 
+                                      normalised_edit_agreement)
 from taupy.basic.utilities import (satisfiability_count, 
                                    z3_assertion_from_argument)
 from taupy.basic.core import EmptyDebate, Debate
+from taupy.basic.positions import Position
 from .update import introduce, response
 from taupy.generators.maps import generate_hierarchical_argument_map
 import taupy.simulation.strategies as strategies
@@ -462,7 +467,141 @@ class FixedDebateSimulation(SimulationBase):
                 "log": self.log
             }
 
-def experiment(n, executor={}, simulations={}, runs={}):
+class SocialInfluenceSimulation(SimulationBase):
+    """
+    A simulation in which agents update their positions based on what
+    other agents think, through a reason-exchange mechanism similar to
+    Mäs & Flache (2013) or Singer et al. (2019).
+
+    -----
+    References:
+
+    Mäs, Michael & Flache, Andreas. 2013. Differentiation without distancing:
+    Explaining bi-polarization of opinions without negative influence. PLOS ONE
+    8 (11). DOI: 10.1371/journal.pone.0074516.
+
+    Singer et al. 2019. Rational social and political polarization.
+    Philosophical Studies 176: 2243–2267. DOI: 10.1007/s11098-018-1124-5.
+    """
+    def __init__(self,
+                 debate_generation = {"max_density": 0.8},
+                 number_key_statements = 3,
+                 sentencepool = "p:10",
+                 positions = None,
+                 initial_position_size = 5,
+                 updating_strategy = "closest_closed_partial_coherent",
+                 partial_neighbour_search_radius = 50
+                 ):
+
+        self.sentencepool = [i for i in symbols(sentencepool)]
+        self.key_statements = list(sentencepool)[:number_key_statements]
+        self.debate = generate_hierarchical_argument_map(
+                        N = len(list(self.sentencepool)),
+                        k = len(self.key_statements),
+                        **debate_generation)
+        
+        self.log = []
+        self.assertions = []
+        self.partial_neighbour_search_radius = partial_neighbour_search_radius
+
+        if positions is None:
+            self.init_positions([], target_length=0)
+        else:
+            self.init_positions(deepcopy(positions),
+                                target_length=initial_position_size)
+
+        for p in self.positions[0]:
+            p.debate = self.debate
+
+        self.updating_strategy = updating_strategy
+        # Are the initial positions closed and coherent give the debate?
+        # If not, update these positions.
+        # This also means that the positions in self.positions[0] will be less
+        # interesting compared to those in self.positions[1]
+        response(simulation = self,
+                 debate = self.debate,
+                 positions = self.positions[-1],
+                 method = self.updating_strategy,
+                 sentences = self.sentencepool)
+
+    def __repr__(self):
+        """
+        Control the display of individual objects
+        """
+        return str(f"Simulation with {len(self.debate)} arguments "
+                   + f"and {len(self.positions[-1])} agents.")
+
+    def step(self):
+        pick_position = choice(list(enumerate(self.positions[-1])))
+        source = pick_position[1]
+        source_id = pick_position[0]
+        influence_item = choice(self.sentencepool)
+
+        candidates = []
+
+        for i, p in enumerate(self.positions[-1]):
+            d = normalised_edit_distance(source, p)
+            update = choices([True, False], weights=[1-d, d])[0]
+            if update:
+                new_position = Position(self.debate, 
+                                        {k: p[k] for k in p if k != influence_item},
+                                        introduction_strategy=p.introduction_strategy)
+                if influence_item in source:
+                    new_position[influence_item] = source[influence_item]
+
+                self.log.append(
+                    f"Position {i} was influenced by Position {source_id}."
+                )
+            else:
+                new_position = p
+                self.log.append(
+                    f"Position {i} was not influenced by Position {source_id}."
+                )
+
+            candidates.append(new_position)
+
+        response(simulation = self,
+                 debate = self.debate,
+                 positions = candidates,
+                 method = self.updating_strategy,
+                 sentences = self.sentencepool)
+
+    def run(self, max_steps=float("inf"), max_agreement=0.9, quiet=True):
+
+        # The step counter
+        i = 0
+                
+        while True:
+
+            # Determine the current population-wide mean agreement by taking
+            # the mean of the upper triangle matrix of the differences
+            # between positions (assuming, for simplicity, that the difference
+            # metric is symmetric.)
+            current_mean_agreement = difference_matrix(
+                self.positions[-1], 
+                normalised_edit_agreement)[np.triu_indices(
+                    len(self.positions[-1]), k=1)].mean()
+
+            if i <= max_steps and current_mean_agreement <= max_agreement:
+                self.step()
+                i += 1
+            else:
+                break
+        
+        if quiet:
+            return (f"Simulation ended. {i} steps taken. "
+                    + f"Reached mean agreement of {current_mean_agreement}.")
+        else:
+            return {
+                "positions": self.positions,
+                "debate": self.debate,
+                "sentencepool": self.sentencepool,
+                "log": self.log
+            }
+        
+
+
+def experiment(n, sim_type=Simulation, executor={}, simulations={}, runs={}):
     """
     Generate and execute `n` number of Simulations and output their results.
     The Simulations can be controlled via a dictionary passed to ``simulations``.
@@ -473,7 +612,7 @@ def experiment(n, executor={}, simulations={}, runs={}):
     to ``executor``.
     """
     print(f"Starting experiment at {time.ctime()}.")
-    simulations = [Simulation(**simulations) for _ in range(n)]
+    simulations = [sim_type(**simulations) for _ in range(n)]
 
     with ProcessPoolExecutor(**executor) as executor:
         results = [executor.submit(i.run, quiet=False, **runs) for i in simulations]

@@ -1,11 +1,12 @@
-from .simulation import Simulation, FixedDebateSimulation, experiment
+from .simulation import (Simulation, FixedDebateSimulation, 
+                         SocialInfluenceSimulation, experiment)
 from .update import (introduce, response)
 from .evaluation import evaluate_experiment
 
 from .strategies import (random, attack, fortify, convert, undercut)
 
 __all__ = [
-            'Simulation', 'FixedDebateSimulation',
+            'Simulation', 'FixedDebateSimulation', 'SocialInfluenceSimulation',
             'experiment',
             'introduce',
             'response',

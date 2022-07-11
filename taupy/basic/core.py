@@ -117,15 +117,27 @@ class Argument(Implies, Base):
     def __init__(self, *args):
         # Check for bad premise input
         if not self.args[0].is_Boolean:
-            raise ValueError("Argument requires Boolean input for premises. Normally, this"
-                             + " will be either a single premise or a conjunction of premises"
-                             + " marked with sympy's And() or the & operator."
+            raise ValueError("Argument requires Boolean input for premises." 
+                             + " Normally, this will be either a single premise"
+                             + " or a conjunction of premises marked with"
+                             + " sympy's And() or the & operator."
                              + " Tuples, lists, etc. do not currently work.")
 
         self.premises = list(self.args[0].args)
-        self.conclusion = next(iter(self.args[1].atoms()))
-        self.requirements = {p: False if Not(p) in self.args[0].args else True for p in self.args[0].atoms()} \
-                            | {next(iter(self.args[1].atoms())): False if self.args[1].is_Not else True}
+        self.conclusion = self.args[1]
+
+    def get_requirements(self):
+        """
+        We somtimes say that an agent “takes” an argument. This means that the
+        agent's position assigns truth values to the propositions as indicated
+        by their sign. E.g., if Not(p1) is part of the Argument, the agent needs
+        to have {p1: False} as a sub-position.
+
+        The “requirements” returns conditions for a (partial) position that 
+        “takes” the Argument `self`.  
+        """
+        return {p: False if Not(p) in self.args[0].args else True for p in self.args[0].atoms()} \
+                | {list(self.args[1].atoms())[0]: False if self.args[1].is_Not else True}
     
 class Debate(And, Base):
     """

@@ -72,12 +72,14 @@ class Simulation(list, SimulationBase):
 
         if sentencepool == "inherit": # import from parent debate
             self.sentencepool = [i for i in parent_debate.atoms()]
-            raise NotImplementedError("Inherited sentence pools are not implemented.")
+            raise NotImplementedError(
+                "Inherited sentence pools are not implemented.")
         else:
             self.sentencepool = [i for i in symbols(sentencepool)]
             self.used_premises = []
 
-        self.max_sentencepool = [i for i in symbols(max_sentencepool)] if max_sentencepool else self.sentencepool
+        self.max_sentencepool = [i for i in symbols(max_sentencepool)] \
+                                 if max_sentencepool else self.sentencepool
         
         if key_statements is None:
             self.key_statements = list()
@@ -90,14 +92,18 @@ class Simulation(list, SimulationBase):
 
         if positions is not None:
             if copy_input_positions == True:
-                self.init_positions(deepcopy(positions), target_length=initial_position_size)
+                self.init_positions(deepcopy(positions), 
+                                    target_length=initial_position_size)
             else:
-                self.init_positions(positions, target_length=initial_position_size)
+                self.init_positions(positions, 
+                                    target_length=initial_position_size)
         else:
             self.init_positions([], target_length=0)
 
         if debate_growth not in ["random", "tree"]:
-            raise NotImplementedError("The requested growth method is not implemented. Available methods are `random`  and `tree`.")
+            raise NotImplementedError("The requested growth method is not "
+                                      + "implemented. Available methods are "
+                                      + "`random`  and `tree`.")
         
         self.debate_growth = debate_growth
         self.directed = directed
@@ -138,24 +144,26 @@ class Simulation(list, SimulationBase):
                                      weights=[i[1] for i in self.events.items()])[0]
 
             if selected_event not in ["introduction", "new_sentence"]:
-                raise NotImplementedError(f"No recipe for event type {selected_event}.")
+                raise NotImplementedError(
+                    f"No recipe for event type {selected_event}.")
 
             if selected_event == "introduction":
                 if self.directed and len(self.positions[-1]) >= 2:
                     # The user asked for a directed simulation and has supplied
-                    # enough Positions. Now instantiate turns of trying to introduce
-                    # arguments.
+                    # enough Positions. Now instantiate turns of trying to 
+                    # introduce arguments.
                     j = 0
                     while j < len(self.positions[-1]) / 2:
                         pick_positions = sample(self.positions[-1], k=2)
 
-                        # Support for positions with multiple introduction strategies.
-                        # First, try to pick a random element from the list of introduction
-                        # strategies of a position. If that fails, assume that the strategy
-                        # preference of a position is not given as a list, but as a single
-                        # item.
+                        # Support for positions with multiple introduction 
+                        # strategies. First, try to pick a random element from 
+                        # the list of introduction  strategies of a position. If
+                        # that fails, assume that the strategy preference of a 
+                        # position is not given as a list, but as a single item.
                         try:
-                            pick_strategy = choice(pick_positions[0].introduction_strategy)
+                            pick_strategy = choice(
+                                pick_positions[0].introduction_strategy)
                         except KeyError:
                             pick_strategy = pick_positions[0].introduction_strategy
 
@@ -164,9 +172,9 @@ class Simulation(list, SimulationBase):
                                                         target=pick_positions[1],
                                                         strategy=pick_strategy)
                         if not argument_introduced:
-                            # The argument introduction did not succeed in this turn.
-                            # We are trying it again if there have been less tries than
-                            # half the size of the population.
+                            # The argument introduction did not succeed in this 
+                            # turn. We are trying it again if there have been 
+                            # less tries than half the size of the population.
                             j += 1
                             continue
                         else:
@@ -176,24 +184,28 @@ class Simulation(list, SimulationBase):
                                 f"Argument introduction suceeded after {j+1} attempts.")
                             break
                     else:
-                        # There have been more tries equal to half of the population
-                        # size, but an argument could not be found. This is enough
-                        # grounds to terminate the simulation run.
+                        # There have been more tries equal to half of the 
+                        # population size, but an argument could not be found. 
+                        # This is enough grounds to terminate the simulation run.
                         self.log.append(
-                            f"Argument introduction did not succeed, even after {j+1} attempts.")
+                            "Argument introduction did not succeed, even after "
+                            + f"{j+1} attempts.")
                         argument_introduced = False
 
                     if argument_introduced:
-                        # Check if introduction was succesful before attempting response.
+                        # Check if introduction was succesful before attempting 
+                        # response.
                         response(simulation=self,
                                  debate=self[-1], 
                                  positions=self.positions[-1],
                                  method=self.default_update_strategy,
                                  sentences=self.sentencepool)
                 else:
-                    # The user did not ask for a directed simulation and/or provided less than 2 positions.
-                    # In this case, we're investing less work.
-                    argument_introduced = introduce(self, strategy=self.default_introduction_strategy)
+                    # The user did not ask for a directed simulation and/or 
+                    # provided less than 2 positions. In this case, we're 
+                    # investing less work.
+                    argument_introduced = introduce(
+                        self, strategy=self.default_introduction_strategy)
                     if argument_introduced:
                         response(simulation=self,
                                  debate=self[-1],
@@ -202,34 +214,39 @@ class Simulation(list, SimulationBase):
                                  sentences=self.sentencepool)
 
                 if not argument_introduced:
-                    # Break out of the Simulation if no argument could be inserted.
-                    # In this case, the log will tell more about what went wrong.
+                    # Break out of the Simulation if no argument could be 
+                    # inserted. In this case, the log will tell more about what 
+                    # went wrong.
                     break
 
             if selected_event == "new_sentence":
                 # Let's see which sentences could be inserted into the debate.
-                # This will be the difference between the sentencepool and the max_sentencepool
+                # This will be the difference between the sentencepool and the 
+                # max_sentencepool
 
-                sentence_candidates = set(self.max_sentencepool) - set(self.sentencepool)
+                sentence_candidates = set(self.max_sentencepool) \
+                                      - set(self.sentencepool)
 
                 if len(sentence_candidates) > 0:
                     # Append a random candidate to the debate's sentencepool.
                     selected_sentence = choice(list(sentence_candidates))
                     self.sentencepool.append(selected_sentence)
-                    self.log.append(f"Sentence {selected_sentence} added to the sentence pool.")
+                    self.log.append(f"Sentence {selected_sentence} added to "
+                                    + "the sentence pool.")
 
                     # Carry along the debate stage.
                     self.append(self[-1])
 
-                    # Now have the positions take a random stance toward the newly inserted sentence.
+                    # Now have the positions take a random stance toward the 
+                    # newly inserted sentence.
                     expanded_positions = []
                     for p in self.positions[-1]:
                         e = deepcopy(p)
-                        # There is a 2:1 chance that the position does not suspend judgement on the
-                        # new sentence.
+                        # There is a 2:1 chance that the position does not 
+                        # suspend judgement on the new sentence.
                         if choice([True, True, False]):
-                            # If the positions does not suspend, there is a 1:1 chance it will assign
-                            # either truth value.
+                            # If the positions does not suspend, there is a 1:1 
+                            # chance it will assign either truth value.
                             e[selected_sentence] = choice([True, False])
                         expanded_positions.append(e)
 
@@ -239,7 +256,8 @@ class Simulation(list, SimulationBase):
                     # Failure to insert a sentence does not end the simulation, 
                     # but we take note of it in the log.
                     self.log.append(
-                        "Tried to insert a new sentence to the debate but maximum extension was reached.")
+                        "Tried to insert a new sentence to the debate but "
+                        + "maximum extension was reached.")
 
             i += 1
             if self[-1].density() >= max_density or i >= max_steps or satisfiability_count(self[-1]) <= min_sccp:
@@ -263,15 +281,15 @@ class FixedDebateSimulation(SimulationBase):
     """
     A simulation that begins with a pre-defined debate. Agents uncover arguments
     from the debate in each simulation step. The pre-defined debate follows the
-    argument map generation algorithm from Betz et al (2021).
+    argument map generation algorithm from Betz et al. (2021).
 
     Warning: This Simulation class is not compatible to multiprocessing as 
              implemented in concurrent.futures. It can not currently be used
              together with the experiment() function of this module.
     -----
     References:
-    Betz, Gregor, Vera Chekan & Tamara Mchedlidze. 2021. Heuristic algorithms for 
-          the approximation of mutual coherence.
+    Betz, Gregor, Vera Chekan & Tamara Mchedlidze. 2021. Heuristic algorithms 
+          for the approximation of mutual coherence.
     """
 
     def __init__(self,
@@ -290,14 +308,16 @@ class FixedDebateSimulation(SimulationBase):
         self.assertions = []
         self.partial_neighbour_search_radius = partial_neighbour_search_radius
         self.sentencepool = [i for i in symbols(sentencepool)]
-        self.debate = generate_hierarchical_argument_map(N = len(self.sentencepool),
-                                                         k = int(num_key_statements),
-                                                         **debate_generation)
+        self.debate = generate_hierarchical_argument_map(
+                        N = len(self.sentencepool),
+                        k = int(num_key_statements),
+                        **debate_generation)
         
         if positions is None:
             self.init_positions([], target_length=0)
         else:
-            self.init_positions(deepcopy(positions), target_length=initial_position_size)
+            self.init_positions(deepcopy(positions), 
+                                target_length=initial_position_size)
 
         self.updating_strategy = default_update_strategy
         
@@ -333,13 +353,15 @@ class FixedDebateSimulation(SimulationBase):
         # uncovering
 
         if len(self.positions[-1]) > 1:
-            enum_pos = list(enumerate(self.positions[-1])) # Cache to reduce calls to enumerate()
+            # Cache to reduce calls to enumerate()
+            enum_pos = list(enumerate(self.positions[-1]))
             seen_positions = []
             argument_available = False
 
             while True:
                 c = dict()
-                available_positions = [(i, p) for (i, p) in enum_pos if i not in seen_positions]
+                available_positions = [(i, p) for (i, p) in enum_pos \
+                                       if i not in seen_positions]
                 if len(available_positions) == 0:
                     new_argument = False
                     break
@@ -348,10 +370,10 @@ class FixedDebateSimulation(SimulationBase):
                 seen_positions.append(source_id)
 
                 # Support for positions with multiple introduction strategies.
-                # First, try to pick a random element from the list of introduction
-                # strategies of a position. If that fails, assume that the strategy
-                # preference of a position is not given as a list, but as a single
-                # item.
+                # First, try to pick a random element from the list of 
+                # introduction strategies of a position. If that fails, assume 
+                # that the strategy preference of a position is not given as a 
+                # list, but as a single item.
                 try:
                     strategy = choice(source.introduction_strategy)
                 except KeyError:

@@ -282,10 +282,7 @@ class FixedDebateSimulation(SimulationBase):
     A simulation that begins with a pre-defined debate. Agents uncover arguments
     from the debate in each simulation step. The pre-defined debate follows the
     argument map generation algorithm from Betz et al. (2021).
-
-    Warning: This Simulation class is not compatible to multiprocessing as 
-             implemented in concurrent.futures. It can not currently be used
-             together with the experiment() function of this module.
+    
     -----
     References:
     Betz, Gregor, Vera Chekan & Tamara Mchedlidze. 2021. Heuristic algorithms 
@@ -577,9 +574,10 @@ class SocialInfluenceSimulation(SimulationBase):
             d = normalised_edit_distance(source, p)
             update = choices([True, False], weights=[1-d, d])[0]
             if update:
-                new_position = Position(self.debate, 
-                                        {k: p[k] for k in p if k != influence_item},
-                                        introduction_strategy=p.introduction_strategy)
+                new_position = Position(
+                    self.debate, 
+                    {k: p[k] for k in p if k != influence_item},
+                    introduction_strategy=p.introduction_strategy)
                 if influence_item in source:
                     new_position[influence_item] = source[influence_item]
 
@@ -632,10 +630,9 @@ class SocialInfluenceSimulation(SimulationBase):
                 "sentencepool": self.sentencepool,
                 "log": self.log
             }
-        
 
 
-def experiment(n, sim_type=Simulation, executor={}, simulations={}, runs={}):
+def experiment(n, *, sim_type=Simulation, executor={}, simulations={}, runs={}):
     """
     Generate and execute `n` number of Simulations and output their results.
     The Simulations can be controlled via a dictionary passed to ``simulations``.
@@ -644,12 +641,27 @@ def experiment(n, sim_type=Simulation, executor={}, simulations={}, runs={}):
 
     Settings to the ``ProcessPoolExecutor`` should be forwarded in a dictionary
     to ``executor``.
+
+    This function calls two Executors. The first is responsible for setting up
+    the Simulations in parallel. The second performs the simulation runs. This
+    is particularly helpful for Simulation types that involve substantial 
+    computation for set-up, such as FixedDebateSimulation.
     """
+    # TODO 1: Use logging instead of printing
+    # TODO 2: Catch exceptions inside simulation processes
     print(f"Starting experiment at {time.ctime()}.")
-    simulations = [sim_type(**simulations) for _ in range(n)]
+
+    with ProcessPoolExecutor(**executor) as init_sim_executor:
+        init_sims = [init_sim_executor.submit(sim_type, 
+                                              **simulations) for _ in range(n)]
+    
+    simulations = [i.result() for i in init_sims]
+    print(f"Simulations initialised at {time.ctime()}.")
 
     with ProcessPoolExecutor(**executor) as executor:
-        results = [executor.submit(i.run, quiet=False, **runs) for i in simulations]
+        results = [executor.submit(i.run, 
+                                   quiet=False, 
+                                   **runs) for i in simulations]
 
         for count, future in enumerate(as_completed(results), start=1):
             print(f"Simulation {count}/{n} completed at {time.ctime()}.")

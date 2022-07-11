@@ -379,21 +379,33 @@ class FixedDebateSimulation(SimulationBase):
                 except KeyError:
                     strategy = source.introduction_strategy
 
-                for argument in [a for a in self.debate.args if a not in self.uncovered_arguments]:
+                for arg in [a for a in self.debate.args \
+                                 if a not in self.uncovered_arguments]:
+
                     try:
-                        premise_reqs = {k: argument.requirements[k] for k in argument.requirements if k in argument.args[0].atoms()}
-                        conclusion_reqs = {k: argument.requirements[k] for k in argument.requirements if k in argument.args[1].atoms()}
+                        reqs = arg.get_requirements()
+                        premise_reqs = {k: reqs[k] for k in reqs if k in arg.args[0].atoms()}
+                        conclusion_reqs = {k: reqs[k] for k in reqs if k in arg.args[1].atoms()}
                     except:
-                        raise Exception(f"Could not retrieve reqs from argument: {argument}. Arguments uncovered so far: {len(self.uncovered_arguments)}")
+                        raise Exception(
+                            "Could not retrieve requirements from argument: "
+                            + f"{arg}. Arguments uncovered so far: "
+                            + f"{len(self.uncovered_arguments)}")
                     
                     if strategy["pick_premises_from"] == "target":                    
-                        premise_ids = [i for (i, p) in enum_pos if premise_reqs.items() <= p.items()]                
+                        premise_ids = [i for (i, p) in enum_pos \
+                                       if premise_reqs.items() <= p.items()]                
                     
                     if strategy["pick_premises_from"] == "source":
-                        premise_ids = [i for (i, p) in enum_pos if premise_reqs.items() <= source.items()]
+                        premise_ids = [i for (i, p) in enum_pos \
+                                       if premise_reqs.items() <= source.items()]
+
+                    if strategy["pick_premises_from"] == None:
+                        premise_ids = [i for (i, p) in enum_pos]
 
                     if strategy["source_accepts_conclusion"] == "Yes":
-                        conclusion_source_ids = [i for (i, p) in enum_pos if conclusion_reqs.items() <= source.items()]
+                        conclusion_source_ids = [i for (i, p) in enum_pos \
+                                                 if conclusion_reqs.items() <= source.items()]
 
                     if strategy["source_accepts_conclusion"] == "Toleration":
                         suspend_conclusion = {k: None for k in conclusion_reqs}
@@ -416,7 +428,7 @@ class FixedDebateSimulation(SimulationBase):
                     if len(possible_targets) > 0:
                         argument_available = True
                     
-                    c[argument] = len(possible_targets)
+                    c[arg] = len(possible_targets)
 
                 if argument_available:
                     if self.argument_selection_strategy == "any":

@@ -169,7 +169,8 @@ def introduce(_sim, source=None, target=None, strategy=None):
 def response(*, 
              simulation, 
              method,
-             debate=None, 
+             debate=None,
+             models=None,
              positions=None,  
              sentences=None):
     """
@@ -220,7 +221,10 @@ def response(*,
 
     if method == "closest_coherent":
         updated_positions = []
-        list_of_models = list(satisfiability(debate, all_models=True))
+        if models is None:
+            list_of_models = list(satisfiability(debate, all_models=True))
+        else:
+            list_of_models = models
         for (i, p) in enumerate(positions):
             if dpll_satisfiable(And(dict_to_prop(p), debate)):
                 updated_positions.append(p)

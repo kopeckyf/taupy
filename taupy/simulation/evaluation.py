@@ -11,7 +11,7 @@ from collections import Counter
 import numpy as np
 import pandas as pd
 
-def evaluate_experiment(experiment, 
+def evaluate_experiment(experiment,
                         *, 
                         function, 
                         data_type="pickle", 
@@ -28,7 +28,7 @@ def evaluate_experiment(experiment,
     with `evaluate_experiment()`.
     """
 
-    if data_type not in ["pickle", "FixedDebate"]:
+    if data_type not in ["pickle", "FixedDebate", "SocialInfluence"]:
         raise NotImplementedError(
             f"There is no recipe for data type {data_type}."
         )
@@ -47,6 +47,13 @@ def evaluate_experiment(experiment,
                                                             1, len(i["uncovered_arguments"])+1)
                                                         ]],
                                        positions=i["positions"], 
+                                       **arguments) for i in experiment]
+        
+        if data_type == "SocialInfluence":
+            results = [executor.submit(function,
+                                       debate_stages=[i["debate"] \
+                                         for _ in range(len(i["positions"]))],
+                                       positions=i["positions"],
                                        **arguments) for i in experiment]
 
     return pd.concat([i.result() for i in results], 

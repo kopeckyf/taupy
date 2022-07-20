@@ -12,7 +12,8 @@ from taupy.analysis.polarisation import difference_matrix
 from taupy.analysis.agreement import (normalised_edit_distance, 
                                       normalised_edit_agreement)
 from taupy.basic.utilities import (satisfiability_count, 
-                                   z3_assertion_from_argument)
+                                   z3_assertion_from_argument,
+                                   satisfiability)
 from taupy.basic.core import EmptyDebate, Debate
 from taupy.basic.positions import Position
 from .update import introduce, response
@@ -520,8 +521,9 @@ class SocialInfluenceSimulation(SimulationBase):
                  sentencepool = "p:10",
                  positions = None,
                  initial_position_size = 5,
-                 updating_strategy = "closest_closed_partial_coherent",
-                 partial_neighbour_search_radius = 50
+                 updating_strategy = "closest_coherent",
+                 partial_neighbour_search_radius = 50,
+                 influence_parameter = 0
                  ):
 
         self.sentencepool = [i for i in symbols(sentencepool)]
@@ -533,6 +535,7 @@ class SocialInfluenceSimulation(SimulationBase):
         
         self.log = []
         self.assertions = []
+        self.influence_parameter = influence_parameter
         self.partial_neighbour_search_radius = partial_neighbour_search_radius
 
         if positions is None:
@@ -549,11 +552,25 @@ class SocialInfluenceSimulation(SimulationBase):
         # If not, update these positions.
         # This also means that the positions in self.positions[0] will be less
         # interesting compared to those in self.positions[1]
+
+        # Since the debate of a Social Influence Simulation never changes, we
+        # need to compute the legitimate positions once. This saves a lot of 
+        # computation time, but currently is only available for complete 
+        # positions that do not suspend.
+
+        if self.updating_strategy == "closest_coherent":
+            self.all_models = list(satisfiability(self.debate, all_models=True))
+        else:
+            self.all_models = None
+            self.log.append("I was unable to compute all models given the"
+                            + f"updating strategy {self.updating_strategy}.")
+
         response(simulation = self,
-                 debate = self.debate,
-                 positions = self.positions[-1],
-                 method = self.updating_strategy,
-                 sentences = self.sentencepool)
+                debate = self.debate,
+                models = self.all_models,
+                positions = self.positions[-1],
+                method = self.updating_strategy,
+                sentences = self.sentencepool)
 
     def __repr__(self):
         """
@@ -572,7 +589,8 @@ class SocialInfluenceSimulation(SimulationBase):
 
         for i, p in enumerate(self.positions[-1]):
             d = normalised_edit_distance(source, p)
-            update = choices([True, False], weights=[1-d, d])[0]
+            w = [1 - d*self.influence_parameter, d*self.influence_parameter]
+            update = choices([True, False], weights=w)[0]
             if update:
                 new_position = Position(
                     self.debate, 
@@ -595,6 +613,7 @@ class SocialInfluenceSimulation(SimulationBase):
         response(simulation = self,
                  debate = self.debate,
                  positions = candidates,
+                 models = self.all_models,
                  method = self.updating_strategy,
                  sentences = self.sentencepool)
 

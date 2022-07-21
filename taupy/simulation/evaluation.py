@@ -4,12 +4,13 @@ from concurrent.futures import ProcessPoolExecutor
 from taupy import (difference_matrix, group_divergence, group_consensus, 
                    group_size_parity, normalised_hamming_distance, 
                    hamming_distance, edit_distance, normalised_edit_distance, 
-                   pairwise_dispersion, number_of_groups, bna, 
+                   pairwise_dispersion, number_of_groups, bna, satisfiability, 
                    satisfiability_count, Position, Debate, EmptyDebate)
 from statistics import mean
 from collections import Counter
 import numpy as np
 import pandas as pd
+from random import choices
 
 def evaluate_experiment(experiment,
                         *, 
@@ -127,6 +128,40 @@ def majority_voting(debate_stages,
 
     else:
         return pd.DataFrame(list(zip(majority_closed, majority_coherent)))
+
+
+def majority_voting_among_random_sample(debate_stages,
+                                        *, 
+                                        n_positions,
+                                        sentencepool,
+                                        key_statements=None,
+                                        densities=True,
+                                        progress=False,
+                                        method="all"):
+
+    """
+    Before majority voting, pick `n_positions` number of coherent positions
+    for the respective debate stage. Then return the voting result among these
+    positions. It is important to pick random positions with replacement in case
+    there are fewer coherent positions relative to the debate stage then asked 
+    for in `n_positions`.
+    """
+
+    random_positions = []
+
+    for i in debate_stages:
+        sat = satisfiability(i, all_models=True)
+        # Pick positions with replacement
+        random_positions.append(choices(sat, k=n_positions))
+
+    return majority_voting(debate_stages=debate_stages,
+                           positions=random_positions,
+                           sentencepool=sentencepool,
+                           key_statements=key_statements,
+                           densities=densities,
+                           progress=progress,
+                           method=method)
+
 
 def position_changes(debate_stages, 
                      *, 

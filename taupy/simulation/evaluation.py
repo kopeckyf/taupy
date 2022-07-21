@@ -67,7 +67,8 @@ def majority_voting(debate_stages,
                     key_statements=None,
                     densities=True,
                     progress=False,
-                    method="all"):
+                    method="all",
+                    measure_agreement=bna):
     """
     Voting algorithm
     """
@@ -79,6 +80,7 @@ def majority_voting(debate_stages,
 
     majority_closed = []
     majority_coherent = []
+    agreement = []
 
     for stage, plist in enumerate(positions):
         if method == "all":
@@ -111,23 +113,37 @@ def majority_voting(debate_stages,
         majority_closed.append(pos.is_closed())
         majority_coherent.append(pos.is_coherent())
 
+        if measure_agreement is not None:
+            m = difference_matrix(plist, measure=measure_agreement)
+            agreement.append(m[np.triu_indices(len(positions[0]), k=1)].mean())
+        else:
+            agreement.append("not calculated")
+
     if densities or progress:
 
         if not progress:
-            return pd.DataFrame(list(zip(densities, majority_closed, majority_coherent)),
-                                columns=["density", "majority is closed", "majority is coherent"])
+            return pd.DataFrame(list(zip(densities, majority_closed, 
+                                         majority_coherent, agreement)),
+                                columns=["density", "majority is closed", 
+                                         "majority is coherent", "agreement"])
 
         if not densities:
-            return pd.DataFrame(list(zip(progress, majority_closed, majority_coherent)),
-                                columns=["progress", "majority is closed", "majority is coherent"])
+            return pd.DataFrame(list(zip(progress, majority_closed, 
+                                         majority_coherent, agreement)),
+                                columns=["progress", "majority is closed", 
+                                         "majority is coherent", "agreement"])
 
         if progress and densities:
-            return pd.DataFrame(list(zip(progress, densities, majority_closed, majority_coherent)),
-                                columns=["progress", "density", "majority is closed", 
-                                         "majority is coherent"])
+            return pd.DataFrame(list(zip(progress, densities, majority_closed, 
+                                         majority_coherent, agreement)),
+                                columns=["progress", "density", 
+                                         "majority is closed", 
+                                         "majority is coherent",
+                                         "agreement"])
 
     else:
-        return pd.DataFrame(list(zip(majority_closed, majority_coherent)))
+        return pd.DataFrame(list(zip(majority_closed, majority_coherent, 
+                                     agreement)))
 
 
 def majority_voting_among_random_sample(debate_stages,
@@ -137,7 +153,8 @@ def majority_voting_among_random_sample(debate_stages,
                                         key_statements=None,
                                         densities=True,
                                         progress=False,
-                                        method="all"):
+                                        method="all",
+                                        measure_agreement=bna):
 
     """
     Before majority voting, pick `n_positions` number of coherent positions
@@ -160,7 +177,8 @@ def majority_voting_among_random_sample(debate_stages,
                            key_statements=key_statements,
                            densities=densities,
                            progress=progress,
-                           method=method)
+                           method=method,
+                           measure_agreement=measure_agreement)
 
 
 def position_changes(debate_stages, 

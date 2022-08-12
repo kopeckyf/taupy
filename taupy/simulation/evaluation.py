@@ -2,7 +2,7 @@ from igraph import Graph, ADJ_MAX
 from sklearn.cluster import AffinityPropagation, AgglomerativeClustering
 from concurrent.futures import ProcessPoolExecutor
 from taupy import (difference_matrix, group_divergence, group_consensus, 
-                   group_size_parity, normalised_hamming_distance, 
+                   group_size_parity, normalised_hamming_distance, spread,
                    hamming_distance, edit_distance, normalised_edit_distance, 
                    pairwise_dispersion, number_of_groups, bna, satisfiability, 
                    satisfiability_count, Position, Debate, EmptyDebate)
@@ -277,7 +277,7 @@ def auxiliary_information(debate_stages, *, positions):
     return pd.DataFrame(list(zip(size_of_sccp, unique_positions)), 
                         columns=["sccp_extension", "number_uniq_pos"])
 
-def variance_dispersion(*,
+def dispersion_spread(*,
                         debate_stages,
                         positions,
                         measure=normalised_hamming_distance, 
@@ -290,23 +290,24 @@ def variance_dispersion(*,
         progress = [(i+1)/len(debate_stages) for i in range(len(debate_stages))]
 
     dispersions = [pairwise_dispersion(i, measure=measure) for i in positions]
+    spreads = [spread(i, measure=measure) for i in positions]
     
     if densities or progress:
         if not progress:
-            df = list(zip(densities, dispersions))
-            col = ["density", "dispersion"]
+            df = list(zip(densities, dispersions, spreads))
+            col = ["density", "dispersion", "spread"]
 
         if not densities: 
-            df = list(zip(progress, dispersions))
-            col = ["progress", "dispersion"]
+            df = list(zip(progress, dispersions, spreads))
+            col = ["progress", "dispersion", "spread"]
 
         if densities and progress:
-            df = list(zip(densities, progress, dispersions))
-            col = ["densities", "progress", "dispersion"]
+            df = list(zip(densities, progress, dispersions, spreads))
+            col = ["densities", "progress", "dispersion", "spread"]
 
         return pd.DataFrame(df, columns=col)
     else:
-        return dispersions
+        return (dispersions, spreads)
     
 def group_measures_exogenous(debate_stages, 
                              *, 
@@ -507,13 +508,13 @@ def group_measures_affinity_propagation(debate_stages,
     consensus = [group_consensus(i, matrices[num]) 
                  for num, i in enumerate(clusterings)]
     numbers = [number_of_groups(i) for i in clusterings]
-    #size_parity = [group_size_parity(i) for i in clusterings]
+    size_parity = [group_size_parity(i) for i in clusterings]
 
     if densities:
         return pd.DataFrame(list(zip(densities, divergences, consensus, 
-                                     numbers)), 
+                                     numbers, size_parity)), 
                             columns=["density", "divergence", "consensus", 
-                                     "numbers"])
+                                     "numbers", "size_parity"])
     else:
         return pd.Series(divergences)
 
@@ -539,12 +540,12 @@ def group_measures_affinity_propagation_partial_positions(debate_stages,
     consensus = [group_consensus(i, matrices[num]) 
                  for num, i in enumerate(clusterings)]
     numbers = [number_of_groups(i) for i in clusterings]
-    #size_parity = [group_size_parity(i) for i in clusterings]
+    size_parity = [group_size_parity(i) for i in clusterings]
 
     if densities:
         return pd.DataFrame(list(zip(densities, divergences, consensus, 
-                                     numbers)), 
+                                     numbers, size_parity)), 
                             columns=["density", "divergence", "consensus", 
-                                     "numbers"])
+                                     "numbers", "size_parity"])
     else:
         return pd.Series(divergences)

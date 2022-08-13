@@ -63,7 +63,7 @@ def pairwise_dispersion(positions, measure):
     and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
     DOI: 10/d3kn.
     """
-    return sqrt(difference_matrix(positions, measure)[np.triu_indices(
+    return 2 * sqrt(difference_matrix(positions, measure)[np.triu_indices(
         len(positions), k=1)].var())
 
 def lauka(positions):

@@ -18,7 +18,7 @@ from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, 
                        groups_from_stance_toward_single_proposition,
                        difference_matrix, spread, lauka, number_of_groups,
                        pairwise_dispersion, group_divergence, group_consensus, group_size_parity,
-                       normalised_edit_agreement)
+                       normalised_edit_agreement, aggregated_position_of_winners)
 
 from .simulation import (Simulation, FixedDebateSimulation, 
                          SocialInfluenceSimulation,
@@ -38,6 +38,7 @@ __all__ = [
             'groups_from_stance_toward_single_proposition', 'number_of_groups',
             'difference_matrix', 'spread', 'lauka', 'pairwise_dispersion',
             'group_divergence', 'group_consensus', 'group_size_parity',
+            'aggregated_position_of_winners',
             # .simulation
             'Simulation', 'FixedDebateSimulation', 'SocialInfluenceSimulation',
             'experiment', 'evaluate_experiment',

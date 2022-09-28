@@ -7,6 +7,7 @@ from .polarisation import (groups_from_stance_toward_single_proposition,
                            difference_matrix, spread, lauka,
                            pairwise_dispersion, group_divergence, group_consensus,
                            group_size_parity, number_of_groups)
+from .voting import aggregated_position_of_winners
 
 __all__ = [
             'doj',
@@ -20,5 +21,7 @@ __all__ = [
             'groups_from_stance_toward_single_proposition',
             'difference_matrix', 'spread', 'lauka', 'pairwise_dispersion',
             'group_divergence', 'group_consensus', 'group_size_parity',
-            'number_of_groups'
+            'number_of_groups',
+            # voting
+            'aggregated_position_of_winners'
           ]

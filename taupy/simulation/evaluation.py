@@ -1,5 +1,5 @@
 from igraph import Graph, ADJ_MAX
-from sklearn.cluster import AffinityPropagation, AgglomerativeClustering
+from sklearn.cluster import AffinityPropagation, AgglomerativeClustering, DBSCAN
 from concurrent.futures import ProcessPoolExecutor
 from taupy import (difference_matrix, group_divergence, group_consensus, 
                    group_size_parity, normalised_hamming_distance, spread,
@@ -549,3 +549,40 @@ def group_measures_affinity_propagation_partial_positions(debate_stages,
                                      "numbers", "size_parity"])
     else:
         return pd.Series(divergences)
+
+def community_fragmentation_from_density_clustering(debate_stages,
+                                                    *,
+                                                    positions,
+                                                    densities=True,
+                                                    progress=False
+                                                    ):
+    """
+    Community fragmentation gives a measure to what degree a population can
+    be clustered into subpopulations. We use DBSCAN, a community structuring
+    algorithm with noise, to measure this value. The degree to which the 
+    population can be clustered into subcommunities can be understood as the
+    inverse of the proportion of agents that are interpreted as noise by DBSCAN.
+    """
+
+    if densities:
+        densities = [i.density() for i in debate_stages]
+
+    matrices = [difference_matrix(i, measure=normalised_hamming_distance) for i 
+                in positions]
+    
+    clusterings = [DBSCAN(eps=0.2, 
+                          min_samples=3,
+                          metric="precomputed").fit(i).labels_ for i 
+                   in matrices]
+
+    # Noise data points are labelled -1 by DBSCAN. We want the inverse of
+    # the proportion of noise data points, i.e. the agents that ARE clustered
+    # into sub-communities.
+    frag = [1 - np.count_nonzero(i == -1)/i.shape[0] for i in clusterings]
+
+    if densities:
+        return pd.DataFrame(list(zip(densities, frag)),
+                            columns=["density", "fragmentation"])
+    
+    else:
+        return pd.Series(frag)

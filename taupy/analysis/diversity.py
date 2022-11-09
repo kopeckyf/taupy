@@ -64,7 +64,7 @@ def inverse_Simpson_index(clusters):
 def Gini_Simpson_index(clusters):
     """
     Estimates the probability that the belief systems of two randomly drawn
-    agents are clustered into the same cluster. 
+    agents are clustered into different clusters (“inter-type encounters”). 
     """
     return 1 - Simpson_index(clusters)
 

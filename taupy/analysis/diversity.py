@@ -10,7 +10,7 @@ Tuomisto, Hanna. 2010. A consistent terminology for quantifying species
 diversity? Yes, it does exist. Oecologia 164: 853–860. DOI: 10/c445xk.
 """
 
-from polarisation import number_of_groups
+from .polarisation import number_of_groups
 from math import log
 
 def Shannon_index(clusters):

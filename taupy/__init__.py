@@ -18,7 +18,10 @@ from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, 
                        groups_from_stance_toward_single_proposition,
                        difference_matrix, spread, lauka, number_of_groups,
                        pairwise_dispersion, group_divergence, group_consensus, group_size_parity,
-                       normalised_edit_agreement, aggregated_position_of_winners)
+                       normalised_edit_agreement, aggregated_position_of_winners,
+                       attribute_diversity_page, Gini_Simpson_index, 
+                        inverse_Simpson_index, normalised_attribute_diversity_page,
+                        normalised_Shannon_index, Shannon_index, Simpson_index)
 
 from .simulation import (Simulation, FixedDebateSimulation, 
                          SocialInfluenceSimulation,
@@ -32,7 +35,11 @@ __all__ = [
             'Argument', 'Debate', 'EmptyDebate', 'Position', 
             'position_compatibility', 'closedness',
             # .analysis
-            'doj', 'hamming_distance', 'normalised_hamming_distance', 
+            'doj', 
+            'attribute_diversity_page', 'Gini_Simpson_index', 
+            'inverse_Simpson_index', 'normalised_attribute_diversity_page',
+            'normalised_Shannon_index', 'Shannon_index', 'Simpson_index',
+            'hamming_distance', 'normalised_hamming_distance', 
             'bna', 'next_neighbours', 'edit_distance', 'normalised_edit_distance',
             'switch_deletion_neighbourhood', 'normalised_edit_agreement',
             'groups_from_stance_toward_single_proposition', 'number_of_groups',

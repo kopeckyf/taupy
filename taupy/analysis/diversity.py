@@ -24,8 +24,12 @@ def Shannon_index(clusters):
     clusters = [c for c in clusters if c]
 
     population_size = sum([len(c) for c in clusters])
-    return  -1 * sum([len(c)/population_size * log(
-            len(c)/population_size) for c in clusters])
+
+    try:
+        return  -1 * sum([len(c)/population_size * log(
+                len(c)/population_size) for c in clusters])
+    except ZeroDivisionError:
+        return float("nan")
 
 def normalised_Shannon_index(clusters):
 
@@ -41,7 +45,10 @@ def Simpson_index(clusters):
     clusters = [c for c in clusters if c]
     population_size = sum([len(c) for c in clusters])
 
-    return sum([(len(c)/population_size)**2 for c in clusters])
+    try:
+        return sum([(len(c)/population_size)**2 for c in clusters])
+    except ZeroDivisionError:
+        return float("nan")
 
 def inverse_Simpson_index(clusters):
     """

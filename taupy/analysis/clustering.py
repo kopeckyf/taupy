@@ -52,7 +52,7 @@ def leiden(clustering_matrices):
                     weights="weight", objective_function="modularity")) \
                         for g in graphs]
 
-def affinity(clustering_matrices):
+def affinity_propagation(clustering_matrices):
     """
     Return the community structure obtained by clustering with Affinity 
     Propagation.
@@ -67,7 +67,7 @@ def affinity(clustering_matrices):
              for j in range(len(k.cluster_centers_indices_))] 
              for k in fits]
 
-def agglomerative(clustering_matrices, *, distance_threshold=0.75):
+def agglomerative_clustering(clustering_matrices, *, distance_threshold=0.75):
     """
     Return community structuring obtained by Agglomerative Clustering. 
     """

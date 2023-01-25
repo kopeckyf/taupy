@@ -20,8 +20,10 @@ from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, 
                        pairwise_dispersion, group_divergence, group_consensus, group_size_parity,
                        normalised_edit_agreement, aggregated_position_of_winners,
                        attribute_diversity_page, Gini_Simpson_index, 
-                        inverse_Simpson_index, normalised_attribute_diversity_page,
-                        normalised_Shannon_index, Shannon_index, Simpson_index)
+                       inverse_Simpson_index, normalised_attribute_diversity_page,
+                       normalised_Shannon_index, Shannon_index, Simpson_index,
+                       ncc, average_ncc, clustering_matrices, leiden, affinity_propagation,
+                       agglomerative_clustering, density_based_clustering)
 
 from .simulation import (Simulation, FixedDebateSimulation, 
                          SocialInfluenceSimulation,
@@ -45,7 +47,9 @@ __all__ = [
             'groups_from_stance_toward_single_proposition', 'number_of_groups',
             'difference_matrix', 'spread', 'lauka', 'pairwise_dispersion',
             'group_divergence', 'group_consensus', 'group_size_parity',
-            'aggregated_position_of_winners',
+            'aggregated_position_of_winners', 'ncc', 'average_ncc',
+            'clustering_matrices', 'leiden', 'affinity_propagation', 
+            'agglomerative_clustering', 'density_based_clustering',
             # .simulation
             'Simulation', 'FixedDebateSimulation', 'SocialInfluenceSimulation',
             'experiment', 'evaluate_experiment',

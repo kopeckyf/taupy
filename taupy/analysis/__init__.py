@@ -5,7 +5,9 @@ from .diversity import (attribute_diversity_page, Gini_Simpson_index,
 from .agreement import (hamming_distance, bna, next_neighbours, 
                         edit_distance, switch_deletion_neighbourhood,
                         normalised_hamming_distance, normalised_edit_distance,
-                        normalised_edit_agreement)
+                        normalised_edit_agreement, ncc, average_ncc)
+from .clustering import (clustering_matrices, leiden, affinity_propagation, 
+                         agglomerative_clustering, density_based_clustering)
 from .polarisation import (groups_from_stance_toward_single_proposition,
                            difference_matrix, spread, lauka,
                            pairwise_dispersion, group_divergence, group_consensus,
@@ -23,7 +25,10 @@ __all__ = [
             'bna', 'next_neighbours', 'edit_distance',
             'switch_deletion_neighbourhood',
             'normalised_edit_distance', 'normalised_hamming_distance',
-            'normalised_edit_agreement',
+            'normalised_edit_agreement', 'ncc', 'average_ncc',
+            # clustering
+            'clustering_matrices', 'leiden', 'affinity_propagation', 
+            'agglomerative_clustering', 'density_based_clustering',
             # polarisation
             'groups_from_stance_toward_single_proposition',
             'difference_matrix', 'spread', 'lauka', 'pairwise_dispersion',

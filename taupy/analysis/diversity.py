@@ -35,7 +35,13 @@ def normalised_Shannon_index(clusters):
 
     clusters = [c for c in clusters if c]
 
-    return Shannon_index(clusters) / log(number_of_groups(clusters))
+    try:
+        return Shannon_index(clusters) / log(number_of_groups(clusters))
+    except ZeroDivisionError:
+        # Happens if number of groups is 1 since ln(1) = 0
+        # But if there is only 1 group, size-based diversity indices should
+        # indicate zero diversity.
+        return 0
 
 def Simpson_index(clusters):
     """

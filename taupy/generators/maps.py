@@ -13,18 +13,19 @@ def generate_hierarchical_argument_map(N = 20,
                                        k = 3,
                                        max_num_args = float("inf"),
                                        max_density = 1.0,
-                                       distribution = {2: 0.19, 3: 0.23, 4: 0.32, 5: 0.26},
+                                       distribution = {2: 0.19, 3: 0.23, 
+                                                       4: 0.32, 5: 0.26},
                                        base_conclusion = 0.75,
                                        base_premises = 0.75):
 
     """
-    Generate a hierarchical synthetic argument map, following the algorithm from Betz et al.
-    (2021).
+    Generate a hierarchical synthetic argument map, following the algorithm from 
+    Betz et al. (2021).
     
     -----
     References:
-    Betz, G., V. Chekan & T. Mchedlidze. 2021. Heuristic Algorithms for the Approximation of
-    Mutual Coherence.
+    Betz, G., V. Chekan & T. Mchedlidze. 2021. Heuristic Algorithms for the 
+    Approximation of Mutual Coherence.
     """   
     
     d = EmptyDebate()
@@ -34,7 +35,9 @@ def generate_hierarchical_argument_map(N = 20,
     key_statements = sentencepool[:k]
 
     while len(d.args) < max_num_args and d.density() < max_density:
-        atomic_levels = proposition_levels_from_debate(d, key_statements=key_statements)
+        atomic_levels = proposition_levels_from_debate(
+            d, key_statements=key_statements
+            )
 
         levels = atomic_levels | {Not(i): atomic_levels[i] for i in atomic_levels}
         w = [base_conclusion**i for i in levels.values()]

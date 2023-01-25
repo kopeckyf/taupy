@@ -3,7 +3,7 @@ from itertools import combinations
 from math import log2
 from sympy.logic import (And, Implies, Not)
 from sympy.logic.boolalg import BooleanTrue
-from .utilities import (iter_to_string, neighbours_of_list, 
+from taupy.basic.utilities import (iter_to_string, neighbours_of_list, 
                         satisfiability_count, satisfiability)
 from taupy.analysis.agreement import edit_distance
 

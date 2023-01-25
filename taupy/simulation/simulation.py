@@ -388,7 +388,8 @@ class FixedDebateSimulation(SimulationBase):
                         raise Exception(
                             "Could not retrieve requirements from argument: "
                             + f"{arg}. Arguments uncovered so far: "
-                            + f"{len(self.uncovered_arguments)}")
+                            + f"{len(self.uncovered_arguments)}"
+                            )
                     
                     if strategy["pick_premises_from"] == "target":                    
                         premise_ids = [i for (i, p) in enum_pos \
@@ -446,7 +447,7 @@ class FixedDebateSimulation(SimulationBase):
 
                 else:
                     self.log.append(
-                        f"No {strategy} argument available for position {source}."
+                        f"No {strategy['name']} argument available for position {source}."
                     )
 
         else:

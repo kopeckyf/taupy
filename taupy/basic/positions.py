@@ -3,23 +3,25 @@ from sympy.logic.algorithms.dpll2 import dpll_satisfiable
 from copy import deepcopy
 from sympy import And, Not
 
+
 class Position(dict):
     """
     A position in terms of the theory of dialectical structure, used to model
     agent's belief systems. 
     """
+
     def __init__(self, debate, *args, introduction_strategy=None, update_strategy=None):
         self.debate = debate
         self.introduction_strategy = introduction_strategy
         self.update_strategy = update_strategy
         dict.__init__(self, *args)
-        
+
     def is_complete(self):
         return True if self.keys() == self.debate.atoms() else False
-    
+
     def is_coherent(self):
         return satisfiability(And(dict_to_prop(self), self.debate))
-    
+
     def is_closed(self):
         # For backwards compatibility, this class method links to a function
         # which was introduced later.
@@ -35,6 +37,7 @@ class Position(dict):
         return {**{k: not self[k] for k in self if self[k] != None},
                 **{k: None for k in self if self[k] == None}}
 
+
 def position_compatibility(pos1, pos2, deep=False):
     """
     Check for compatibility of pos1 and pos2. When deep=False, the check is 
@@ -42,20 +45,22 @@ def position_compatibility(pos1, pos2, deep=False):
     intersected positions.
     """
     if deep == True and pos1.debate != pos2.debate:
-        raise ValueError("Deep compatibility can only be checked for positions \
-            of the same debate.")
-    
+        raise ValueError(
+            "Deep compatibility can only be checked for positions of the same \
+             debate.")
+
     if any(pos1[k] in pos2 and pos1[k] != pos2[k] for k in pos1):
         return False
     else:
         if deep == True:
-            if not satisfiability(And(dict_to_prop({**pos1, **pos2})), 
+            if not satisfiability(And(dict_to_prop({**pos1, **pos2})),
                                   pos1.debate):
                 return False
             else:
                 return True
         else:
             return True
+
 
 def closedness(pos, debate=None, return_alternative=False):
     """
@@ -82,19 +87,20 @@ def closedness(pos, debate=None, return_alternative=False):
     else:
         # The user gave a specific debate.
         d = debate
-    
+
     position = deepcopy(pos)
-    ignorant = {a for a in d.atoms() if a not in position} 
+    ignorant = {a for a in d.atoms() if a not in position}
     suspended = {k for k in position if position[k] == None}
-    
+
     # Defaulting to True here means that closedness is confirmed if the position
     # does not suspend on any sentence and isn't ignorant of any.
     closedness_status = True
 
     for s in ignorant | suspended:
         sat_assume_true = dpll_satisfiable(And(dict_to_prop(position), d, s))
-        sat_assume_false = dpll_satisfiable(And(dict_to_prop(position), d, Not(s)))
-        
+        sat_assume_false = dpll_satisfiable(
+            And(dict_to_prop(position), d, Not(s)))
+
         # Does the position depend on the proposition for closedness?
         if not (sat_assume_true and sat_assume_false):
             # Case 1: The position depends on the truth of s for closedness.
@@ -106,10 +112,10 @@ def closedness(pos, debate=None, return_alternative=False):
                 position[s] = False
                 closedness_status = False
 
-        # If the closedness status is settled after current s and no alternative 
+        # If the closedness status is settled after current s and no alternative
         # is requested, stop the search early to save some computation time.
         # If an alternative is requested, we need to check all propositions.
         if not return_alternative and closedness_status == False:
-            break                    
+            break
 
     return (closedness_status, position) if return_alternative else closedness_status

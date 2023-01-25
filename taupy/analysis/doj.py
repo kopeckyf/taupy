@@ -10,7 +10,7 @@ def doj(pos, debate=None, conditional=None):
     
     The *conditional* doj is returned if ``conditional`` is given another
     position of the same debate. When ``conditional`` is set, ``debate``
-    must be `None`.        
+    must be `None`.
     
     References
     ----------

@@ -152,3 +152,30 @@ def switch_deletion_neighbourhood(position, distance):
     for c in candidates:
         if (not (set(c[0]) & set(c[1]))) and (len(set(c[0]) | set(c[1])) == distance):
             yield c
+
+def ncc(population, *, agent, measure=hamming_distance):
+    """
+    Returns the normalised closedness centrality (NCC) for a population of
+    agents. 
+
+    -----
+    References:
+    Betz, Gregor. Debate dynamics. Chapter 2.4.
+    """
+    n = len(population) - 1
+    d = 2 * sum([measure(agent, p) for p in population])
+
+    try:
+        return n/d
+    except ZeroDivisionError:
+        # There is 100% agreement in the population
+        return float("inf")
+
+def average_ncc(population, *, measure=hamming_distance):
+    """
+    Population-wide average of the normalised closedness centrality.
+    """
+    n = sum([ncc(population, agent=p, measure=measure) for p in population])
+    d = len(population)
+
+    return n/d

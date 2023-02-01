@@ -31,13 +31,11 @@ def difference_matrix(positions, measure):
 def spread(positions, measure):
     """
     Returns the maximum distance between any two of the ``positions`` 
-    relative to a ``measure``.
+    relative to a ``measure`` (originally defined in [Bramson2016]_, p. 80–111).
 
-    References
-    ----------
-    Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
-    and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
-    DOI: 10/d3kn.
+    .. [Bramson2016] Bramson, Aaron et al. 2016. Disambiguation of social 
+                     polarization concepts and measures. The Journal of 
+                     Mathematical Sociology 40(2). DOI: 10/d3kn.
     """
     return np.amax(difference_matrix(positions, measure))
 
@@ -45,7 +43,8 @@ def spread(positions, measure):
 def pairwise_dispersion(positions, measure):
     """
     Returns dispersion, understood as the standard deviation of pairwise 
-    distances between the ``positions`` relative to the ``measure``.
+    distances between the ``positions`` relative to the ``measure``. This 
+    measure was defined in [Bramson2016]_
 
     This is the TDS equivalent of statistical dispersion or variance in 
     polling data. Beside standard deviation, there are other ways of measuring
@@ -59,12 +58,6 @@ def pairwise_dispersion(positions, measure):
     without the diagonal zeroes (this offset is controlled by ``k=1``). 
     Since $D_{a,b} = D_{b,a}$, these are the pairwise difference values we are 
     after. We then take the standard deviation of these values.
-
-    References
-    ----------
-    Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
-    and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
-    DOI: 10/d3kn.
     """
     return 2 * sqrt(difference_matrix(positions, measure)[np.triu_indices(
         len(positions), k=1)].var())
@@ -72,17 +65,15 @@ def pairwise_dispersion(positions, measure):
 
 def lauka(positions):
     """
-    An implementation of Lauka's et al. measure of *mass political polarisation*,
-    adapted to TDS.
+    An implementation of Lauka's et al. ([Lauka2018]_) measure of *mass 
+    political polarisation*, adapted to TDS.
 
     0.25 is the maximum value that the ``sum(l)/num_issues`` can take. The Lauka
     measure is thus a relation of actual compared to maximal value.
 
-    References
-    ----------
-    Lauka, Alban et al. 2018. Mass partisan polarization: Measuring a relational 
-    concept. American Behavioral Scientist 62(1). 107–126. 
-    DOI: 10.1177/0002764218759581
+    .. [Lauka2018] Lauka, Alban et al. 2018. Mass partisan polarization: 
+                   Measuring a relational concept. American Behavioral Scientist 
+                   62(1). 107–126. DOI: 10.1177/0002764218759581
     """
     issues = {j for i in positions for j in i.keys()}
     num_positions = len(positions)
@@ -108,7 +99,8 @@ def number_of_groups(clustering):
 
 def group_divergence(clusters, adjacency_matrix):
     """
-    A variant of Bramson et al.'s group divergence, adapted to TDS. 
+    A variant of Bramson et al.'s group divergence ([Bramson2016]_), adapted to 
+    belief systems in the theory of dialectical structures. 
 
     Group divergence relies on a useful clustering that returns ``clusters``, 
     which is expected to be a list of lists. The ``adjacency_matrix`` can be a 
@@ -121,11 +113,6 @@ def group_divergence(clusters, adjacency_matrix):
      - Affinity propagation (implementation from ``scikit-learn``).
      - Agglomerative clustering (implementation from ``scikit-learn``).
 
-    References
-    ----------
-    Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
-    and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
-    DOI: 10/d3kn.
     """
     l = []
     for c in clusters:
@@ -169,17 +156,12 @@ def group_divergence(clusters, adjacency_matrix):
 
 def group_consensus(clusters, adjacency_matrix):
     """
-    A variant of Bramson et al.'s measure of group consensus, adapted to TDS.
+    A variant of Bramson et al.'s measure of group consensus ([Bramson2016]_), 
+    adapted to belief systems in the theory of dialectical structures.
 
     As ``group_divergence()``, this relies on a good clustering as well. 
     Arguments and recommentations for algorithms to try are the same as in
     ``group_divergence()``.
-
-    References
-    ----------
-    Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
-    and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
-    DOI: 10/d3kn.
     """
     l = []
     for c in clusters:
@@ -196,17 +178,12 @@ def group_consensus(clusters, adjacency_matrix):
 
 def group_size_parity(clusters):
     """
-    Bramson et al.'s measure of (group) size parity, adjusted to TDS. According
-    to the authors, size parity is an entropy measure, which is irrespective of
+    Bramson et al.'s ([Bramson2016]_) measure of (group) size parity, adjusted 
+    to belief systems in the theory of dialectical structures. According to the 
+    authors, size parity is an entropy measure, which is irrespective of
     the size of the population and of the number of groups. It is said to behave
     erratically in case the groups are determined endogenously, e.g. by one of
     the clustering algorithms Leiden, Affinity propagation, etc.
-
-    References
-    ----------
-    Bramson, Aaron et al. 2016. Disambiguation of social polarization concepts
-    and measures. In The Journal of Mathematical Sociology 40(2), pp. 80--111.
-    DOI: 10/d3kn.
     """
     # Catch empty clusters (applicable to the exogenous group detection)
     clusters = [c for c in clusters if c]

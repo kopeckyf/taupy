@@ -36,12 +36,12 @@ def clustering_matrices(positions, *, measure=normalised_hamming_distance,
 
 def leiden(clustering_matrices):
     """
-    Return the community structure obtained by the Leiden clustering algorithm.
-    ------
-    References:
-    Traag, V. A., Waltman, L. & van Eck, N. J. (2019). From Louvain to Leiden: 
-    Guaranteeing well-connected communities. Scientific Reports, 9. 
-    DOI: 10/gfxg2v
+    Return the community structure obtained by the Leiden clustering algorithm
+    (see [Traag2019]_).
+    
+    .. [Traag2019] Traag, V. A., Waltman, L. & van Eck, N. J. 2019. From Louvain
+                   to Leiden: Guaranteeing well-connected communities. 
+                   Scientific Reports, 9. DOI: 10/gfxg2v
     """
     # Creates igraph Graph objects from clustering matrices.
     graphs = [Graph.Weighted_Adjacency(
@@ -55,11 +55,11 @@ def leiden(clustering_matrices):
 def affinity_propagation(clustering_matrices):
     """
     Return the community structure obtained by clustering with Affinity 
-    Propagation.
-    -------
-    References:
-    Frey, B. J. & Dueck, D. (2007). Clustering by passing messages between data
-    points. Science, 315(5814), 972–976. DOI: 10.1126/science.1136800.
+    Propagation ([Frey2007]_).
+    
+    .. [Frey2007] Frey, B. J. & Dueck, D. (2007). Clustering by passing messages 
+                  between data points. Science 315(5814), 972–976. 
+                  DOI: 10.1126/science.1136800.
     """
     fits = [AffinityPropagation(affinity="precomputed", random_state=0).fit(i) 
             for i in clustering_matrices]

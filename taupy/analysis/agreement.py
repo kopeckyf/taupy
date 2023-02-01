@@ -104,13 +104,8 @@ def log_likelihood_measure(pos1, pos2):
     
 def bna(pos1, pos2):
     """
-    A normalised agreement measure, which is used by Betz (2012: 39). Here,
+    A normalised agreement measure, which is used by [Betz2013]_, page 39. Here,
     agreement is understood as the inverse of the normalised Hamming distance.
-    
-    References
-    ----------
-    Betz, Gregor. 2013. Debate dynamics: How controversy improves our beliefs. 
-    Springer. DOI: 10/d3cx
     """
     return 1 - normalised_hamming_distance(pos1, pos2)
 
@@ -156,11 +151,11 @@ def switch_deletion_neighbourhood(position, distance):
 def ncc(population, *, agent, measure=hamming_distance):
     """
     Returns the normalised closedness centrality (NCC) for a population of
-    agents. 
+    agents (see [Betz2013]_, Section 2.4). 
 
-    -----
-    References:
-    Betz, Gregor. Debate dynamics. Chapter 2.4.
+    .. [Betz2013] Betz, Gregor. 2013. Debate dynamics: How controversy improves
+                  our beliefs (Synthese Library 357). Dordrecht: Springer. 
+                  DOI: 10/d3cx
     """
     n = len(population) - 1
     d = 2 * sum([measure(agent, p) for p in population])

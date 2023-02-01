@@ -1,13 +1,12 @@
 """
 Functions to measure diversity among deliberating agents. Interestingly, many
-functions in the module have a common abstract ancestor function (Tuomisto 2010), 
-but are implemented here in a rather pedestrian way for simplicty.
+functions in the module have a common abstract ancestor function 
+([Tuomisto2010]_), but are implemented here in a rather pedestrian way for 
+simplicty.
 
-
-------
-References:
-Tuomisto, Hanna. 2010. A consistent terminology for quantifying species 
-diversity? Yes, it does exist. Oecologia 164: 853–860. DOI: 10/c445xk.
+.. [Tuomisto2010] Tuomisto, Hanna. 2010. A consistent terminology for 
+                  quantifying species diversity? Yes, it does exist. Oecologia 
+                  164: 853–860. DOI: 10/c445xk.
 """
 
 from .polarisation import number_of_groups
@@ -59,17 +58,16 @@ def Simpson_index(clusters):
 def inverse_Simpson_index(clusters):
     """
     Simpson's inverse index is simply dubbed “diversity index” in Page's 
-    “Diversity and complexity”. Political scientists call it “effective 
-    number of parties”, and economists know it as Herfindahl index.
-    ------
-    References:
+    “Diversity and complexity” ([Page2011]_, pp. 73–76). Political scientists 
+    call it “effective number of parties” ([Laakso1979]_), and economists know 
+    it as Herfindahl index.
+    
+    .. [Page2011] Page, Scott E. 2011. Diversity and complexity. Princeton 
+                  University Press.
 
-    Page, Scott E. 2011. Diversity and complexity. 
-    Princeton University Press, pp. 73–76.
-
-    Laakso, Markku & Taagepera, Rein. 1979. “Effective” number of parties: 
-    A measure with application to West Europe. Comparative Political Studies 
-    12(1): 3–27.
+    .. [Laakso1979] Laakso, Markku & Taagepera, Rein. 1979. “Effective” number 
+                    of parties: A measure with application to West Europe. 
+                    Comparative Political Studies 12(1): 3–27.
     """
 
     return 1 / Simpson_index(clusters)
@@ -83,16 +81,11 @@ def Gini_Simpson_index(clusters):
 
 def attribute_diversity_page(positions):
     """
-    Page's attribute diversity is equal to the number of distinct attributes
-    in the population. We interpret it to count the number of distinct truth-
-    value attributions: a population in which both {p1: True} and {p1: False}
-    are maintained is more diverse then a population in which just {p1: True}
-    is maintained.
-    ------
-    References:
-
-    Page, Scott E. 2011. Diversity and complexity. 
-    Princeton University Press, pp. 73–76.
+    Page's ([Page2011]_, pp. 73–76)attribute diversity is equal to the number of 
+    distinct attributes in the population. We interpret it to count the number 
+    of distinct truth-value attributions: a population in which both {p1: True} 
+    and {p1: False} are maintained is more diverse then a population in which 
+    just {p1: True} is maintained.
     """
     attributes = set()
 

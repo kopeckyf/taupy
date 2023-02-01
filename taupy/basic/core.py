@@ -86,12 +86,7 @@ class Base():
     def density(self):
         """
         Return the dialectical density of the Debate object, as defined by Betz
-        (2013: 44-49).
-        
-        References
-        ----------
-        Betz, Gregor. 2013. Debate dynamics: How controversy improves our beliefs. 
-        Springer. DOI: 10/d3cx
+        ([Betz2013]_ , pp. 44–49).
         """
         sigma = satisfiability_count(self)
         return Decimal((len(self.atoms()) - log2(sigma)) / len(self.atoms()))

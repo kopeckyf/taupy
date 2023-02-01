@@ -20,12 +20,10 @@ def generate_hierarchical_argument_map(N = 20,
 
     """
     Generate a hierarchical synthetic argument map, following the algorithm from 
-    Betz et al. (2021).
+    Betz, Chekan & Mchedlidze ([Betz2021]_).
     
-    -----
-    References:
-    Betz, G., V. Chekan & T. Mchedlidze. 2021. Heuristic Algorithms for the 
-    Approximation of Mutual Coherence.
+    .. [Betz2021] Betz, G., V. Chekan & T. Mchedlidze. 2021. Heuristic 
+                  algorithms for the approximation of Mutual Coherence. Ms.
     """   
     
     d = EmptyDebate()

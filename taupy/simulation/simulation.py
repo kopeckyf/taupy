@@ -282,12 +282,7 @@ class FixedDebateSimulation(SimulationBase):
     """
     A simulation that begins with a pre-defined debate. Agents uncover arguments
     from the debate in each simulation step. The pre-defined debate follows the
-    argument map generation algorithm from Betz et al. (2021).
-    
-    -----
-    References:
-    Betz, Gregor, Vera Chekan & Tamara Mchedlidze. 2021. Heuristic algorithms 
-          for the approximation of mutual coherence.
+    argument map generation algorithm Betz, Chekan & Mchedlidze ([Betz2021]_).
     """
 
     def __init__(self,
@@ -504,17 +499,16 @@ class SocialInfluenceSimulation(SimulationBase):
     """
     A simulation in which agents update their positions based on what
     other agents think, through a reason-exchange mechanism similar to
-    Mäs & Flache (2013) or Singer et al. (2019).
+    Mäs & Flache ([Mäs2013]_) or Singer et al. ([Singer2019]_).
 
-    -----
-    References:
+    .. [Mäs2013] Mäs, Michael & Flache, Andreas. 2013. Differentiation without 
+                 distancing: Explaining bi-polarization of opinions without 
+                 negative influence. PLOS ONE 8 (11). 
+                 DOI: 10.1371/journal.pone.0074516.
 
-    Mäs, Michael & Flache, Andreas. 2013. Differentiation without distancing:
-    Explaining bi-polarization of opinions without negative influence. PLOS ONE
-    8 (11). DOI: 10.1371/journal.pone.0074516.
-
-    Singer et al. 2019. Rational social and political polarization.
-    Philosophical Studies 176: 2243–2267. DOI: 10.1007/s11098-018-1124-5.
+    .. [Singer2019] Singer et al. 2019. Rational social and political 
+                    polarization. Philosophical Studies 176: 2243–2267. 
+                    DOI: 10.1007/s11098-018-1124-5.
     """
     def __init__(self,
                  debate_generation = {"max_density": 0.8},

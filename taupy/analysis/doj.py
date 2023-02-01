@@ -5,17 +5,15 @@ from fractions import Fraction
 def doj(pos, debate=None, conditional=None):
     """
     Returns the degree of justification for the position in ``pos`` relative
-    to a ``debate``. If ``debate`` is `None`, the debate stored in the
-    Position object is used. 
+    to a ``debate``, as defined in [Betz2012]_. If ``debate`` is `None`, the 
+    debate stored in the Position object is used. 
     
     The *conditional* doj is returned if ``conditional`` is given another
     position of the same debate. When ``conditional`` is set, ``debate``
     must be `None`.
     
-    References
-    ----------
-    Betz, Gregor. 2012. On degrees of justification. Erkenntnis 77.
-    pp. 237--272. DOI: 10/bkng95
+    .. [Betz2012] Betz, Gregor. 2012. On degrees of justification. 
+                  Erkenntnis 77. pp. 237--272. DOI: 10/bkng95
     """
     
     if debate is None: 

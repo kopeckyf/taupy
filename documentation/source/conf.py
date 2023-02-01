@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath(os.path.join('..', '..', 'taupy')))
 # -- Project information -----------------------------------------------------
 
 project = 'taupy'
-copyright = '2021, Felix Kopecky'
+copyright = '2021–2023, Felix Kopecky'
 author = 'Felix Kopecky'
 
 
@@ -30,7 +30,7 @@ author = 'Felix Kopecky'
 extensions = ['sphinx.ext.autodoc', 'sphinx_math_dollar', 'sphinx.ext.mathjax',
               'sphinx_copybutton', 'sphinx.ext.viewcode']
 
-mathjax_config = {
+mathjax3_config = {
     'tex2jax': {
         'inlineMath': [ ["\\(","\\)"] ],
         'displayMath': [["\\[","\\]"] ],
@@ -58,8 +58,8 @@ html_theme = 'furo'
 
 html_theme_options = {
     "light_css_variables": {
-        "admonition-font-size": "92%;",
-        "admonition-title-font-size": "92%;"
+        "admonition-font-size": "100%;",
+        "admonition-title-font-size": "100%;"
         }
 }
 

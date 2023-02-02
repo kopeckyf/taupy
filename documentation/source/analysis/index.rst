@@ -1,15 +1,9 @@
 Analysis & measurement
 **********************
 
-In the last step of the tutorial, we constructed a simple debate containing two 
-arguments. `taupy` can analyse its debate object in a variety of ways, by 
-measuring:
-
-1. distances between positions and agreement between them
-2. degrees of justification
-3. dialectical density
-4. different concepts of polarisation
-5. graph objects
+:py:mod:`taupy` can analyse its baisc object in a variety of ways. These measures
+are often generally accepted methods, applied to a specific meaning in the theory
+of dialectical structures.
 
 .. toctree::
    :hidden:

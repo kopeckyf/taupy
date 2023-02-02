@@ -1,27 +1,55 @@
 Agreement and distance
 ======================
-Let us continue the debate from the previous step:
+The distance between two positions is always based on their differences in
+truth-value assignments, and their agreement is closely related to this 
+difference: if :math:`\delta` is a distance function, then the agreement of two 
+positions :math:`x` and :math:`y` is given as :math:`1 - \delta(x, y)`.
 
-.. code:: python
-   
-   tau1 = Debate(Argument(a&b,~c), Argument(~d&e, ~a))
-   pos1 = Position(tau1, {a: True, b: False, c: True})
-   pos2 = Position(tau1, {d: False, e: True, a: False})
+Hamming distance
+----------------
+For positions that assign truth values to the same propositions, and for complete
+positions in particular, the Hamming distance is the most easy distance measure.
+It simply counts the items that two positions evaluate differently. 
 
-We can now check the Hamming distance and the unweighted edit distance between
-`pos1` and `pos2`, along with their normalised agreement:   
+.. autofunction:: taupy.analysis.agreement.hamming_distance
 
-.. code:: python
+Since the Hamming distance is only applicable to positions with exactly the same
+domain, it can be normalised to the number of proposition that a position assigns
+a truth value to, or its length.
 
-   # What is the Hamming distance between pos1 and pos2?
-   hd(pos1, pos2)
-   
-   # Check the unweighted edit distance
-   edit_distance(pos1, pos2)
+.. autofunction:: taupy.analysis.agreement.normalised_hamming_distance
 
-   # And their normalised agreement, i.e. HD / |Domain(pos)|?
-   # This will return a Fraction. If you can handle precision issues,
-   # you can do int(bna(pos1, pos2))
-   bna(pos1, pos2)
-   
-`bna()` measures the normalised agreement between two complete positions.
+Closely related to the Hamming distance is Betz' normalised agreement, or 
+:py:func:`bna` for short. For two positions of equal domain, :math:`x` and 
+:math:`y`, :math:`\text{bna}(x,y) = 1 - \text{HD}(x,y) / \text{len}(x)`. As 
+before, the Hamming distance expects :math:`\text{len}(x) = \text{len}(y)`. 
+
+.. autofunction:: taupy.analysis.agreement.bna
+
+Edit distance
+-------------
+
+The notion of difference and agreement is meaningful for positions of different
+domains as well. The edit distance is equal to the minimal number of operations
+that are necessary to transform one position into the other. Each operation is 
+assigned to a weight, and the edit distance is calculated as a weighted sum of
+the operations. There are three operations: switching of a truth value, adding
+of a truth-value assignment and deletion of such. The edit distance is generally
+asymmetric if the weights are unequal.
+
+.. hint:: When all operations in the edit distance have the same weight, the edit
+          distance is a generalisation of the Hamming distance. For positions of
+          equal domain, it then simplifies to the Hamming distance.
+
+.. autofunction:: taupy.analysis.agreement.edit_distance
+
+The edit distance can be normalised by first calculating the maximal distance
+given the union of the positions' domains and the weights allocated to the 
+operations. 
+
+.. autofunction:: taupy.analysis.agreement.normalised_edit_distance
+
+An agreement function based on the normalised edit distance is defined for 
+convenience. It equals :math:`1-\text{normalised ED}(x,y)`.
+
+.. autofunction:: taupy.analysis.agreement.normalised_edit_agreement

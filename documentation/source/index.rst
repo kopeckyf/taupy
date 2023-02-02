@@ -35,6 +35,7 @@ The :ref:`genindex` and the :ref:`modindex` and the :ref:`modules`.
    
    installation/index
    basic/index
+   analysis/index
    
    references
    

@@ -1,2 +1,2 @@
-Tutorial B: Tracking agreement in simulated debates
-***************************************************
+Tracking agreement in debate simulations
+****************************************

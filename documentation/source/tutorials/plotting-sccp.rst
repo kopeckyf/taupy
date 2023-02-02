@@ -1,5 +1,5 @@
-Tutorial A: Plotting the SCCP
-*****************************
+Plotting the SCCP
+*****************
 
 In this tutorial, we will be using the drawing capabilities 
 from :py:obj:`networkx` to plot a simple debate's space of
@@ -43,3 +43,9 @@ connected by an edge if they differ in exactly one truth-value attribution (i.e.
 if their Hamming distance equals 1).
 
 .. image:: tutorials_example_sccp.svg
+   :align: center
+   :class: only-light
+   
+.. image:: tutorials_example_sccp_dark.svg
+   :align: center
+   :class: only-light   

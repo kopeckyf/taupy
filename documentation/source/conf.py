@@ -10,6 +10,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import datetime
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join('..', '..', 'taupy')))
@@ -18,7 +19,7 @@ sys.path.insert(0, os.path.abspath(os.path.join('..', '..', 'taupy')))
 # -- Project information -----------------------------------------------------
 
 project = 'taupy'
-copyright = '2021–2023, Felix Kopecky'
+copyright = f'{datetime.date.today().year}, Felix Kopecky'
 author = 'Felix Kopecky'
 
 
@@ -27,8 +28,12 @@ author = 'Felix Kopecky'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx_math_dollar', 'sphinx.ext.mathjax',
-              'sphinx_copybutton', 'sphinx.ext.viewcode']
+extensions = ['sphinx.ext.autodoc', 
+              'sphinx_math_dollar', 
+              'sphinx.ext.mathjax',
+              'sphinx_copybutton', 
+              'sphinx.ext.viewcode', 
+              'sphinx.ext.autosummary']
 
 mathjax3_config = {
     'tex2jax': {

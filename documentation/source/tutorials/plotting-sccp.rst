@@ -48,4 +48,4 @@ if their Hamming distance equals 1).
    
 .. image:: tutorials_example_sccp_dark.svg
    :align: center
-   :class: only-light   
+   :class: only-dark

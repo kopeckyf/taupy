@@ -35,6 +35,13 @@ all complete and coherent positions in a debate :math:`\tau` were equally likely
 of being drawn, then what is the probability that the set of propositions 
 :math:`P` would be true according to a randomly chosen position? 
 
+.. code:: python
+
+   from taupy import Argument, Debate, doj
+   from sympy.abc import a, b, c
+   # returns 3/7
+   doj({c: False}, debate=Debate(Argument(a&b, c)))
+
 .. note:: The DOJ of an incoherent position always equals zero. The DOJ of a 
 	  complete position equals :math:`1/|\Gamma_\tau|`, since there is 
 	  exactly one item in the SCCP that extents that position – and this is
@@ -51,14 +58,20 @@ relative to which the justification of :math:`P` should be evaluated.
 
 .. math::
     
-    \text{doj}(P|C)_\tau := \frac{\{|\gamma\in\Gamma_\tau \cap C | P \subseteq \gamma\}|}
+    \text{doj}(P|C)_\tau := \frac{|\{\gamma\in\Gamma_\tau \cap C | P \subseteq \gamma\}|}
     				 {|\{\gamma\in\Gamma_\tau \cap C\}|}
     
-In `taupy`, a conditional DOJ is calculated with the `conditional` argument: 
+In :py:mod:`taupy`, a conditional DOJ is calculated with the 
+:py:attr:`conditional` argument: 
 
 .. code:: python
 
+   from taupy import Argument, Debate, Position, doj
+   from sympy.abc import a, b, c
+   pos1 = Position(Debate(Argument(a&b, c)), {a: True})
+   pos2 = Position(Debate(Argument(a&b, c)), {c: True})
    # What is the degree of justification for pos1, conditional to pos2?
+   # Returns 1/2
    doj(pos1, conditional=pos2)
    
 .. warning:: In conditional DOJs, both the set of propositions :math:`P` 

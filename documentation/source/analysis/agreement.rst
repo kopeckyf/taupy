@@ -2,8 +2,15 @@ Agreement and distance
 ======================
 The distance between two positions is always based on their differences in
 truth-value assignments, and their agreement is closely related to this 
-difference: if :math:`\delta` is a distance function, then the agreement of two 
-positions :math:`x` and :math:`y` is given as :math:`1 - \delta(x, y)`.
+difference: if :math:`\delta` is a normalised distance function, then the 
+agreement of two positions :math:`x` and :math:`y` is given as 
+:math:`1 - \delta(x, y)`.
+
+The distance functions below accept pairs of agents and output the agreement or
+distance of that pair. To obtain the differences among more than two positions, 
+use :py:func:`difference_matrix` to obtain a squared matrix of distances.  
+
+.. autofunction:: taupy.analysis.polarisation.difference_matrix
 
 Hamming distance
 ----------------

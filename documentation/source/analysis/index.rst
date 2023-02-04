@@ -1,7 +1,7 @@
 Analysis & measurement
 **********************
 
-:py:mod:`taupy` can analyse its baisc object in a variety of ways. These measures
+:py:mod:`taupy` can analyse its basic object in a variety of ways. These measures
 are often generally accepted methods, applied to a specific meaning in the theory
 of dialectical structures.
 
@@ -11,5 +11,6 @@ of dialectical structures.
    agreement
    density
    doj
+   clustering
    polarisation
    diversity

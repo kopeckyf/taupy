@@ -7,13 +7,10 @@ from taupy import (difference_matrix, group_divergence, group_consensus,
                    pairwise_dispersion, number_of_groups, bna, satisfiability, 
                    satisfiability_count, Position, Debate, EmptyDebate,
                    Shannon_index, Simpson_index, normalised_Shannon_index,
-                   Gini_Simpson_index, inverse_Simpson_index, 
-                   attribute_diversity_page, normalised_attribute_diversity_page)
+                   Gini_Simpson_index, inverse_Simpson_index)
 from statistics import mean
-from collections import Counter
 import numpy as np
 import pandas as pd
-from random import choices
 
 def evaluate_experiment(experiment,
                         *, 
@@ -62,153 +59,6 @@ def evaluate_experiment(experiment,
 
     return pd.concat([i.result() for i in results], 
                      keys=[n for n, _ in enumerate(results)])
-
-def majority_voting(debate_stages, 
-                    *, 
-                    positions,
-                    sentencepool,
-                    key_statements=None,
-                    densities=True,
-                    progress=False,
-                    method="all",
-                    measure_agreement=bna):
-    """
-    Voting algorithm
-    """
-    if densities:
-        densities = [i.density() for i in debate_stages]
-
-    if progress:
-        progress = [(i+1)/len(debate_stages) for i in range(len(debate_stages))]
-
-    majority_closed = []
-    majority_coherent = []
-    majority_holders = []
-    agreement = []
-    attribute_diversity = []
-    norm_attribute_diversity = []
-
-    for stage, plist in enumerate(positions):
-        if method == "all":
-            vote_none = Counter([x for l in [[s for s in sentencepool if s not in i] for i in plist] for x in l])
-            vote_true = Counter([x for l in [[s for s in i if i[s]==True] for i in plist] for x in l])
-            vote_false = Counter([x for l in [[s for s in i if i[s]==False] for i in plist] for x in l])
-
-        if method == "key":
-            if key_statements is None:
-                raise ValueError("No key statements supplied.")
-            vote_none = Counter([x for l in [[s for s in key_statements if s not in i] for i in plist] for x in l])
-            vote_true = Counter([x for l in [[s for s in key_statements if s in i and i[s]==True] for i in plist] for x in l])
-            vote_false = Counter([x for l in [[s for s in key_statements if s in i and  i[s]==False] for i in plist] for x in l])
-
-        v = pd.merge(pd.DataFrame.from_dict(vote_none, orient="index", columns=["None"]),
-                     pd.merge(pd.DataFrame.from_dict(vote_true, orient="index", columns=["True"]),
-                              pd.DataFrame.from_dict(vote_false, orient="index", columns=["False"]), 
-                              how="outer", 
-                              left_index=True, 
-                              right_index=True), 
-                     how="outer", 
-                     left_index=True, 
-                     right_index=True).fillna(0)
-        
-        d = v.apply("idxmax",axis=1).to_dict()
-        pos = Position(debate_stages[stage], 
-                       {k: True for k in d if d[k] == "True"} \
-                       | {k: False for k in d if d[k] == "False"})
-        
-        majority_closed.append(pos.is_closed())
-        majority_coherent.append(pos.is_coherent())
-        majority_holders.append(len([p for p in plist if p == pos])/len(plist))
-
-        if measure_agreement is not None:
-            m = difference_matrix(plist, measure=measure_agreement)
-            agreement.append(m[np.triu_indices(len(positions[0]), k=1)].mean())
-        else:
-            agreement.append("not calculated")
-
-        attribute_diversity.append(attribute_diversity_page(plist))
-        norm_attribute_diversity.append(
-            normalised_attribute_diversity_page(plist, sentencepool=sentencepool)
-        )
-
-
-    if densities or progress:
-
-        if not progress:
-            return pd.DataFrame(list(zip(densities, majority_closed, 
-                                         majority_coherent, agreement,
-                                         majority_holders, attribute_diversity,
-                                         norm_attribute_diversity)),
-                                columns=["density", "majority is closed", 
-                                         "majority is coherent", "agreement",
-                                         "holders of majority position",
-                                         "attribute diversity", 
-                                         "normalised attribute diversity"])
-
-        if not densities:
-            return pd.DataFrame(list(zip(progress, majority_closed, 
-                                         majority_coherent, agreement,
-                                         majority_holders, attribute_diversity,
-                                         norm_attribute_diversity)),
-                                columns=["progress", "majority is closed", 
-                                         "majority is coherent", "agreement",
-                                         "holders of majority position",
-                                         "attribute diversity", 
-                                         "normalised attribute diversity"])
-
-        if progress and densities:
-            return pd.DataFrame(list(zip(progress, densities, majority_closed, 
-                                         majority_coherent, agreement,
-                                         majority_holders, attribute_diversity,
-                                         norm_attribute_diversity)),
-                                columns=["progress", "density", 
-                                         "majority is closed", 
-                                         "majority is coherent",
-                                         "agreement",
-                                         "holders of majority position",
-                                         "attribute diversity", 
-                                         "normalised attribute diversity"])
-
-    else:
-        return pd.DataFrame(list(zip(majority_closed, majority_coherent, 
-                                     agreement, majority_holders, attribute_diversity,
-                                         norm_attribute_diversity)))
-
-
-def majority_voting_among_random_sample(debate_stages,
-                                        *, 
-                                        n_positions,
-                                        sentencepool,
-                                        key_statements=None,
-                                        densities=True,
-                                        progress=False,
-                                        method="all",
-                                        measure_agreement=bna):
-
-    """
-    Before majority voting, pick `n_positions` number of coherent positions
-    for the respective debate stage. Then return the voting result among these
-    positions. It is important to pick random positions with replacement in case
-    there are fewer coherent positions relative to the debate stage then asked 
-    for in `n_positions`.
-    """
-
-    random_positions = []
-
-    for i in debate_stages:
-        sat = satisfiability(i, all_models=True)
-        # Pick positions with replacement
-        random_positions.append(choices(sat, k=n_positions))
-
-    return majority_voting(debate_stages=debate_stages,
-                           positions=random_positions,
-                           sentencepool=sentencepool,
-                           key_statements=key_statements,
-                           densities=densities,
-                           progress=progress,
-                           method=method,
-                           measure_agreement=measure_agreement)
-
 
 def position_changes(debate_stages, 
                      *, 

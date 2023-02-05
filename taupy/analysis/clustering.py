@@ -12,9 +12,12 @@ from taupy.analysis.agreement import normalised_hamming_distance
 def clustering_matrices(positions, *, measure=normalised_hamming_distance, 
                         scale=-4, distance_threshold=0.2):
     """
-    Converts difference matrices to sparse clustering matrices that can be input
-    to community structuring algorithms. This is necessary because many 
-    clustering algorithms are designed for sparse social networks.
+    Converts difference matrices to sparse clustering (adjacency) matrices that 
+    can be input to community structuring algorithms. This is necessary because 
+    many clustering algorithms are designed for sparse social networks.
+
+    The default scale of -4 means that agents with a normalised δ > 0.4 will be
+    flattened.
     """
 
     diff_matrices = [difference_matrix(i, measure=measure) for i in positions]
@@ -67,26 +70,34 @@ def affinity_propagation(clustering_matrices):
              for j in range(len(k.cluster_centers_indices_))] 
              for k in fits]
 
-def agglomerative_clustering(clustering_matrices, *, distance_threshold=0.75):
+def agglomerative_clustering(difference_matrices, *, distance_threshold=0.75):
     """
-    Return community structuring obtained by Agglomerative Clustering. 
+    Return community structuring obtained by Agglomerative Clustering. Please
+    note that Agglomerative Clustering accepts a common difference matrix, *not* 
+    an adjacency matrix as Leiden and Affinity Propagation do. It is not
+    advisable to pass the output of clustering_matrices() to this function. 
+    Please use difference_matrix() with a normalised distance measure as input.
     """
     agglomerative = [AgglomerativeClustering(
                         affinity="precomputed", 
                         n_clusters=None, 
                         compute_full_tree=True, 
                         distance_threshold=distance_threshold, 
-                        linkage="complete").fit(i) for i in clustering_matrices]
+                        linkage="complete").fit(i) for i in difference_matrices]
     
     return [[[i[0] for i in enumerate(k.labels_) if i[1] == j] 
                 for j in range(k.n_clusters_)]
                 for k in agglomerative]
 
-def density_based_clustering(matrices, *, min_cluster_size=3, 
+def density_based_clustering(difference_matrices, *, min_cluster_size=3, 
                              max_neighbour_distance=0.2):
     """
-    Return community structure obtained from density based clustering. This
-    clustering algorithm allows noise. Points with -1 signal noise.
+    Return community structure obtained from density based clustering on
+    distance (not adjacency) matrices. This clustering algorithm is the only
+    one implemented in this module to allow noise. Points with -1 signal noise.
     """
-    return [DBSCAN(eps=max_neighbour_distance, min_samples=min_cluster_size,
-                   metric="precomputed").fit(i).labels_ for i in matrices]
+    return [DBSCAN(
+                eps=max_neighbour_distance, 
+                min_samples=min_cluster_size,
+                metric="precomputed").fit(i).labels_ 
+            for i in difference_matrices]

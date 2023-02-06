@@ -73,12 +73,10 @@ def normalised_edit_distance(pos1, pos2, weights = {"substitution": 1.0,
                                                     "insertion": 1.0, 
                                                     "deletion": 1.0}):
     """
-    The (weighted) edit distance, normalised to return a value in [0,1].
+    The (weighted) edit distance, normalised to return a value in [0, 1].
     Normalisation is understood as the relation between actual and maximal
     difference. Maximal difference is achieved in the edit distance if the
     most costly action is performed for all items.
-
-    ⚠ Warning: This interpretation of normalisation is not without alternatives ⚠
     """
 
     # Special case: The edit distance between two empty positions
@@ -104,8 +102,9 @@ def log_likelihood_measure(pos1, pos2):
     
 def bna(pos1, pos2):
     """
-    A normalised agreement measure, which is used by [Betz2013]_, page 39. Here,
-    agreement is understood as the inverse of the normalised Hamming distance.
+    A normalised agreement measure for positions of equal length, which is 
+    used by [Betz2013]_, page 39. Here, agreement is normalised to the length 
+    of the positions.
     """
     return 1 - normalised_hamming_distance(pos1, pos2)
 
@@ -174,3 +173,14 @@ def average_ncc(population, *, measure=hamming_distance):
     d = len(population)
 
     return n/d
+
+def difference_matrix(positions, measure):
+    """
+    Create a quadratic matrix $D_{ij}$ in which rows and columns are filled by
+    ``positions``. The value at $D_{ij}$ is the distance, 
+    calculated by ``measure``, between positions $i$ and $j$.
+
+    This matrix of distances is the fundamental object to calculate most 
+    polarisation measures.
+    """
+    return np.array([[measure(i, j) for j in positions] for i in positions])

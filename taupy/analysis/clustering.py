@@ -6,8 +6,8 @@ import numpy as np
 from igraph import Graph, ADJ_MAX
 from sklearn.cluster import AffinityPropagation, AgglomerativeClustering, DBSCAN
 
-from taupy.analysis.polarisation import difference_matrix
-from taupy.analysis.agreement import normalised_hamming_distance
+from taupy.analysis.agreement import (normalised_hamming_distance, 
+                                      difference_matrix)
 
 def clustering_matrices(positions, *, measure=normalised_hamming_distance, 
                         scale=-4, distance_threshold=0.2):

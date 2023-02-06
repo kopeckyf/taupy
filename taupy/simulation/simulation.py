@@ -8,9 +8,9 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 import time
 import numpy as np
 
-from taupy.analysis.polarisation import difference_matrix
 from taupy.analysis.agreement import (normalised_edit_distance, 
-                                      normalised_edit_agreement)
+                                      normalised_edit_agreement,
+                                      difference_matrix)
 from taupy.basic.utilities import (satisfiability_count, 
                                    z3_assertion_from_argument,
                                    satisfiability)

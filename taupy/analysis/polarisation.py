@@ -2,6 +2,7 @@ import numpy as np
 import numpy.ma as ma
 from math import sqrt, log
 from sympy import symbols
+from taupy.analysis.agreement import difference_matrix
 
 
 def groups_from_stance_toward_single_proposition(positions, proposition):
@@ -16,26 +17,10 @@ def groups_from_stance_toward_single_proposition(positions, proposition):
             [n for n, p in enumerate(positions) if p[q] == False]]
 
 
-def difference_matrix(positions, measure):
-    """
-    Create a quadratic matrix $D_{ij}$ in which rows and columns are filled by
-    ``positions``. The value at $D_{ij}$ is the distance, 
-    calculated by ``measure``, between positions $i$ and $j$.
-
-    This matrix of distances is the fundamental object to calculate most 
-    polarisation measures.
-    """
-    return np.array([[measure(i, j) for j in positions] for i in positions])
-
-
 def spread(positions, measure):
     """
     Returns the maximum distance between any two of the ``positions`` 
     relative to a ``measure`` (originally defined in [Bramson2016]_, p. 80–111).
-
-    .. [Bramson2016] Bramson, Aaron et al. 2016. Disambiguation of social 
-                     polarization concepts and measures. The Journal of 
-                     Mathematical Sociology 40(2). DOI: 10/d3kn.
     """
     return np.amax(difference_matrix(positions, measure))
 
@@ -44,7 +29,7 @@ def pairwise_dispersion(positions, measure):
     """
     Returns dispersion, understood as the standard deviation of pairwise 
     distances between the ``positions`` relative to the ``measure``. This 
-    measure was defined in [Bramson2016]_
+    measure was defined in [Bramson2016]_.
 
     This is the TDS equivalent of statistical dispersion or variance in 
     polling data. Beside standard deviation, there are other ways of measuring

@@ -101,3 +101,19 @@ def density_based_clustering(difference_matrices, *, min_cluster_size=3,
                 min_samples=min_cluster_size,
                 metric="precomputed").fit(i).labels_ 
             for i in difference_matrices]
+
+def clustering_based_on_stance(positions, *, proposition, 
+                               truth_values=[True, False, None]):
+    """
+    An exogenous clustering method based on the positions' stances toward a 
+    selected proposition. Cluster number is always equal to number of truth
+    values, but may contain empty clusters. 
+    """
+
+    dict_of_tva = {t: [] for t in truth_values}
+
+    for i, p in enumerate(positions):
+        if proposition in p:
+            dict_of_tva[p[proposition]].append(i)
+    
+    return [dict_of_tva[key] for key in dict_of_tva]            

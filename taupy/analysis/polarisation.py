@@ -181,7 +181,7 @@ def group_size_parity(clusters):
         return float("nan")
 
 
-def coverage_of_clustering(clusters):
+def coverage_of_clustering(clusters, *, noise_value=-1):
     """
     The amount of agents fitted into a cluster by algorithms with noise. 
     Examples for such algorithms are ``OPTICS`` and ``DBSCAN`` from sklearn.
@@ -190,4 +190,4 @@ def coverage_of_clustering(clusters):
 
     Non-clustered nodes are marked by `-1` by convention.
     """
-    return [1 - np.count_nonzero(c == -1) / c.shape[0] for c in clusters]
+    return [1 - np.count_nonzero(c == noise_value)/c.shape[0] for c in clusters]

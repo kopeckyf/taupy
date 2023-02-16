@@ -7,7 +7,7 @@ from .agreement import (hamming_distance, bna, next_neighbours,
                         normalised_hamming_distance, normalised_edit_distance,
                         normalised_edit_agreement, ncc, average_ncc,
                         difference_matrix)
-from .clustering import (clustering_matrices, leiden, affinity_propagation, 
+from .clustering import (clustering_matrix, leiden, affinity_propagation, 
                          agglomerative_clustering, density_based_clustering)
 from .polarisation import (groups_from_stance_toward_single_proposition,
                            spread, lauka, pairwise_dispersion, group_divergence, 
@@ -26,7 +26,7 @@ __all__ = [
             'normalised_edit_distance', 'normalised_hamming_distance',
             'normalised_edit_agreement', 'ncc', 'average_ncc',
             # clustering
-            'clustering_matrices', 'leiden', 'affinity_propagation', 
+            'clustering_matrix', 'leiden', 'affinity_propagation', 
             'agglomerative_clustering', 'density_based_clustering',
             # polarisation
             'groups_from_stance_toward_single_proposition', 'spread', 'lauka', 

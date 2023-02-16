@@ -9,10 +9,10 @@ from sklearn.cluster import AffinityPropagation, AgglomerativeClustering, DBSCAN
 from taupy.analysis.agreement import (normalised_hamming_distance, 
                                       difference_matrix)
 
-def clustering_matrices(positions, *, measure=normalised_hamming_distance, 
-                        scale=-4, distance_threshold=0.2):
+def clustering_matrix(positions, *, measure=normalised_hamming_distance, 
+                      scale=-4, distance_threshold=0.2):
     """
-    Converts difference matrices to sparse clustering (adjacency) matrices that 
+    Converts a difference matrix to a sparse clustering (adjacency) matrix that 
     can be input to community structuring algorithms. This is necessary because 
     many clustering algorithms are designed for sparse social networks.
 
@@ -20,22 +20,20 @@ def clustering_matrices(positions, *, measure=normalised_hamming_distance,
     flattened.
     """
 
-    diff_matrices = [difference_matrix(i, measure=measure) for i in positions]
+    diff_matrix = difference_matrix(positions, measure=measure)
 
     if scale is not None:
-        filtered_matrices = [np.exp(scale * i.astype("float64")) 
-                             for i in diff_matrices]  
+        filtered_matrix = np.exp(scale * diff_matrix.astype("float64"))
     else:
-        filtered_matrices = diff_matrices
+        filtered_matrix = diff_matrix
 
-    for i in filtered_matrices:
-        # Create a triangle filtered triangle matrix
-        np.fill_diagonal(i, 0)
-        i[np.triu_indices(len(positions[0]))] = 0
-        # All cells below the filter threshold are flattened.
-        i[i < distance_threshold] = 0
+    # Create a filtered (lower) triangle matrix
+    np.fill_diagonal(filtered_matrix, 0)
+    filtered_matrix[np.triu_indices(len(positions))] = 0
+    # All cells below the filter threshold are flattened.
+    filtered_matrix[filtered_matrix < distance_threshold] = 0
 
-    return filtered_matrices
+    return filtered_matrix
 
 def leiden(positions, *, clustering_settings={}):
     """
@@ -46,16 +44,16 @@ def leiden(positions, *, clustering_settings={}):
                    to Leiden: Guaranteeing well-connected communities. 
                    Scientific Reports, 9. DOI: 10/gfxg2v
     """
-    matrices = clustering_matrices(positions=positions, **clustering_settings)
+    matrix = clustering_matrix(positions=positions, **clustering_settings)
 
     # Creates igraph Graph objects from clustering matrices.
-    graphs = [Graph.Weighted_Adjacency(
-                i.astype("float64").tolist(), mode=ADJ_MAX) \
-                    for i in matrices]
+    graph = Graph.Weighted_Adjacency(
+                matrix.astype("float64").tolist(), mode=ADJ_MAX
+            )
     # Perform the community_leiden() method on the Graph objects and return
-    return [list(g.community_leiden(
-                    weights="weight", objective_function="modularity")) \
-                        for g in graphs]
+    return list(graph.community_leiden(
+                    weights="weight", objective_function="modularity")
+               )
 
 def affinity_propagation(positions, *, clustering_settings={}):
     """
@@ -66,12 +64,11 @@ def affinity_propagation(positions, *, clustering_settings={}):
                   between data points. Science 315(5814), 972–976. 
                   DOI: 10.1126/science.1136800.
     """
-    matrices = clustering_matrices(positions=positions, **clustering_settings)
-    fits = [AffinityPropagation(affinity="precomputed", random_state=0).fit(i) 
-            for i in matrices]
-    return [[[i[0] for i in enumerate(k.labels_) if i[1] == j] 
-             for j in range(len(k.cluster_centers_indices_))] 
-             for k in fits]
+    matrix = clustering_matrix(positions=positions, **clustering_settings)
+    fits = AffinityPropagation(affinity="precomputed", random_state=0).fit(matrix) 
+    return [[i[0] for i in enumerate(fits.labels_) if i[1] == j] 
+             for j in range(len(fits.cluster_centers_indices_))
+           ] 
 
 def agglomerative_clustering(positions, *, distance_threshold=0.75,
                              base_measure=normalised_hamming_distance):
@@ -79,46 +76,37 @@ def agglomerative_clustering(positions, *, distance_threshold=0.75,
     Return community structuring obtained by Agglomerative Clustering. Please
     note that Agglomerative Clustering accepts a common difference matrix, *not* 
     an adjacency matrix as Leiden and Affinity Propagation do. It is not
-    advisable to pass the output of clustering_matrices() to this function. 
+    advisable to pass the output of clustering_matrix() to this function. 
     Please use difference_matrix() with a normalised distance measure as input.
     """
+    matrix = difference_matrix(positions=positions, measure=base_measure)
 
-    difference_matrices = [difference_matrix(
-                            positions=p,
-                            measure=base_measure
-                            )
-                           for p in positions]
-
-    agglomerative = [AgglomerativeClustering(
+    agglomerative = AgglomerativeClustering(
                         affinity="precomputed", 
                         n_clusters=None, 
                         compute_full_tree=True, 
                         distance_threshold=distance_threshold, 
-                        linkage="complete").fit(i) for i in difference_matrices]
+                        linkage="complete"
+                    ).fit(matrix)
     
-    return [[[i[0] for i in enumerate(k.labels_) if i[1] == j] 
-                for j in range(k.n_clusters_)]
-                for k in agglomerative]
+    return [[i[0] for i in enumerate(agglomerative.labels_) if i[1] == j] 
+                for j in range(agglomerative.n_clusters_)
+           ]
 
 def density_based_clustering(positions, *, min_cluster_size=3, 
                              max_neighbour_distance=0.2, 
                              base_measure=normalised_hamming_distance):
     """
     Return community structure obtained from density based clustering on
-    distance (not adjacency) matrices. This clustering algorithm is the only
+    a distance (not adjacency) matrix. This clustering algorithm is the only
     one implemented in this module to allow noise. Points with -1 signal noise.
     """
-    difference_matrices = [difference_matrix(
-                            positions=p,
-                            measure=base_measure
-                            )
-                           for p in positions]
+    matrix = difference_matrix(positions=positions, measure=base_measure)
 
-    return [DBSCAN(
+    return DBSCAN(
                 eps=max_neighbour_distance, 
                 min_samples=min_cluster_size,
-                metric="precomputed").fit(i).labels_ 
-            for i in difference_matrices]
+                metric="precomputed").fit(matrix).labels_ 
 
 def clustering_based_on_stance(positions, *, proposition, 
                                truth_values=[True, False, None]):

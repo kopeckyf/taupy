@@ -22,13 +22,14 @@ from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, 
                        attribute_diversity_page, Gini_Simpson_index, 
                        inverse_Simpson_index, normalised_attribute_diversity_page,
                        normalised_Shannon_index, Shannon_index, Simpson_index,
-                       ncc, average_ncc, clustering_matrices, leiden, affinity_propagation,
+                       ncc, average_ncc, clustering_matrix, leiden, affinity_propagation,
                        agglomerative_clustering, density_based_clustering)
 
 from .simulation import (Simulation, FixedDebateSimulation, 
                          SocialInfluenceSimulation,
-                         experiment, introduce, response, 
-                         evaluate_experiment)
+                         experiment, introduce, response,
+                         strategies, 
+                         Evaluation, evaluate_experiment)
 
 from .generators import generate_hierarchical_argument_map
 
@@ -48,11 +49,11 @@ __all__ = [
             'difference_matrix', 'spread', 'lauka', 'pairwise_dispersion',
             'group_divergence', 'group_consensus', 'group_size_parity',
             'aggregated_position_of_winners', 'ncc', 'average_ncc',
-            'clustering_matrices', 'leiden', 'affinity_propagation', 
+            'clustering_matrix', 'leiden', 'affinity_propagation', 
             'agglomerative_clustering', 'density_based_clustering',
             # .simulation
             'Simulation', 'FixedDebateSimulation', 'SocialInfluenceSimulation',
-            'experiment', 'evaluate_experiment',
+            'experiment', 'Evaluation', 'evaluate_experiment', 'strategies',
             # Update mechanisms
             'introduce', 'response',
             # Common utilities

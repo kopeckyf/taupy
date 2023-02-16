@@ -1,71 +1,366 @@
-from igraph import Graph, ADJ_MAX
-from sklearn.cluster import AffinityPropagation, AgglomerativeClustering, DBSCAN
+"""
+Functions for evaluating multiple data points, such as Simulations or Experiments.
+Compared to the functions in the :py:mod:`analysis` modules, the functions in 
+this module operate on collections of objects. The analysis functions provide 
+the atomic measures for these operations.
+"""
+
 from concurrent.futures import ProcessPoolExecutor
 from taupy import (difference_matrix, group_divergence, group_consensus, 
-                   group_size_parity, normalised_hamming_distance, spread,
-                   hamming_distance, edit_distance, normalised_edit_distance, 
-                   pairwise_dispersion, number_of_groups, bna, satisfiability, 
-                   satisfiability_count, Position, Debate, EmptyDebate,
-                   Shannon_index, Simpson_index, normalised_Shannon_index,
-                   Gini_Simpson_index, inverse_Simpson_index)
+                   normalised_hamming_distance, spread, pairwise_dispersion, 
+                   bna, satisfiability_count, Position, 
+                   aggregated_position_of_winners)
+
 from statistics import mean
 import numpy as np
 import pandas as pd
 
-def evaluate_experiment(experiment,
-                        *, 
-                        function, 
-                        data_type="pickle", 
-                        executor={}, 
-                        arguments={"densities": True, 
-                                   "progress": False}
-                        ):
+def evaluate_experiment(*args, **dargs):
     """
-    A function that applies an evaluation `function` to a collection of 
-    Simulations from an `experiment`. Simulations return different data formats,
-    hence the option to specify a `data_type`. `arguments` are passed to the 
-    evaluation function and need to be chosen based on the required arguments
-    of the functions. Every `function` in this module is designed to be applied
-    with `evaluate_experiment()`.
+    In taupy 0.4 and earlier, there wasn't an Evaluation class. All uses of this
+    function can be adopted to the new class pretty easily. See the user guide
+    for more information.
     """
+    raise NotImplementedError(
+        "This function is deprecated. Please use the Evaluation() class instead."
+    )
 
-    if data_type not in ["pickle", "FixedDebate", "SocialInfluence"]:
-        raise NotImplementedError(
-            f"There is no recipe for data type {data_type}."
+class Evaluation():
+    """
+    A class to collect measurement values for a simulation while storing shared 
+    information between evaluation functions (such as clusterings).
+    """
+    def __init__(self, *, debate_stages, list_of_positions=None, 
+                 clustering_method=None, multiprocessing_settings={}):
+        self.simulations = debate_stages
+        self.clustering_method = clustering_method
+        self.positions = self.gather_positions(list_of_positions)
+        self.data = pd.DataFrame()
+        self.clusters = []
+        self.mpsettings = multiprocessing_settings
+
+    def __repr__(self):
+        """
+        Return the DataFrame when object is printed.
+        """
+        return repr(self.data)
+
+    def gather_positions(self, position_location):
+        if position_location == None:
+            return [sim.positions for sim in self.simulations]
+        else:
+            return position_location
+
+    def generate_clusters(self, *, clustering_settings={}):
+
+        if self.clustering_method is None:
+            raise ValueError("No clustering method found.")
+
+        with ProcessPoolExecutor(**self.mpsettings) as executor:
+            clustering_results = [executor.submit(
+                                    obtain_clusterings,
+                                    method=self.clustering_method,
+                                    positions=i,
+                                    settings=clustering_settings
+                                    ) for i in self.positions]
+
+        self.clusters = [i.result() for i in clustering_results]
+        return 
+
+    def add_data_columns(self, list_of_series):
+        """
+        Add measurements stored in a list of pd.Series to the DataFrame.
+        """
+        input_data = pd.DataFrame(
+                        pd.concat(
+                            list_of_series, 
+                            keys=list(range(len(self.simulations)))
+                            )
+                        )
+        self.data = pd.concat([self.data, input_data], axis=1)
+        return
+
+    def debate_stage_analysis(self, function):
+        """
+        Evaluation functions that analyse the debate stages without taking
+        further data into account. From this module, functions that can be 
+        passed to :param:`function` are:
+
+        - densities_of_debate_stages
+        - sccp_extension
+        - progress
+        """
+
+        with ProcessPoolExecutor(**self.mpsettings) as executor:
+            calculations = [executor.submit(
+                                function, 
+                                debate_stages=i
+                                ) 
+                            for i in self.simulations]
+
+        observations = [i.result() for i in calculations]
+
+        self.add_data_columns(observations)
+        return
+
+    def clusters_analysis(self, *, function, column_name="NAME",
+                                 configuration={}):
+        """
+        Multi-process functions that work on the clusterings of a simulation.
+        See the cluster_analysis() function in this module.
+        """
+
+        if len(self.clusters) != len(self.simulations):
+            raise ValueError(
+                "No suitable clustering found. Have you run generate_clusters()?"
+            )
+        
+        with ProcessPoolExecutor(**self.mpsettings) as executor:
+            clst = [executor.submit(
+                    cluster_analysis,
+                    function=function,
+                    clusters=c,
+                    column_name=column_name,
+                    configuration=configuration
+                    ) for c in self.clusters]
+
+        observations = [i.result() for i in clst]
+
+        self.add_data_columns(observations)
+        return 
+
+    def position_analysis(self, *, function, configuration={}):
+        """
+        A method for multiprocessing of evaluation functions that work on the
+        positions. Examples are (see the shortcut functions as well):
+
+        - dispersions_between_positions()
+        - mean_agreement_between_positions()
+        """
+
+        with ProcessPoolExecutor(**self.mpsettings) as executor:
+            observations = [executor.submit(
+                    function,
+                    positions=i,
+                    **configuration
+                    ) for i in self.positions]
+
+        results = [i.result() for i in observations]        
+
+        self.add_data_columns(results)
+        return
+
+    def densities(self):
+        """
+        A shortcut function to directly add the densities to the evaluation
+        DataFrame.
+        """
+        return self.debate_stage_analysis(
+                    function=densities_of_debate_stages
+                    )
+
+    def dispersions(self, *, configuration={}):
+        """
+        A shortcut function to directly add pairwise dispersion measurements to 
+        the evaluation DataFrame.
+        """
+        return self.position_analysis(
+                    function=dispersions_between_positions,
+                    configuration=configuration
+                    )
+
+    def agreement_means(self, *, configuration={}):
+        """
+        A shortcut to directly add the mean population-wide agreement to the
+        evaluation DataFrame.
+        """
+        return self.position_analysis(
+                    function=mean_agreement_between_positions,
+                    configuration=configuration
+                    )
+
+    def group_divergence(self, *, measure=normalised_hamming_distance):
+
+        if len(self.clusters) != len(self.simulations):
+            raise ValueError(
+                "No suitable clustering found. Have you run generate_clusters()?"
+            )
+
+        with ProcessPoolExecutor(**self.mpsettings) as executor:
+            clst = [executor.submit(
+                        divergencies_among_positions,
+                        clusters=self.clusters[n],
+                        measure=measure,
+                        positions=i
+                    ) for n, i in enumerate(self.positions)]
+            
+            results = [i.result() for i in clst]
+        
+        self.add_data_columns(results)
+        return
+
+    def group_consensus(self, *, measure=normalised_hamming_distance):
+
+        if len(self.clusters) != len(self.simulations):
+            raise ValueError(
+                "No suitable clustering found. Have you run generate_clusters()?"
+            )
+
+        with ProcessPoolExecutor(**self.mpsettings) as executor:
+            clst = [executor.submit(
+                        consensus_among_positions,
+                        clusters=self.clusters[n],
+                        measure=measure,
+                        positions=i
+                    ) for n, i in enumerate(self.positions)]
+            
+            results = [i.result() for i in clst]
+        
+        self.add_data_columns(results)
+        return
+
+    def coherence_of_majority_positions(self, *, not_present_value=None):
+
+        with ProcessPoolExecutor(**self.mpsettings) as executor:
+            calculations = [executor.submit(
+                                majority_coherences,
+                                positions=self.positions[i],
+                                debate_stages=sim,
+                                not_present_value=not_present_value
+                                ) 
+                            for i, sim in enumerate(self.simulations)]
+
+        cmp = [i.result() for i in calculations]
+
+        self.add_data_columns(cmp)
+        return 
+
+def densities_of_debate_stages(debate_stages):
+    return pd.Series([i.density() for i in debate_stages], name="density")
+
+def progress(debate_stages):
+    return pd.Series(
+            [i/(len(debate_stages)-1) for (i,_) in enumerate(debate_stages)], 
+            name="progress"
+            )
+
+def dispersions_between_positions(positions, 
+                                  *, 
+                                  measure=normalised_hamming_distance):
+    return pd.Series(
+        [pairwise_dispersion(i, measure=measure) for i in positions],
+        name="dispersion"
         )
 
-    with ProcessPoolExecutor(**executor) as executor:
-        if data_type == "pickle":
-            results = [executor.submit(function, 
-                                       debate_stages=i, 
-                                       positions=i.positions,
-                                       **arguments) for i in experiment]
-        if data_type == "FixedDebate":
-            results = [executor.submit(function, 
-                                       debate_stages=[EmptyDebate(), 
-                                                      *[Debate(*i["uncovered_arguments"][:j])
-                                                        for j in range(
-                                                            1, len(i["uncovered_arguments"])+1)
-                                                        ]],
-                                       positions=i["positions"], 
-                                       **arguments) for i in experiment]
+def spread_between_positions(positions, 
+                             *, 
+                             measure=normalised_hamming_distance):
         
-        if data_type == "SocialInfluence":
-            results = [executor.submit(function,
-                                       debate_stages=[i["debate"] \
-                                         for _ in range(len(i["positions"]))],
-                                       positions=i["positions"],
-                                       **arguments) for i in experiment]
+    return pd.Series(
+            [spread(i, measure=measure) for i in positions], 
+            name="spread"
+            )
 
-    return pd.concat([i.result() for i in results], 
-                     keys=[n for n, _ in enumerate(results)])
+def mean_agreement_between_positions(positions, *, measure=bna):
+    return pd.Series(
+            [difference_matrix(i, measure=measure)[
+                np.triu_indices(len(i), k=1)].mean() for i in positions],
+            name="agreement"
+            )
 
-def position_changes(debate_stages, 
-                     *, 
+def majority_coherences(*, positions, debate_stages, not_present_value=None):
+    return pd.Series([Position(
+                        stage, 
+                        aggregated_position_of_winners(
+                            positions[i],
+                            not_present_value=not_present_value
+                        )
+                    ).is_coherent() for (i,stage) in enumerate(debate_stages)],
+                    name="majority is coherent"
+                )
+
+def numbers_of_unique_positions(positions):
+    return pd.Series(
+            [len([
+                dict(i) for i in set(frozenset(position.items())
+                                        for position in positions)
+                ])
+            ], 
+            name="number of unique positions"
+            )
+
+def sccp_extension(debate_stages):
+    return pd.Series(
+            [satisfiability_count(i) for i in debate_stages], 
+            name="Size of SCCP"
+            ) 
+
+def divergencies_among_positions(*, positions, clusters, 
+                                 measure=normalised_hamming_distance):
+    if len(clusters) != len(positions):
+        raise ValueError(
+            "The supplied clustering is unsuitable for the supplied positions."
+        )
+    
+    matrices = [difference_matrix(i, measure=measure) for i in positions]
+    return pd.Series(
+            [group_divergence(i, matrices[num]) 
+                for num, i in enumerate(clusters)],
+            name="group divergence"
+            )
+
+def consensus_among_positions(*, positions, clusters, 
+                              measure=normalised_hamming_distance):
+
+    if len(clusters) != len(positions):
+        raise ValueError(
+            "The supplied clustering is unsuitable for the supplied positions."
+        )
+    
+    matrices = [difference_matrix(i, measure=measure) for i in positions]
+        
+    return pd.Series(
+            [group_consensus(i, matrices[num]) 
+                for num, i in enumerate(clusters)],
+            name="group consensus"
+        )
+
+def obtain_clusterings(*, method, positions, settings={}):
+    """
+    Apply the clustering method to the collection of positions stored in a 
+    simulation.
+    """
+    return [method(i, **settings) for i in positions]
+
+def cluster_analysis(*, function, clusters, column_name="NAME", 
+                     configuration={}):
+        """
+        :param function: A function to work on the cluster structure.
+        :param column_name: The column name in the parent Evaluation's DataFrame.
+
+        A function that applies a measure on the cluster structure alone without
+        further processing. Here is a list of examples from `taupy` that work with
+        this function:
+
+        - number_of_groups()
+        - group_size_parity()
+        - coverage_of_clustering()
+        - Shannon_index()
+        - normalised_Shannon_index()
+        - Simpson_index()
+        - inverse_Simpson_index()
+        - Gini_Simpson_index()
+        """
+        return pd.Series(
+                [function(i, **configuration) for i in clusters],
+                name=column_name
+            )
+
+def position_changes(*,
+                     debate_stages, 
                      positions,
-                     measure=hamming_distance, 
-                     densities=True,
-                     progress=False):
+                     measure=normalised_hamming_distance
+                     ):
     
     #pairs of debate stages
     p = [positions[i:i+2] for i in range(len(positions)-1)]
@@ -75,404 +370,9 @@ def position_changes(debate_stages,
         d = [measure(pair[0][i], pair[1][i]) for i in range(len(pair[0]))]
         averages.append(len([pos for pos in d if pos != 0]))
 
-    if densities:
-        densities = [i.density() for i in debate_stages]
-        density_pairs = [mean(densities[i:i+2]) for i in range(len(densities)-1)]
-
-    if progress:
-        progress = [(i+1) / len(debate_stages) for i in range(len(debate_stages))]
-        progress_pairs = [mean(progress[i:i+2]) for i in range(len(progress)-1)]
+    densities = [i.density() for i in debate_stages]
+    density_pairs = [mean(densities[i:i+2]) for i in range(len(densities)-1)]
     
-    if densities or progress:
-        if not progress:
-            return pd.DataFrame(list(zip(density_pairs, averages)), 
+    return pd.DataFrame(list(zip(density_pairs, averages)), 
                                 columns=["avg density in pair", 
                                          "position difference"])
-        
-        if not densities:
-            return pd.DataFrame(list(zip(progress_pairs, averages)), 
-                                columns=["avg progress in pair", 
-                                         "position difference"])
-
-        if densities and progress:
-            return pd.DataFrame(list(zip(density_pairs, progress_pairs, averages)), 
-                                columns=["avg density in pair", 
-                                         "avg progress in pair",
-                                         "position difference"])
-
-    else:
-        return averages
-
-def len_of_positions(debate_stages, 
-                     *, 
-                     positions):
-    sim_ids = [idx for idx, _ in enumerate(debate_stages)]
-
-    int1 = len([p for p in positions[-1] if len(p) in list(range(0,7))])
-    int2 = len([p for p in positions[-1] if len(p) in list(range(7,14))])
-    int3 = len([p for p in positions[-1] if len(p) in list(range(14,21))])
-
-    return pd.DataFrame(list(zip(sim_ids, int1, int2, int3)), 
-                        columns=["id", "0–6", "7–13", "14–20"])
-    
-
-def mean_population_wide_agreement(*,
-                                   debate_stages,
-                                   positions,
-                                   densities=True, 
-                                   progress=False, 
-                                   measure=bna):
-
-    if densities:
-        densities = [i.density() for i in debate_stages]
-
-    if progress:
-        progress = [(i+1)/len(debate_stages) for i in range(len(debate_stages))]
-    
-    matrices = [difference_matrix(i, measure=measure) for i in positions]
-    agreement = [i[np.triu_indices(len(positions[0]), k=1)].mean() for i in matrices]
-    
-    if densities and not progress:
-        return pd.DataFrame(list(zip(densities, agreement)), 
-                            columns=["density", "agreement"])
-    
-    if progress and not densities:
-        return pd.DataFrame(list(zip(progress, agreement)), 
-                            columns=["progress", "agreement"])
-
-    if densities and progress:
-        return pd.DataFrame(list(zip(densities, progress, agreement)), 
-                            columns=["densities", "progress", "agreement"])
-
-    if not (densities or progress):
-        return pd.Series(agreement)
-
-def auxiliary_information(debate_stages, *, positions):
-    size_of_sccp = [satisfiability_count(i) for i in debate_stages]
-    unique_positions = [len([dict(i) for i in set(frozenset(position.items())
-                             for position in stage)])
-                        for stage in positions]
-
-    return pd.DataFrame(list(zip(size_of_sccp, unique_positions)), 
-                        columns=["sccp_extension", "number_uniq_pos"])
-
-def dispersion_spread(*,
-                        debate_stages,
-                        positions,
-                        measure=normalised_hamming_distance, 
-                        densities=True,
-                        progress=False):
-    if densities:
-        densities = [i.density() for i in debate_stages]
-
-    if progress:
-        progress = [(i+1)/len(debate_stages) for i in range(len(debate_stages))]
-
-    dispersions = [pairwise_dispersion(i, measure=measure) for i in positions]
-    spreads = [spread(i, measure=measure) for i in positions]
-    
-    if densities or progress:
-        if not progress:
-            df = list(zip(densities, dispersions, spreads))
-            col = ["density", "dispersion", "spread"]
-
-        if not densities: 
-            df = list(zip(progress, dispersions, spreads))
-            col = ["progress", "dispersion", "spread"]
-
-        if densities and progress:
-            df = list(zip(densities, progress, dispersions, spreads))
-            col = ["densities", "progress", "dispersion", "spread"]
-
-        return pd.DataFrame(df, columns=col)
-    else:
-        return (dispersions, spreads)
-    
-def group_measures_exogenous(debate_stages, 
-                             *, 
-                             positions,
-                             sentence=None, 
-                             densities=True):
-    if densities:
-        densities = [i.density() for i in debate_stages]
-
-    matrices = [difference_matrix(i, measure=edit_distance)
-                / len(set.union(*[set(j) for j in i])) for i in positions]
-    
-    clusterings = []
-    for i in positions:
-        accepting_positions = []
-        rejecting_positions = []
-        suspending_positions = []
-        for num, pos in enumerate(i):
-            if sentence in pos:
-                if pos[sentence] == True:
-                    accepting_positions.append(num)
-                if pos[sentence] == False:
-                    rejecting_positions.append(num)
-            else:
-                suspending_positions.append(num)
-        clusterings.append([accepting_positions, rejecting_positions, 
-                            suspending_positions])  
-    
-    divergences = [group_divergence(i, matrices[num]) 
-                   for num, i in enumerate(clusterings)]
-    consensus = [group_consensus(i, matrices[num]) 
-                 for num, i in enumerate(clusterings)]
-    numbers = [number_of_groups(i) for i in clusterings]
-    size_parity = [group_size_parity(i) for i in clusterings]
-
-    if densities:
-        return pd.DataFrame(list(zip(densities, divergences, consensus, 
-                                     numbers, size_parity)), 
-                            columns=["density", "divergence", "consensus", 
-                                     "numbers", "size_parity"])
-    else:
-        return pd.Series(divergences)
-
-def group_measures_leiden(debate_stages, 
-                          *,
-                          positions,
-                          densities=True, 
-                          progress=False,
-                          key_propositions=None):
-
-    if densities:
-        densities = [i.density() for i in debate_stages]
-
-    matrices = [difference_matrix(i, measure=normalised_hamming_distance) for i in positions]
-    
-    if key_propositions == None:
-        clustering_matrices = matrices
-    else:
-        filtered_positions = [[{k: j[k] for k in key_propositions} for j in i] 
-                              for i in positions]
-        clustering_matrices = [difference_matrix(i, measure=normalised_hamming_distance) \
-                               for i in filtered_positions]
-        
-    filtered_matrices = [np.exp(-4 * i.astype("float64")) 
-                         for i in clustering_matrices]
-    
-    for i in filtered_matrices:
-        np.fill_diagonal(i, 0)
-        # Assume number of positions is homogenous.
-        i[np.triu_indices(len(positions[0]))] = 0
-        i[i<0.2] = 0
-    
-    graphs = [Graph.Weighted_Adjacency(i.astype("float64").tolist(), 
-                                       mode=ADJ_MAX) 
-              for i in filtered_matrices]
-    clusterings = [list(g.community_leiden(weights="weight", 
-                                           objective_function="modularity")) 
-                   for g in graphs]
-    divergences = [group_divergence(i, matrices[num]) 
-                   for num, i in enumerate(clusterings)]
-    consensus = [group_consensus(i, matrices[num]) 
-                 for num, i in enumerate(clusterings)]
-    numbers = [number_of_groups(i) for i in clusterings]
-    size_parity = [group_size_parity(i) for i in clusterings]
-
-    shannon_values = [Shannon_index(i) for i in clusterings]
-    norm_shannon_values = [normalised_Shannon_index(i) for i in clusterings]
-    simpson_values = [Simpson_index(i) for i in clusterings]
-    inverse_simpson_values = [inverse_Simpson_index(i) for i in clusterings]
-    gini_simpson_values = [Gini_Simpson_index(i) for i in clusterings]
-
-    if densities:
-        return pd.DataFrame(list(zip(densities, divergences, consensus, numbers, 
-                                     size_parity, shannon_values, norm_shannon_values,
-                                     simpson_values, inverse_simpson_values,
-                                     gini_simpson_values)), 
-                            columns=["density", "divergence", "consensus", "numbers", 
-                                     "size_parity", "Shannon", "normalised Shannon",
-                                     "Simpson", "inverse Simpson", "Gini–Simpson"])
-    else:
-        return pd.Series(divergences)
-
-def group_measures_agglomerative(debate_stages, 
-                                 *,
-                                 positions,
-                                 densities=True,
-                                 progress=False):
-    if densities:
-        densities = [i.density() for i in debate_stages]
-
-    matrices = [difference_matrix(i, measure=normalised_hamming_distance) 
-                for i in positions]
-    agglomerative = [AgglomerativeClustering(affinity="precomputed", 
-                                             n_clusters=None, 
-                                             compute_full_tree=True, 
-                                             distance_threshold=.75, 
-                                             linkage="complete").fit(i) 
-                     for i in matrices]
-    
-    clusters = [[[i[0] for i in enumerate(k.labels_) if i[1] == j] 
-                 for j in range(k.n_clusters_)]
-                for k in agglomerative]
-    divergences = [group_divergence(i, matrices[num]) 
-                   for num, i in enumerate(clusters)]
-    consensus = [group_consensus(i, matrices[num]) 
-                 for num, i in enumerate(clusters)]
-    numbers = [number_of_groups(i) for i in clusters]
-    size_parity = [group_size_parity(i) for i in clusters]
-
-    if densities:
-        return pd.DataFrame(list(zip(densities, divergences, consensus, 
-                                     numbers, size_parity)), 
-                            columns=["density", "divergence", "consensus", 
-                                     "numbers", "size_parity"])
-    else:
-        return pd.Series(divergences)
-
-def group_measures_leiden_partial_positions(debate_stages, 
-                                            *,
-                                            positions,
-                                            densities=True, 
-                                            progress=False, 
-                                            key_propositions=None):
-    if densities:
-        densities = [i.density() for i in debate_stages]
-
-    matrices = [difference_matrix(i, measure=edit_distance)
-                / len(set.union(*[set(j) for j in i])) for i in positions]
-
-    if key_propositions == None:
-        clustering_matrices = matrices
-    else:
-        filtered_positions = [[{k: j[k] for k in key_propositions if k in j} 
-                               for j in i] for i in positions]
-        clustering_matrices = [difference_matrix(i, measure=edit_distance)
-                               / len(set.union(*[set(j) for j in i])) 
-                               for i in filtered_positions]
-
-    filtered_matrices = [np.exp(-4 * i.astype("float64")) 
-                         for i in clustering_matrices]
-    
-    graphs = [Graph.Weighted_Adjacency(i.astype("float64").tolist(), 
-                                       mode=ADJ_MAX) 
-              for i in filtered_matrices]
-    clusterings = [list(g.community_leiden(weights="weight", 
-                                           objective_function="modularity")) 
-                   for g in graphs]
-    divergences = [group_divergence(i, matrices[num]) 
-                   for num, i in enumerate(clusterings)]
-    consensus = [group_consensus(i, matrices[num]) 
-                 for num, i in enumerate(clusterings)]
-    numbers = [number_of_groups(i) for i in clusterings]
-    size_parity = [group_size_parity(i) for i in clusterings]
-
-    if densities:
-        return pd.DataFrame(list(zip(densities, divergences, consensus, 
-                                     numbers, size_parity)), 
-                            columns=["density", "divergence", "consensus", 
-                                     "numbers", "size_parity"])
-    else:
-        return pd.Series(divergences)
-
-
-def group_measures_affinity_propagation(debate_stages, 
-                                        *, 
-                                        positions,
-                                        densities=True,
-                                        progress=False):
-    if densities:
-        densities = [i.density() for i in debate_stages]
-    
-    matrices = [difference_matrix(i, measure=normalised_hamming_distance) 
-                for i in positions]
-    filtered_matrices = [np.exp(-4 * i.astype("float64")) for i in matrices]
-    
-    for i in filtered_matrices:
-        np.fill_diagonal(i, 0)
-        # Assume number of positions is homogenous.
-        i[np.triu_indices(len(positions[0]))] = 0
-        i[i<0.2] = 0
-
-    fits = [AffinityPropagation(affinity="precomputed", random_state=0).fit(i) 
-            for i in filtered_matrices]
-    clusterings = [[[i[0] for i in enumerate(k.labels_) if i[1] == j] 
-                    for j in range(len(k.cluster_centers_indices_))] 
-                   for k in fits]
-    divergences = [group_divergence(i, matrices[num]) 
-                   for num, i in enumerate(clusterings)]
-    consensus = [group_consensus(i, matrices[num]) 
-                 for num, i in enumerate(clusterings)]
-    numbers = [number_of_groups(i) for i in clusterings]
-    size_parity = [group_size_parity(i) for i in clusterings]
-
-    if densities:
-        return pd.DataFrame(list(zip(densities, divergences, consensus, 
-                                     numbers, size_parity)), 
-                            columns=["density", "divergence", "consensus", 
-                                     "numbers", "size_parity"])
-    else:
-        return pd.Series(divergences)
-
-def group_measures_affinity_propagation_partial_positions(debate_stages, 
-                                                          *,
-                                                          positions,
-                                                          densities=True,
-                                                          progress=False):
-    if densities:
-        densities = [i.density() for i in debate_stages]
-    
-    matrices = [difference_matrix(i, measure=edit_distance)
-                / len(set.union(*[set(j) for j in i])) for i in positions]
-    filtered_matrices = [np.exp(-4 * i.astype("float64")) for i in matrices]
-
-    fits = [AffinityPropagation(affinity="precomputed", random_state=0).fit(i) 
-            for i in filtered_matrices]
-    clusterings = [[[i[0] for i in enumerate(k.labels_) if i[1] == j] 
-                    for j in range(len(k.cluster_centers_indices_))] 
-                   for k in fits]
-    divergences = [group_divergence(i, matrices[num]) 
-                   for num, i in enumerate(clusterings)]
-    consensus = [group_consensus(i, matrices[num]) 
-                 for num, i in enumerate(clusterings)]
-    numbers = [number_of_groups(i) for i in clusterings]
-    size_parity = [group_size_parity(i) for i in clusterings]
-
-    if densities:
-        return pd.DataFrame(list(zip(densities, divergences, consensus, 
-                                     numbers, size_parity)), 
-                            columns=["density", "divergence", "consensus", 
-                                     "numbers", "size_parity"])
-    else:
-        return pd.Series(divergences)
-
-def community_fragmentation_from_density_clustering(debate_stages,
-                                                    *,
-                                                    positions,
-                                                    densities=True,
-                                                    progress=False
-                                                    ):
-    """
-    Community fragmentation gives a measure to what degree a population can
-    be clustered into subpopulations. We use DBSCAN, a community structuring
-    algorithm with noise, to measure this value. The degree to which the 
-    population can be clustered into subcommunities can be understood as the
-    inverse of the proportion of agents that are interpreted as noise by DBSCAN.
-    """
-
-    if densities:
-        densities = [i.density() for i in debate_stages]
-
-    matrices = [difference_matrix(i, measure=normalised_hamming_distance) for i 
-                in positions]
-    
-    clusterings = [DBSCAN(eps=0.2, 
-                          min_samples=3,
-                          metric="precomputed").fit(i).labels_ for i 
-                   in matrices]
-
-    # Noise data points are labelled -1 by DBSCAN. We want the inverse of
-    # the proportion of noise data points, i.e. the agents that ARE clustered
-    # into sub-communities.
-    frag = [1 - np.count_nonzero(i == -1)/i.shape[0] for i in clusterings]
-
-    if densities:
-        return pd.DataFrame(list(zip(densities, frag)),
-                            columns=["density", "fragmentation"])
-    
-    else:
-        return pd.Series(frag)

@@ -4,8 +4,7 @@ Functions to introduce Arguments into Debates and update Positions accordingly.
 
 from copy import deepcopy
 import numpy as np
-from more_itertools import powerset
-from iteration_utilities import unique_everseen
+from more_itertools import powerset, unique_everseen
 from random import randrange, choice, choices, shuffle
 from sympy import And, Not, symbols
 from sympy.logic.algorithms.dpll2 import dpll_satisfiable

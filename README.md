@@ -10,8 +10,5 @@ The recommended installation method is to use `pip`:
 pip install taupy
 ```
 
-## Contribute & Feedback
-Your contributions and feedback are most welcome! Please feel free to open an issue if you found a bug or miss a feature, or a pull request if you want to submit an improvement.
-
 ## License
 This project is (c) Felix Kopecky, licensed under BSD-3.

@@ -151,10 +151,6 @@ def ncc(population, *, agent, measure=hamming_distance):
     """
     Returns the normalised closedness centrality (NCC) for a population of
     agents (see [Betz2013]_, Section 2.4). 
-
-    .. [Betz2013] Betz, Gregor. 2013. Debate dynamics: How controversy improves
-                  our beliefs (Synthese Library 357). Dordrecht: Springer. 
-                  DOI: 10/d3cx
     """
     n = len(population) - 1
     d = 2 * sum([measure(agent, p) for p in population])

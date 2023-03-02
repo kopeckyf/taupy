@@ -3,10 +3,6 @@ Functions to measure diversity among deliberating agents. Interestingly, many
 functions in the module have a common abstract ancestor function 
 ([Tuomisto2010]_), but are implemented here in a rather pedestrian way for 
 simplicty.
-
-.. [Tuomisto2010] Tuomisto, Hanna. 2010. A consistent terminology for 
-                  quantifying species diversity? Yes, it does exist. Oecologia 
-                  164: 853–860. DOI: 10/c445xk.
 """
 
 from .polarisation import number_of_groups
@@ -61,13 +57,6 @@ def inverse_Simpson_index(clusters):
     “Diversity and complexity” ([Page2011]_, pp. 73–76). Political scientists 
     call it “effective number of parties” ([Laakso1979]_), and economists know 
     it as Herfindahl index.
-    
-    .. [Page2011] Page, Scott E. 2011. Diversity and complexity. Princeton 
-                  University Press.
-
-    .. [Laakso1979] Laakso, Markku & Taagepera, Rein. 1979. “Effective” number 
-                    of parties: A measure with application to West Europe. 
-                    Comparative Political Studies 12(1): 3–27.
     """
 
     return 1 / Simpson_index(clusters)

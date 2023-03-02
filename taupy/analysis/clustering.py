@@ -39,10 +39,6 @@ def leiden(positions, *, clustering_settings={}):
     """
     Return the community structure obtained by the Leiden clustering algorithm
     (see [Traag2019]_).
-    
-    .. [Traag2019] Traag, V. A., Waltman, L. & van Eck, N. J. 2019. From Louvain
-                   to Leiden: Guaranteeing well-connected communities. 
-                   Scientific Reports, 9. DOI: 10/gfxg2v
     """
     matrix = clustering_matrix(positions=positions, **clustering_settings)
 
@@ -59,10 +55,6 @@ def affinity_propagation(positions, *, clustering_settings={}):
     """
     Return the community structure obtained by clustering with Affinity 
     Propagation ([Frey2007]_).
-    
-    .. [Frey2007] Frey, B. J. & Dueck, D. (2007). Clustering by passing messages 
-                  between data points. Science 315(5814), 972–976. 
-                  DOI: 10.1126/science.1136800.
     """
     matrix = clustering_matrix(positions=positions, **clustering_settings)
     fits = AffinityPropagation(affinity="precomputed", random_state=0).fit(matrix) 

@@ -11,9 +11,6 @@ def doj(pos, debate=None, conditional=None):
     The *conditional* doj is returned if ``conditional`` is given another
     position of the same debate. When ``conditional`` is set, ``debate``
     must be `None`.
-    
-    .. [Betz2012] Betz, Gregor. 2012. On degrees of justification. 
-                  Erkenntnis 77. pp. 237--272. DOI: 10/bkng95
     """
     
     if debate is None: 

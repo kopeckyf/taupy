@@ -53,6 +53,119 @@ class Simulation(list, SimulationBase):
     """
     A simulation in which agents introduce new arguments bit by bit. 
     For historic reasons, this kind of simulation bears the generic name.
+
+    :param bool directed: 
+        Boolean indicating whether purposeful argument introductions are requested.
+        If set to False, random arguments that do not take into account agents'
+        belief systems are introduced.
+
+    :param debate_growth: 
+        Can be either of :py:obj:`"random"` or :py:obj:`"treelike"`. Random
+        debate growth leads to argument maps that are like random graphs. 
+        Tree-like debate growth leads to maps that are hierarchical, tree-like
+        structures. The latter require specification of :py:attr:`key_statements`,
+        as the roots of the tree need to be specified.
+
+    :param dict events:
+        A mapping of events to their chance of occuring. Recognised events
+        are :py:obj:`"introduction"` and :py:obj:`"new_sentence"`.  
+
+    :param sentencepool: 
+        The initial pool of sentence available for argument introductions. The
+        input needs to be valid input for :py:func:`sympy.symbols`. It is
+        recommded to use sympy's :py:obj:`"p:n"` notation, where `n` refers to 
+        the number of sentences. 
+
+    :param max_sentencepool: 
+        When the probability of a `"new_sentence"` event is non-zero, the 
+        sentencepool is enlarged in the course of a simulation run until it 
+        reaches its maximum extension. As in :py:attr:`sentencepool`, the input
+        needs to be understood by :py:func:`sympy.symbols()` and should be 
+        equal or greater than :py:attr:`sentencepool`. If :py:obj:`None` is 
+        input, it will default to the extension of :py:attr:`sentencepool`.
+
+    :param key_statements: 
+        When a :py:obj:`"treelike"` :py:attr:`debate_growth` is selected, should
+        be an iterable of inputs understood by :py:func:`sympy.symbols`. Has no
+        effect when :py:obj:`"random"` :py:attr:`debate_growth` is selected. 
+        These key statements will be the roots of constructed tree-like argument
+        map. Needs to be a subset of elements from :py:attr:`sentencepool` and
+        :py:attr:`max_sentencepool`.
+
+        .. admonition :: Example
+
+            A sentence pool of :py:obj:`"p:20"` includes the symbols 
+            :py:obj:`p0`, :py:obj:`p1`, ..., :py:obj:`p19`. The first two items
+            can be selected as roots for the argument map like this:
+
+            >>> s = Simulation(debate_growth="treelike", sentencepool="p:20", key_statements=["p0", "p1"])
+
+    :param parent_debate: 
+        If supplied, the simulation will inherit this debate stage. Otherwise, 
+        simulations are initialised with an empty debate stage.
+
+    :param argumentlength: 
+        Either an integer or an iterable of integers indicating
+        the number of premises per argument. If an integer $n$
+        is provided, all arguments will have $n$ premises. If
+        an iterable is provided, one of its elements $e$ is 
+        chosen randomly at each argument introduction, and the
+        introduced arguments will receive $e$ premises.
+
+        .. admonition :: Examples
+
+            Arguments with exactly four premises are introduced to a 
+            simulation:
+
+            >>> s = Simulation(argumentlength=4)
+
+            Arguments with 1–4 premises are introduced to this simulation:
+
+            >>> s = Simulation(argumentlength=[1,2,3,4])
+
+    :param positions:
+        An iterable of agents participating in the debate. If not supplied, only
+        random arguments can be introduced in a simulation. Other argumentation 
+        strategies require at least two agents in the population.
+
+        .. admonition:: Example
+
+            First generate a list of 10 agents with the fortify strategy:
+            
+            >>> mypositions = [Position(debate=None, introduction_strategy=strategies.fortify) for _ in range(10)]
+
+            And then use it in the Simulation initialisation:
+            
+            >>> s = Simulation(positions=mypositions)
+
+    :param copy_input_positions:
+        Decide whether to make a deep copy of the input :py:attr:`positions`. If 
+        set to :py:obj:`False`, the input position objects will be mutated by the
+        simulation run. 
+
+    :param initial_position_size:
+        If given as an integer $i$, positions will be filled up with random 
+        truth-value attributions until they contain $i$ such judgements. When 
+        :py:obj:`None` is selected, agents will have complete positions, i.e. 
+        they will assign a truth-value to each sentence in the sentence pool.
+
+    :param default_introduction_strategy:
+        The introduction strategy for positions that have no :py:attr:`introduction_strategy`
+        assigned to them.
+
+    :param default_update_strategy:
+        Specifies how agents should update their belief system in case of 
+        incoherence. Two methods are implemented:
+        
+        - :py:obj:`"closest_coherent"`: recommended for complete positions
+        - :py:obj:`"closest_closed_partial_coherent"`: recommended for partial positions
+
+    :param int partial_neighbour_search_radius:
+        A parameter for the :py:obj:`"closest_closed_partial_coherent"`. As the 
+        number of partial neighbours rises exponentially when the distance
+        increases, this puts an upper limit on the number of inspected possible
+        positions that an agent with a partial position would move to.
+
     """
 
     def __init__(self,

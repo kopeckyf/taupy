@@ -11,6 +11,7 @@ of dialectical structures.
    agreement
    density
    doj
+   centrality
    clustering
    polarisation
    diversity

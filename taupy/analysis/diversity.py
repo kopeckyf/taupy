@@ -55,8 +55,8 @@ def inverse_Simpson_index(clusters):
     """
     Simpson's inverse index is simply dubbed “diversity index” in Page's 
     “Diversity and complexity” ([Page2011]_, pp. 73–76). Political scientists 
-    call it “effective number of parties” ([Laakso1979]_), and economists know 
-    it as Herfindahl index.
+    call it “effective number of parties”, and it is known as Herfindahl index
+    in economics.
     """
 
     return 1 / Simpson_index(clusters)

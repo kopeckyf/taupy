@@ -91,7 +91,7 @@ def normalised_edit_distance(pos1, pos2, weights = {"substitution": 1.0,
 def normalised_edit_agreement(pos1, pos2):
     """
     An agreement function based on the normalised edit distance is defined for 
-    convenience. It equals :math:`1-\text{normalised ED}(x,y)`.
+    convenience. It equals $1-\text{normalised ED}(x,y)$.
     """
     return 1 - normalised_edit_distance(pos1, pos2)
 

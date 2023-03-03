@@ -396,18 +396,61 @@ class FixedDebateSimulation(SimulationBase):
     A simulation that begins with a pre-defined debate. Agents uncover arguments
     from the debate in each simulation step. The pre-defined debate follows the
     argument map generation algorithm Betz, Chekan & Mchedlidze ([Betz2021]_).
+        
+    :param argument_selection_strategy: Can be :py:obj:`"any"` or :py:obj:`"max"`.
+        When set to :py:obj:`"any"`, a random argument is uncovered at each
+        step as long as it matches the argumentation strategies' requirements.
+        If :py:obj:`"max"` is selected, arguments that reach the most agents in
+        the population is selected. 
+        
+    :param dict debate_generation: Additional settings to the initial argument map 
+        generation which are passed on to :py:func:`generate_hierarchical_argument_map`.
+        Note that the number of key statements and the sentencepool are provided
+        in dedicated attributes :py:attr:`num_key_statements` and 
+        :py:attr:`sentencepool`.
+        
+    :param default_update_strategy: Agents who need to update their position do
+        so according to the strategy selected here. Options are 
+        :py:obj:`"closest_coherent"` for complete positions and 
+        :py:obj:`"closest_closed_partial_coherent"` for partial positions.
+
+    :param initial_arguments: Start the simulation with these arguments, even
+        if they are not part of the generated argument map. It is advised to 
+        use the default :py:obj:`None`.
+        
+    :param initial_position_size: The number of belief for the initial positions.
+        If set to :py:obj:`None`, will default to the length of the 
+        :py:attr:`sentencepool`. If smaller than the :py:attr:`sentencepool`,
+        positions will be partial and contain a random subset of sentences. 
+        Positions that have no initial truth-value attributions will be randomly
+        assigned.
+        
+    :param int num_key_statements: The number of roots for the generated 
+        tree-like argument map. 
+        
+    :param int partial_neighbour_search_radius: An additional setting for the 
+        :py:obj:`"closest_closed_partial_coherent"` updating strategy, indicating
+        the neighbourhood radius that is scanned for an alternative if a position
+        needs to update.
+        
+    :param positions: A list of initial positions, as indicated in 
+        :ref:`Setting up a population`.
+        
+    :param sentencepool: A sentencepool, given as an iterable understood by
+        :py:func:`sympy.symbols`, to be forwarded to the tree-like argument map
+        generation. 
     """
 
     def __init__(self,
-                 debate_generation = {"max_density": 1.0},
-                 initial_arguments = None,
-                 positions = None,
-                 initial_position_size = None,
-                 default_update_strategy = "closest_coherent",
                  argument_selection_strategy = "any",
-                 sentencepool = "p:10",
+                 debate_generation = {"max_density": 1.0},
+                 default_update_strategy = "closest_coherent",
+                 initial_arguments = None,
+                 initial_position_size = None,
                  num_key_statements = 1,
-                 partial_neighbour_search_radius = 100
+                 partial_neighbour_search_radius = 100,
+                 positions = None,
+                 sentencepool = "p:10"
                  ):
 
         self.log = []

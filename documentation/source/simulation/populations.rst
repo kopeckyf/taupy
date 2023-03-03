@@ -1,13 +1,23 @@
 Setting up a population
 =======================
 
-Lists of positions
-------------------
-
 A debate can progress without any agents present. In this case, arguments will be
 inserted to, or uncovered from, the argument map until a stopping criterion is used.
 Simulations in which agents update their belief systems need to be initialised with
-a list of positions. These can be generated as :py:obj:`taupy.Position` objects:
+a list of positions.
+
+When simulations are initialised with a population, the agents from this population
+update their belief systems in response to argument introductions and sentence
+pool expansions. The simulation objects have a :py:attr:`Simulation.positions` 
+attribute, which is a list of populations in which the $i$th element stores the
+population at the $i$th simulation step. The initialised population is stored in
+the first element, :py:attr:`Simulation.positions[0]`.
+
+Populations are lists of positions
+----------------------------------
+
+The initial population needs to be generated as a list of 
+:py:obj:`taupy.Position` objects:
 
 >>> my_population = [Position() for _ in range(10)]
 

@@ -63,7 +63,7 @@ Our raw data is generated! Now let's combine this data and plot it:
     import seaborn
     
     # Add a column to our data indicating which strategy was in use:
-    attack_eval["strategy"] = "convert"
+    attack_eval["strategy"] = "attack"
     convert_eval["strategy"] = "convert"
     
     our_data = pd.concat([attack_eval, convert_eval])

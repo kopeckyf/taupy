@@ -56,7 +56,4 @@ operations.
 
 .. autofunction:: taupy.analysis.agreement.normalised_edit_distance
 
-An agreement function based on the normalised edit distance is defined for 
-convenience. It equals :math:`1-\text{normalised ED}(x,y)`.
-
 .. autofunction:: taupy.analysis.agreement.normalised_edit_agreement

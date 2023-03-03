@@ -149,8 +149,15 @@ def switch_deletion_neighbourhood(position, distance):
 
 def ncc(population, *, agent, measure=hamming_distance):
     """
-    Returns the normalised closedness centrality (NCC) for a population of
-    agents (see [Betz2013]_, Section 2.4). 
+    Returns the normalised closedness centrality (NCC) of an :py:attr:`agent`
+    in a :py:attr:`population` relative to a :py:attr:`measure` 
+    (see [Betz2013]_, Section 2.4). 
+    
+    :param population: Iterable containing agents' belief systems.
+    
+    :param agent: A single agent's belief system.
+    
+    :param measure: A distance measure between belief systems.
     """
     n = len(population) - 1
     d = 2 * sum([measure(agent, p) for p in population])

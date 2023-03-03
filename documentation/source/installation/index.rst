@@ -10,12 +10,31 @@ taupy is distributed on PyPi, the Python Package Index. To install it, run
 
    pip install taupy
 
-Then, you can import :py:obj:`taupy` to a Python session. 
+You can then import :py:obj:`taupy` to a Python session, either by importing 
+the module to your current namespace:
+
+.. code:: python
+  
+    import taupy
+    
+Or by importing every public object from :py:mod:`taupy` to the current 
+namespace.
 
 .. code:: python
 
     from taupy import *
     
+.. note::
+  
+    All objects are documented using their their full in this user guide, but 
+    they can be publicly accessed. 
+    For example, the class :py:class:`taupy.basic.core.Argument` can
+    be accessed simply as :py:class:`Argument` if all :py:mod:`taupy` objects have
+    been imported to the current namespace using the :code:`*`-notation, or as 
+    :py:class:`taupy.Argument` if the module has been imported to the current 
+    namespace. It would also be possible to use the pedestrian reference 
+    :py:class:`taupy.basic.core.Argument` when the module has been imported.
+     
 Known installation issues
 =========================
 

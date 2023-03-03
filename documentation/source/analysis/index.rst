@@ -1,12 +1,10 @@
 Analysis & measurement
 **********************
 
-:py:mod:`taupy` can analyse its basic object in a variety of ways. These measures
-are often generally accepted methods, applied to a specific meaning in the theory
-of dialectical structures.
+You can learn more about arguments, debates, and positions through measures and
+other analytical tools from this module. 
 
 .. toctree::
-   :hidden:
    
    agreement
    density

@@ -25,10 +25,6 @@ References for further reading
 .. [HubertArabie1985] Hubert, L., & Arabie, P. 1985. Comparing partitions. 
    Journal of Classification, 2, 193–218. 
 
-.. [Laakso1979] Laakso, M. & Taagepera, R. 1979. “Effective” number 
-               of parties: A measure with application to West Europe. 
-               Comparative Political Studies 12(1): 3–27.
-
 .. [Page2011] Page, S. E. 2011. Diversity and complexity. Princeton 
             University Press.
 

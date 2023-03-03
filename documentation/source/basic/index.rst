@@ -1,13 +1,15 @@
 Base objects
 ************
 
-The theory of dialectical structures describes debates. Debates are composed of
-arguments as well as support and defeat relations between them. Arguments in
-turn are composed of sentences, and the components of all arguments make up a
-debate's sentence pool.
+The theory of dialectical structures is an abstract representation of 
+deliberation. It uses three main object types to do so. A :py:class:`Debate` 
+is composed of a set of arguments as well as a support and defeat relation 
+between them. An :py:class:`Argument` consists of premises and a conclusion.
+The relations between arguments are automatically determined through their 
+premises and conclusions. An agent's belief system that it forms in light of 
+the debate is described as a :py:class:`Position`.
 
 .. toctree::
-   :hidden:
    
    arguments
    debates

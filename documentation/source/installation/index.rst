@@ -1,23 +1,31 @@
+Installation and quick start
+****************************
+
 Installation
-************
+============
 
-Installation via pip
-====================
-
-taupy is distributed on PyPi, the Python Package Index. To install it, run
+:py:mod:`taupy` is distributed on PyPi, the Python Package Index. To install the latest 
+release version, run:
 
 .. code-block:: 
 
    pip install taupy
+   
+To install :py:mod:`taupy` from source, clone the 
+`GitHub repository <https://github.com/kopeckyf/taupy>`_
+and run :code:`pip install ./` in the root folder containing :code:`setup.py`.
+   
+Quick start
+===========
 
-You can then import :py:obj:`taupy` to a Python session, either by importing 
-the module to your current namespace:
+After installation :py:obj:`taupy` can be imported to a Python session, either 
+by importing the module to your current namespace:
 
 .. code:: python
   
     import taupy
     
-Or by importing every public object from :py:mod:`taupy` to the current 
+or by importing every public object from :py:mod:`taupy` to the current 
 namespace.
 
 .. code:: python

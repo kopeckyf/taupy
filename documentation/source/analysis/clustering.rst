@@ -22,14 +22,17 @@ Clustering algorithms
 frontends to the clustering algorithms in :py:mod:`igraph` and :py:mod:`sklearn`.
 
 .. autofunction:: taupy.analysis.clustering.leiden
-
 .. autofunction:: taupy.analysis.clustering.affinity_propagation
-
 .. autofunction:: taupy.analysis.clustering.agglomerative_clustering
-
 .. autofunction:: taupy.analysis.clustering.density_based_clustering
 
-Clustering accuracy
--------------------
+Comparing clusterings
+---------------------
+
+The adjusted Rand index (ARI, [HubertArabie1985]_) measures the similarity 
+between two clusterings. For simulations that contain many debate stages, the 
+ARI can indicate whether the clustering in subsequent debate stages has 
+completely changed or is somewhat stable. A reasonably high ARI can support the
+reliability of the clustering method for the analysed debate stages.
 
 .. autofunction:: taupy.basic.utilities.ari

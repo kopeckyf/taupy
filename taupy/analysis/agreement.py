@@ -155,7 +155,7 @@ def ncc(population, *, agent, measure=hamming_distance):
     
     :param population: Iterable containing agents' belief systems.
     
-    :param agent: A single agent's belief system.
+    :param agent: A single belief system.
     
     :param measure: A distance measure between belief systems.
     """

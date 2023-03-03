@@ -28,12 +28,15 @@ author = 'Felix Kopecky'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 
-              'sphinx_math_dollar', 
-              'sphinx.ext.mathjax',
-              'sphinx_copybutton', 
-              'sphinx.ext.viewcode', 
-              'sphinx.ext.autosummary']
+extensions = [
+    'sphinx_copybutton', 
+    'sphinx.ext.autodoc', 
+    'sphinx.ext.autosectionlabel',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.mathjax',
+    'sphinx.ext.viewcode', 
+    'sphinx_math_dollar', 
+    ]
 
 mathjax3_config = {
     'tex2jax': {

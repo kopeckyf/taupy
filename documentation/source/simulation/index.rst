@@ -21,8 +21,8 @@ has been introduced.
 .. toctree::
    :hidden:
 
-   simulations
    populations
+   simulations
    update
    experiments
    evaluation

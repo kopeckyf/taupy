@@ -29,6 +29,25 @@ class Evaluation():
     """
     A class to collect measurement values for a simulation while storing shared 
     information between evaluation functions (such as clusterings).
+    
+    :param debate_stages: An iterator containing the lists of debate stages for
+        each simulation run.
+    
+    :param list_of_positions: An iterator containing the lists of belief sytems
+        for each simulation run.
+    
+    :param clustering_method: When evaluation functions that rely on position
+        clustering are called, the clustering algorithm specified here will be
+        used. Functions from :py:mod:`taupy.analysis.clustering` can be selected
+        here, in particular :py:func:`leiden`, :py:func:`affinity_propagation`,
+        and :py:func:`agglomerative_clustering`.
+    
+    :param dict multiprocessing_settings: Settings forwarded to multiprocessing. 
+        Should be options that are recognised by 
+        :py:class:`concurrent.futures.ProcessPoolExecutor`.
+    
+    :var data: A :py:obj:`pandas.DataFrame` containing the analysed data.
+    
     """
     def __init__(self, *, debate_stages, list_of_positions=None, 
                  clustering_method=None, multiprocessing_settings={}):
@@ -52,6 +71,12 @@ class Evaluation():
             return position_location
 
     def generate_clusters(self, *, clustering_settings={}):
+        """
+        Apply the clustering algorithm selected in 
+        :py:attr:`Evaluation.clustering_method` to the stored debate stages and 
+        positions. The clusters are saved in the :py:obj:`Evaluation.clusters` 
+        list and can be accessed by functions that work on clusterings.
+        """
 
         if self.clustering_method is None:
             raise ValueError("No clustering method found.")
@@ -82,13 +107,13 @@ class Evaluation():
 
     def debate_stage_analysis(self, function):
         """
-        Evaluation functions that analyse the debate stages without taking
-        further data into account. From this module, functions that can be 
-        passed to :param:`function` are:
+        A generic evaluation method to analyse, in multiprocessing, only debate
+        stages without taking further data into account. From this module, 
+        functions that can be passed to :py:attr:`function` are:
 
-        - densities_of_debate_stages
-        - sccp_extension
-        - progress
+        - :py:func:`densities_of_debate_stages`
+        - :py:func:`sccp_extension`
+        - :py:func:`progress`
         """
 
         with ProcessPoolExecutor(**self.mpsettings) as executor:
@@ -106,8 +131,29 @@ class Evaluation():
     def clusters_analysis(self, *, function, column_name="NAME",
                                  configuration={}):
         """
-        Multi-process functions that work on the clusterings of a simulation.
-        See the cluster_analysis() function in this module.
+        Generic multi-process function to apply a measure that works on the 
+        cluster structure of a simulation.
+        
+        :param function: A function to be applied in multiprocessing. 
+            Here is a list of examples from different `taupy` 
+            submodules that work with this function:
+
+                - :py:func:`number_of_groups <taupy.analysis.polarisation.number_of_groups>`
+                - :py:func:`group_size_parity <taupy.analysis.polarisation.group_size_parity>`
+                - :py:func:`coverage_of_clustering <taupy.analysis.polarisation.coverage_of_clustering>`
+                - :py:func:`Shannon_index <taupy.analysis.diversity.Shannon_index>`
+                - :py:func:`normalised_Shannon_index <taupy.analysis.diversity.normalised_Shannon_index>`
+                - :py:func:`Simpson_index <taupy.analysis.diversity.Simpson_index>`
+                - :py:func:`inverse_Simpson_index <taupy.analysis.diversity.inverse_Simpson_index>`
+                - :py:func:`Gini_Simpson_index <taupy.analysis.diversity.Gini_Simpson_index>`
+        
+            Note that :py:func:`group_divergence` and :py:func:`group_consensus`
+            are calculated with dedicated methods. This is because both functions
+            rely on additional information not present in the clustering alone.
+        
+        :param str column_name: Title of the column that is added to the 
+            Evaluations :py:obj:`data` table. Should be indicative of the 
+            measure that was applied.        
         """
 
         if len(self.clusters) != len(self.simulations):
@@ -131,11 +177,11 @@ class Evaluation():
 
     def position_analysis(self, *, function, configuration={}):
         """
-        A method for multiprocessing of evaluation functions that work on the
-        positions. Examples are (see the shortcut functions as well):
+        A generic method to evaluate functions that work on positions, with
+        multiprocessing. Examples are (see the shortcut functions as well):
 
-        - dispersions_between_positions()
-        - mean_agreement_between_positions()
+        - :py:func:`dispersions_between_positions`
+        - :py:func:`mean_agreement_between_positions`
         """
 
         with ProcessPoolExecutor(**self.mpsettings) as executor:
@@ -180,6 +226,13 @@ class Evaluation():
                     )
 
     def group_divergence(self, *, measure=normalised_hamming_distance):
+        """
+        Calculate the group divergence between all positions stored in the 
+        :py:class:`Evaluation` object and add a column to the data object.
+        Raises an error if no clustering has been generated. 
+        
+        See :py:func:`taupy.analysis.polarisation.group_divergence` for details.
+        """
 
         if len(self.clusters) != len(self.simulations):
             raise ValueError(
@@ -200,7 +253,13 @@ class Evaluation():
         return
 
     def group_consensus(self, *, measure=normalised_hamming_distance):
-
+        """
+        Calculate the group consensus between all positions stored in the 
+        :py:class:`Evaluation` object and add a column to the data object.
+        Raises an error if no clustering has been generated. 
+        
+        See :py:func:`taupy.analysis.polarisation.group_consensus` for details.
+        """
         if len(self.clusters) != len(self.simulations):
             raise ValueError(
                 "No suitable clustering found. Have you run generate_clusters()?"
@@ -339,17 +398,7 @@ def cluster_analysis(*, function, clusters, column_name="NAME",
         :param column_name: The column name in the parent Evaluation's DataFrame.
 
         A function that applies a measure on the cluster structure alone without
-        further processing. Here is a list of examples from `taupy` that work with
-        this function:
-
-        - number_of_groups()
-        - group_size_parity()
-        - coverage_of_clustering()
-        - Shannon_index()
-        - normalised_Shannon_index()
-        - Simpson_index()
-        - inverse_Simpson_index()
-        - Gini_Simpson_index()
+        further processing.
         """
         return pd.Series(
                 [function(i, **configuration) for i in clusters],

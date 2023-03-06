@@ -6,8 +6,13 @@ to the sentence pool.
 
 The simulation objects :py:obj:`taupy.Simulation` and 
 :py:obj:`taupy.FixedDebateSimulation` have :py:meth:`run` methods
-which automatically coordinate and triggers these events. These methods accept 
-identical stopping positions:
+which automatically trigger these events.
+
+.. automethod:: taupy.simulation.simulation.Simulation.run
+
+.. automethod:: taupy.simulation.simulation.FixedDebateSimulation.run
+
+These methods accept the following simulation termination conditions:
 
 :py:attr:`max_density`: The maximum inferential density, determined by 
 :py:func:`taupy.Base.density`, after which a simulation is terminated.
@@ -21,7 +26,10 @@ effect.
 positions for the debate. If there are fewer positions in the SCCP at a debate 
 stage, the simulation is terminated.
 
+For example, let's start a simulation :py:obj:`s` until either a density of 0.8 
+is reached or 200 argument and sentence introductions have been executed, 
+whichever occurs first:
 
-.. automethod:: taupy.simulation.simulation.Simulation.run
+.. code:: python
 
-.. automethod:: taupy.simulation.simulation.FixedDebateSimulation.run
+    s.run(max_density=0.8, max_steps=200)

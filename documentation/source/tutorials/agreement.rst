@@ -3,11 +3,12 @@ Tracking agreement in debate simulations
 
 .. note:: This recipe reproduces results from Chapter 6 in [Betz2013]_.
 
-We want to know whether argumentation is conducive to consensus for agents with
-randomly initialised belief systems.
+We want to know whether a pair of agents with randomly initialised belief systems 
+can achieve consensus through argumentation.
 
-We begin by initialising two sets of agents, one equipped with the “attack” 
-strategy, the other one with the “convert” strategy.
+Since we also want to understand how different argumentation strategy affect
+consensus conduciveness, we set up two sets of agents, one equipped with the 
+“attack” and the other with the “convert” strategy.
 
 .. code:: python
 

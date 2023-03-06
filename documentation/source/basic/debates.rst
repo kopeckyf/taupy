@@ -18,10 +18,9 @@ The defeat and support relation in TDS are defined as follows: An argument
 :math:`a\in T` supports another :math:`b\in T` if the conclusion of :math:`a` is 
 equivalent to one of the premises in :math:`b`.
 
-In taupy, you don't have to input these relations manually – and in fact, you 
-can't. They are determined automatically from the arguments in your input. In the
-map below, supports between arguments are visualised with solid edges, and 
-defeats through dashed edges.
+:py:mod:`taupy` does not require manual input of relations. They are determined 
+automatically from the provided arguments. In the map below, supports between 
+arguments are visualised with solid edges, and defeats through dashed edges.
 
 .. image:: argument_map.svg
    :align: center
@@ -34,13 +33,15 @@ defeats through dashed edges.
 Debate objects
 ==============
 
-In :py:mod:`taupy`, debates are instances of the :py:class:`taupy.Debate` class. 
+In :py:mod:`taupy`, debates are instances of the :py:class:`taupy.Debate` class.
+The general logical structure of a debate is that of a conjunction: 
+:py:class:`taupy.Debate` is a sub-class of :py:class:`sympy.And`.
 
 .. autoclass:: taupy.basic.core.Debate
    
 A :py:class:`Debate` is composed of arguments. These do not necessarily exhibit 
 any relation. When a debate is initialised, its arguments are given as a 
-comma-separated list. Any number of arguments can be passed to an 
+comma-separated list. Any number of arguments can be passed to a 
 :py:class:`Debate` object.
 
 .. code:: python  

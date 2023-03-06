@@ -4,14 +4,15 @@ Positions
 Positions are belief sytems of agents
 =====================================
 
-Arguments are relations between propositions: if the premises were true, the
-conclusion would be as well. Agents can accept arguments as valid without 
+(Valid) arguments are relations between propositions: if the premises were true, 
+the conclusion would be as well. Agents can accept arguments as valid without 
 agreeing to the premises. The mere existence of an argument does not force an
 agent to assert the conclusion if it does not accept one or more of the premises.
 
 The theory of dialectical structures represents belief systems of agents as 
-mappings from the propositions discussed in a debate to truth values. This means 
-that positions are always relative to a debate. 
+mappings from the propositions discussed in a debate to truth values –  positions 
+can only be held relative to a debate. A position that assigns True to a 
+proposition is often said to “accept” it, and to “reject” it if it assigns False.
 
 Let us look at a debate :math:`\tau_1` with five propositions: a, b, c, 
 d and e, and a position :math:`\text{Pos}_1` that assigns truth values to these
@@ -35,7 +36,9 @@ In :py:mod:`taupy`, positions are input with as instances of :py:class:`Position
 
 .. autoclass:: taupy.basic.positions.Position
 
-The above example can be typed like this:
+As positions can only be held relative to a debate, it is given as the first 
+argument when creating a new :py:obj:`Position` object. The truth-value 
+assignments are given as a mapping in the second argument:
 
 .. code:: python  
 
@@ -50,23 +53,17 @@ Properties of positions
 
 Completeness
 ------------
-A position does not need to assign a truth value to every sentence in the pool. A position that does not, 
-as the above example :math:`p`, is called *partial*. A *complete* position assigns a truth value to every
-proposition in the debate. 
+Positions do not necessarily assign a truth value to every sentence in the pool. 
+A position that does not is called “partial”. A “complete” position assigns a 
+truth value to every proposition in the debate. 
 
 .. automethod:: taupy.basic.positions.Position.is_complete
-
-In `taupy`, positins are a third kind of object: a `Position`. Positions are always relative to a debate,
-which should be given as the first argument when creating a new `Position` object. The truth-value assignment
-(TVA) is given as a Python dictionary in the second argument:
 
 .. code:: python
 
    pos1 = Position(tau1, {a: True, b: False, c: True})
-   # Check whether it is complete, i.e. assigns True or False to any sentence in its Debate:
+   # Check whether it is complete, i.e. assigns True or False to every sentence in its Debate:
    pos1.is_complete()
-
-Positions can be complete or partial, and they have two more important properties: coherence and closedness.
 
 Closedness
 ----------
@@ -96,8 +93,7 @@ There are two ways to express coherence for a position relative to a debate:
 .. note:: Coherence does not imply closedness. Under condition (1b), a coherent
    position is only required not to contradict its inferential obligations. But
    a coherent position can still not follow some of them, e.g. by being a partial
-   position and not assigning a value to the conclusion, or by suspending 
-   judgement on it.
+   position and not assigning a value to the conclusion.
    
    Coherence and completeness jointly imply closedness.
    
@@ -121,7 +117,8 @@ Given a debate :py:obj:`tau`, this set can be obtained with
 
 When interpreted as a graph, this set is called the *space of coherent and 
 complete positions*, or SCCP, often expressed by the Greek letter Gamma 
-(:math:`\Gamma`). The SCCP can yield insights about the debate itself.
+(:math:`\Gamma`). The SCCP yields insights about the debate itself, such as 
+its :ref:`inferential density <Inferential density>`.
 
 .. automethod:: taupy.basic.core.Debate.sccp
 

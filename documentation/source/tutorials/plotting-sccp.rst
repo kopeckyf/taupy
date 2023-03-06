@@ -34,7 +34,7 @@ which can be easily imported by :py:obj:`networkx`.
     # plot the graph. networkx uses matplotlib here.
     nx.draw(graph, pos=layout, with_labels=True, node_color="#aaa")
 
-And this returns the figure below. In the figure, nodes have a label that shows
+In the resulting figure below, nodes have a label that shows
 the bit string representation of the position they resemble. In this bit string,
 propositions are ordered alphabetically (`p1` will show in the first bit, `p5`
 in the last), and they are either `0` if the position assigns False to this 

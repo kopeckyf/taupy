@@ -2,8 +2,8 @@ Setting up a simulation
 =======================
 
 Simulations are instances of a simulation class. There are multiple simulation
-classes in :py:mod:`taupy` for different kinds of simulations. In the class 
-:py:class:`taupy.Simulation` arguments are composed at each introduction step. 
+classes in :py:mod:`taupy` for different kinds of simulations. The class 
+:py:class:`taupy.Simulation` composes arguments at each introduction step. 
 In the class :py:class:`taupy.FixedDebateSimulation`, argument maps are 
 pre-compiled and arguments are individually uncovered in each introduction step.
 
@@ -14,13 +14,12 @@ Examples
 A minimal example
 ^^^^^^^^^^^^^^^^^
 
-Simulations that only introduce arguments, but have no agents that react to them
-can be created with a call to :py:class:`Simulation` and leaving the 
-:py:attr:`positions` to :py:obj:`None`. This would give us a debate without 
-positions. Simulations without positions can only contain un-directed, random 
-arguments. Introduced arguments can only follow a purposeful argumentation 
-strategy if there are at least two agents in the population, a `source` and a 
-`target`.
+Simulations without agents that follow purposeful introduction or updating 
+strategies can be created with a call to :py:class:`Simulation` and leaving the 
+:py:attr:`positions` to :py:obj:`None`. Simulations without positions can only 
+contain un-directed, random arguments. Introduced arguments can only follow a 
+purposeful argumentation strategy if there are at least two agents in the 
+population, a “source” and a “target”.
 
 .. code:: python
  

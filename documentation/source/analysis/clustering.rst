@@ -2,10 +2,10 @@ Clustering belief systems
 =========================
 
 Clustering is a pre-condition for some diversity and polarisation measures. 
+Intuitively, clusters should be formed by groups that have low internal distance.
 Belief systems in the theory of dialectical structures are clustered by comparing
-their distances to other agents. Intuitively, clusters should be formed by groups
-that have low mutual distance. This means that clustering is dependent on a 
-distance function.
+their distances to other agents. Clustering depends on a distance function in this
+way. 
 
 Generate clustering matrices
 ----------------------------

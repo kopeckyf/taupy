@@ -1,10 +1,9 @@
 Setting up a population
 =======================
 
-A debate can progress without any agents present. In this case, arguments will be
-inserted to, or uncovered from, the argument map until a stopping criterion is used.
 Simulations in which agents update their belief systems need to be initialised with
-a list of positions.
+a list of positions. This is optional: a debate can progress without any agents 
+present.
 
 When simulations are initialised with a population, the agents from this population
 update their belief systems in response to argument introductions and sentence
@@ -35,8 +34,10 @@ Custom argumentation strategies are also accepted):
 >>> my_population = fortify_positions + convert_positions 
 
 When you initialise positions like this, they will be assigned random thruth-value
-attributions during the simulation initialisation. You can also generate a
-population with custom beliefs. For example, these could be bi-polarised:
+attributions during the simulation initialisation. 
+
+It is also possible to generate a population with specific beliefs. The population
+below is set-up as bi-polarised:
 
 .. code-block:: python
 

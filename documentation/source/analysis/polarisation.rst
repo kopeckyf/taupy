@@ -1,10 +1,11 @@
 Polarisation
 ============
 
-Polarisation has many meanings. Identifying a populations as polarised depends, 
-to some degree, on the measure of polarisation. Bramson et al. ([Bramson2016]_)
-review some of these measures, and :py:mod:`taupy` implements many of these 
-measures in a definition that is adapted to the belief systems its agents have.
+Identifying a population as polarised depends on a measure of polarisation as 
+there are many different notions of “polarisation” ([Bramson2016]_).
+:py:mod:`taupy` implements many of the measures identified by Bramson et al., but
+in a definition that is adapted to the belief systems in the theory of 
+dialectical structures.
 
 Measures without clustering
 ---------------------------

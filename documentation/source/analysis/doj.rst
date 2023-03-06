@@ -2,9 +2,9 @@ Degrees of justification
 ========================
 
 A degree of justification (DOJ) quantifies how justified a truth-value assignment
-is in light of a debate. A DOJ always lies in the interval [0, 1] – and they can
-be treated as probabilities in the sense that the DOJ measure fulfils the 
-Kolmogorov axioms ([Betz2012]_, Theorem 6). 
+is in light of a debate. A DOJ always lies in the interval [0, 1] – and can
+be treated as a probability in the sense that it fulfils the Kolmogorov axioms 
+([Betz2012]_, Theorem 6). 
 
 .. seealso:: The concept was introduced to the theory of dialectical structures
              in [Betz2012]_. 
@@ -12,7 +12,7 @@ Kolmogorov axioms ([Betz2012]_, Theorem 6).
 .. autofunction:: taupy.analysis.doj.doj
 
 .. tip:: :func:`taupy.doj` returns a fraction. If you want to use integers instead,
-         call :code:`int(doj())`.
+         call :code:`float(doj())`.
 
 Unconditional DOJs
 ------------------
@@ -32,8 +32,8 @@ The DOJ of a position :math:`P` in a debate is equal to the proportion of
 positions in the debate's SCCP that extend :math:`P`, or have its truth-value 
 assignments as a part. One can also understand this in terms of probability: if 
 all complete and coherent positions in a debate :math:`\tau` were equally likely 
-of being drawn, then what is the probability that the set of propositions 
-:math:`P` would be true according to a randomly chosen position? 
+of being drawn, then how likely would the set of propositions 
+:math:`P` be true according the drawn position? 
 
 .. code:: python
 
@@ -46,7 +46,8 @@ of being drawn, then what is the probability that the set of propositions
 	  complete position equals :math:`1/|\Gamma_\tau|`, since there is 
 	  exactly one item in the SCCP that extents that position – and this is
 	  the position itself. This means that DOJs are most informative for 
-	  coherent partial positions.
+	  coherent partial positions – particularly for truth-value assignments of
+	  single sentences.
    
 Conditional DOJs
 ----------------
@@ -73,6 +74,4 @@ In :py:mod:`taupy`, a conditional DOJ is calculated with the
    # What is the degree of justification for pos1, conditional to pos2?
    # Returns 1/2
    doj(pos1, conditional=pos2)
-   
-.. warning:: In conditional DOJs, both the set of propositions :math:`P` 
-             and the set of conditions :math:`C` must have the same `debate`.
+

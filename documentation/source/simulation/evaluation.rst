@@ -2,9 +2,9 @@ Evaluation
 ==========
 
 The :py:class:`Evaluation <taupy.simulation.evaluation.Evaluation>` class 
-provides methods for analysing many debate stages, positions, and storing that
-information in a combined data table. It performs most of its operations 
-concurrently and gives a performance advantage on machines with many processors.
+provides methods for analysing large chunks of data and storing that
+information in a combined table. It performs most of its operations 
+concurrently and gives a performance advantage on machines with many CPUs.
 All measures described in :ref:`Analysis & measurement` can be applied to 
 :py:class:`Evaluation` objects.
 

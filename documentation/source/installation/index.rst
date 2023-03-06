@@ -18,8 +18,8 @@ and run :code:`pip install ./` in the root folder containing :code:`setup.py`.
 Quick start
 ===========
 
-After installation :py:obj:`taupy` can be imported to a Python session, either 
-by importing the module to your current namespace:
+After installation :py:obj:`taupy` can be imported to Python either by importing 
+the module to the current namespace:
 
 .. code:: python
   
@@ -34,8 +34,8 @@ namespace.
     
 .. note::
   
-    All objects are documented using their their full in this user guide, but 
-    they can be publicly accessed. 
+    All objects in the user guide can be publicly accessed even though they are
+    often referenced with their full path. 
     For example, the class :py:class:`taupy.basic.core.Argument` can
     be accessed simply as :py:class:`Argument` if all :py:mod:`taupy` objects have
     been imported to the current namespace using the :code:`*`-notation, or as 
@@ -50,8 +50,8 @@ Known installation issues
 occur for :py:mod:`taupy` itself, provided that Pyton 3.9 or newer is used.
 
 There are some known problems installing dependencies that :py:mod:`taupy` relies
-on. These can usually be solved by installing these packages from a different source
-then via pip.
+on. These can usually be solved by installing these packages before initiating 
+the :py:mod:`taupy` installation in pip.
 
 On Windows
 ^^^^^^^^^^
@@ -65,7 +65,7 @@ On Windows
   to install Microsoft's Visual C++ Build Tools in order to compile the C code.
 
   As of version 0.5, :py:mod:`taupy` no longer depends on :py:mod:`iteration-utilities`
-  but uses :py:mod:`more-itertools` for all non-standard combinatorial tasks.
+  but uses :py:mod:`more-itertools` for advanced combinatorial tasks.
   :py:mod:`taupy` version 0.4 or older can be used with Python 3.9 on Windows 
   without installing additional build tools.
 

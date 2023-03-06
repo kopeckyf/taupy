@@ -804,13 +804,13 @@ class SocialInfluenceSimulation(SimulationBase):
 
 def experiment(n, *, sim_type=Simulation, executor={}, simulations={}, runs={}):
     """
-    Generate and execute `n` number of Simulations and output their results.
-    The Simulations can be controlled via a dictionary passed to ``simulations``.
-    The ``Simulation.run()``s can be controlled with a dictionary passed to
-    ``runs``.
+    Generate and execute :py:attr:`n` number of Simulations and output their 
+    results. The Simulations can be controlled via a dictionary passed to 
+    :py:attr:`simulations`. The :py:func:`Simulation.run()` can be controlled 
+    with a dictionary passed to :py:attr:`runs`.
 
-    Settings to the ``ProcessPoolExecutor`` should be forwarded in a dictionary
-    to ``executor``.
+    Settings to the :py:obj:`ProcessPoolExecutor` should be forwarded in a 
+    dictionary to :py:attr:`executor`.
 
     This function calls two Executors. The first is responsible for setting up
     the Simulations in parallel. The second performs the simulation runs. This

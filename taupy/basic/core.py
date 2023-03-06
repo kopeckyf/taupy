@@ -135,9 +135,7 @@ class Argument(Implies, Base):
                 | {list(self.args[1].atoms())[0]: False if self.args[1].is_Not else True}
     
 class Debate(And, Base):
-    """
-    Debates
-    """
+    
     def __init__(self, *args):
         And.__init__(self)
         self.actual_positions = []

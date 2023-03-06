@@ -1,0 +1,666 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
+
+    <meta name="generator" content="sphinx-5.0.1, furo 2022.06.04.1"/>
+        <title>taupy.basic.utilities - taupy</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 100%;;
+  --admonition-title-font-size: 100%;;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">taupy</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">taupy</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation/index.html">Installation and quick start</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../basic/index.html">Base objects</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../basic/arguments.html">Arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../basic/debates.html">Debates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../basic/positions.html">Positions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../analysis/index.html">Analysis &amp; measurement</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../analysis/agreement.html">Agreement and distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../analysis/density.html">Inferential density</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../analysis/doj.html">Degrees of justification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../analysis/centrality.html">Centrality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../analysis/clustering.html">Clustering belief systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../analysis/polarisation.html">Polarisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../analysis/diversity.html">Diversity</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../generators/index.html">Synthesise new objects</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../generators/surveys.html">Surveys and aggregation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../generators/maps.html">Argument maps</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../simulation/index.html">Simulations</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../simulation/populations.html">Setting up a population</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../simulation/simulations.html">Setting up a simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../simulation/update.html">Running a simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../simulation/experiments.html">Experiments: Simulations in parallel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../simulation/evaluation.html">Evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References for further reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Class and function index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/plotting-sccp.html">Plotting the SCCP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/agreement.html">Tracking agreement in debate simulations</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <h1>Source code for taupy.basic.utilities</h1><div class="highlight"><pre>
+<span></span><span class="k">try</span><span class="p">:</span> <span class="c1"># Assume that CUDD is installed on the system and bindings present.</span>
+    <span class="kn">from</span> <span class="nn">dd.cudd</span> <span class="kn">import</span> <span class="n">BDD</span>
+<span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">dd.autoref</span> <span class="kn">import</span> <span class="n">BDD</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;taupy Info: Module dd.cudd not found, reverting to dd.autoref&quot;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sympy.logic</span> <span class="kn">import</span> <span class="n">to_cnf</span><span class="p">,</span> <span class="n">And</span><span class="p">,</span> <span class="n">Not</span>
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">symbols</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">sample</span><span class="p">,</span> <span class="n">choice</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span><span class="p">,</span> <span class="n">combinations</span>
+<span class="kn">from</span> <span class="nn">more_itertools</span> <span class="kn">import</span> <span class="n">random_combination</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">import</span> <span class="nn">taupy.basic.core</span> <span class="k">as</span> <span class="nn">tpc</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">z3</span>
+
+<span class="k">def</span> <span class="nf">dict_to_prop</span><span class="p">(</span><span class="n">dictionary</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function that converts a dictionary to a propositional formula,</span>
+<span class="sd">    acknowledging the dictionary&#39;s truth-value attributions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span> <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span> <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Not</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">And</span><span class="p">(</span><span class="o">*</span><span class="n">l</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">dict_to_binary</span><span class="p">(</span><span class="n">dictionary</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A helper function that converts the dictionary representation of a position</span>
+<span class="sd">    to its presentation in a binary string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">dictionary</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dictionary</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span> <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dictionary</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span> <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dictionary</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Position contains suspension and can&#39;t be represented in binary form.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">l</span>
+
+<span class="k">def</span> <span class="nf">free_premises</span><span class="p">(</span><span class="n">debate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a list of premises that are &quot;free&quot; in the sense of [1: Def. 3].</span>
+<span class="sd">    -----</span>
+<span class="sd">    Referenes:</span>
+<span class="sd">    [1] Betz, Gregor. 2009. Evaluating dialectical structures. In: Journal</span>
+<span class="sd">        of philosophical logic 38: 283--312. DOI: 10/cxrbhh</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">premises</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">debate</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="p">[</span><span class="o">*</span><span class="n">i</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">atoms</span><span class="p">()]:</span>
+            <span class="n">premises</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+    <span class="n">conclusions</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">debate</span><span class="o">.</span><span class="n">args</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">premises</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">conclusions</span> <span class="ow">and</span>
+            <span class="n">Not</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">conclusions</span><span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">iter_to_string</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function that converts a dictionary position to a bit string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">iter_to_list_of_strings</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">neighbours_of_list</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the neighbours of a position in list format. A neighbour is a position</span>
+<span class="sd">    that has HD = 1 to the position in question.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">complements</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># complements[0] == 1 and complements[1] == 0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)):</span>
+        <span class="k">yield</span> <span class="p">(</span><span class="n">l</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">complements</span><span class="p">[</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">]]]</span> <span class="o">+</span> <span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
+
+<span class="k">def</span> <span class="nf">satisfiability_count</span><span class="p">(</span><span class="n">formula</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Count the models that satisfy a Boolean formula, using Binary decision diagrams.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">variables</span> <span class="o">=</span> <span class="n">iter_to_list_of_strings</span><span class="p">(</span><span class="n">formula</span><span class="o">.</span><span class="n">atoms</span><span class="p">())</span>
+    <span class="n">diagram</span> <span class="o">=</span> <span class="n">BDD</span><span class="p">()</span>
+    <span class="n">diagram</span><span class="o">.</span><span class="n">declare</span><span class="p">(</span><span class="o">*</span><span class="n">variables</span><span class="p">)</span>
+    <span class="n">expression</span> <span class="o">=</span> <span class="n">diagram</span><span class="o">.</span><span class="n">add_expr</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">to_cnf</span><span class="p">(</span><span class="n">formula</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">diagram</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">nvars</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">formula</span><span class="o">.</span><span class="n">atoms</span><span class="p">())))</span>
+
+<div class="viewcode-block" id="satisfiability"><a class="viewcode-back" href="../../../basic/positions.html#taupy.basic.utilities.satisfiability">[docs]</a><span class="k">def</span> <span class="nf">satisfiability</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">all_models</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a generator of models for the given Boolean formula, using BDDs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">variables</span> <span class="o">=</span> <span class="n">iter_to_list_of_strings</span><span class="p">(</span><span class="n">formula</span><span class="o">.</span><span class="n">atoms</span><span class="p">())</span>
+    <span class="n">diagram</span> <span class="o">=</span> <span class="n">BDD</span><span class="p">()</span>
+    <span class="n">diagram</span><span class="o">.</span><span class="n">declare</span><span class="p">(</span><span class="o">*</span><span class="n">variables</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">all_models</span><span class="p">:</span>
+        <span class="n">expression</span> <span class="o">=</span> <span class="n">diagram</span><span class="o">.</span><span class="n">add_expr</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">to_cnf</span><span class="p">(</span><span class="n">formula</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="p">[{</span><span class="n">symbols</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> \
+            <span class="n">diagram</span><span class="o">.</span><span class="n">pick_iter</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">care_vars</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> \
+                <span class="n">formula</span><span class="o">.</span><span class="n">atoms</span><span class="p">()})]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">expression</span> <span class="o">=</span> <span class="n">diagram</span><span class="o">.</span><span class="n">add_expr</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">to_cnf</span><span class="p">(</span><span class="n">formula</span><span class="p">)))</span>
+            <span class="nb">next</span><span class="p">(</span><span class="n">diagram</span><span class="o">.</span><span class="n">pick_iter</span><span class="p">(</span><span class="n">expression</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<span class="k">def</span> <span class="nf">satisfiable_extensions</span><span class="p">(</span><span class="n">debate</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return all extensions of a (partial) position relative to a debate. If the position is</span>
+<span class="sd">    complete and satisfiable, it is returned as a satisfiable extension of itself. If it is</span>
+<span class="sd">    a partial position and satisfiable, complete positions that extend it are returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># The union of propositions in the position and debate is used here in case the position</span>
+    <span class="c1"># has a stance toward a proposition that is not yet part of an argument.</span>
+    <span class="n">variables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">({</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">debate</span><span class="o">.</span><span class="n">atoms</span><span class="p">()}</span> <span class="o">|</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">position</span><span class="o">.</span><span class="n">keys</span><span class="p">()})</span>
+    <span class="n">diagram</span> <span class="o">=</span> <span class="n">BDD</span><span class="p">()</span>
+    <span class="n">diagram</span><span class="o">.</span><span class="n">declare</span><span class="p">(</span><span class="o">*</span><span class="n">variables</span><span class="p">)</span>
+
+    <span class="n">expression</span> <span class="o">=</span> <span class="n">diagram</span><span class="o">.</span><span class="n">add_expr</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">to_cnf</span><span class="p">(</span><span class="n">debate</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">diagram</span><span class="o">.</span><span class="n">pick_iter</span><span class="p">(</span><span class="n">expression</span><span class="p">,</span> <span class="n">care_vars</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">}):</span>
+        <span class="k">yield</span> <span class="p">{</span><span class="n">symbols</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+<span class="k">def</span> <span class="nf">graph_from_positions</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">return_attributions</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a dictionary of lists (position: [neighbour1, neighbour2, ...])</span>
+<span class="sd">    that resembles the space of the positions.</span>
+
+<span class="sd">    If return_attributions is set to True, this function returns a tuple. The</span>
+<span class="sd">    first object then is the graph representation in a dict of lists format, the</span>
+<span class="sd">    second object is a mapping from the string representation of a position</span>
+<span class="sd">    to its dictionary format. This is useful because non-hashable objects like</span>
+<span class="sd">    dictionaries can not be used as identifiers of nodes in graphs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">props</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">sort_key</span><span class="p">())</span>
+    <span class="n">bits</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">props</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bits</span><span class="p">:</span>
+        <span class="n">neighbourlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">iter_to_string</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">neighbours_of_list</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bits</span><span class="p">]</span>
+        <span class="n">d</span><span class="p">[</span><span class="n">iter_to_string</span><span class="p">(</span><span class="n">b</span><span class="p">)]</span> <span class="o">=</span> <span class="n">neighbourlist</span>
+    <span class="k">if</span> <span class="n">return_attributions</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">d</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">iter_to_string</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bits</span><span class="p">),</span> <span class="n">positions</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">d</span>
+
+<span class="k">def</span> <span class="nf">rand_index</span><span class="p">(</span><span class="n">partition1</span><span class="p">,</span> <span class="n">partition2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate Rand&#39;s index, a measure of similarity for two data clusterings.</span>
+<span class="sd">    Not yet implemented.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+<div class="viewcode-block" id="ari"><a class="viewcode-back" href="../../../analysis/clustering.html#taupy.basic.utilities.ari">[docs]</a><span class="k">def</span> <span class="nf">ari</span><span class="p">(</span><span class="n">partition1</span><span class="p">,</span> <span class="n">partition2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the Adjusted Rand Index.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># First, let&#39;s look at the number of elements</span>
+    <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">partition1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">partition2</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The two partitions have a different number of elements.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">num_of_elements</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">partition1</span><span class="p">)</span>
+
+    <span class="n">contingency</span> <span class="o">=</span> <span class="n">contingency_matrix</span><span class="p">(</span><span class="n">partition1</span><span class="p">,</span> <span class="n">partition2</span><span class="p">)</span>
+    <span class="n">sums_of_columns</span> <span class="o">=</span> <span class="n">contingency</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">sums_of_rows</span> <span class="o">=</span> <span class="n">contingency</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">columns</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">sums_of_columns</span><span class="p">])</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">sums_of_rows</span><span class="p">])</span>
+    <span class="n">elements</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span><span class="n">contingency</span><span class="p">)])</span>
+    <span class="n">expected_value</span> <span class="o">=</span> <span class="n">columns</span> <span class="o">*</span> <span class="n">rows</span> <span class="o">/</span> <span class="p">(</span><span class="n">num_of_elements</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_of_elements</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">elements</span> <span class="o">-</span> <span class="n">expected_value</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">rows</span> <span class="o">+</span> <span class="n">columns</span><span class="p">))</span> <span class="o">-</span> <span class="n">expected_value</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">contingency_matrix</span><span class="p">(</span><span class="n">partition1</span><span class="p">,</span> <span class="n">partition2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A contingency matrix, a necessary indegredient for Rand&#39;s index and the ARI.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[[</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">k</span><span class="p">))</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">partition1</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">partition2</span><span class="p">]</span>
+    <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">pick_random_positions_from_debate</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">debate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A helper function to pull `n` random positions from a debate&#39;s SCCP. Returns</span>
+<span class="sd">    :py:obj:`False` if the debate&#39;s SCCP is smaller than `n`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">satisfiability_count</span><span class="p">(</span><span class="n">debate</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">n</span><span class="p">:</span>
+        <span class="c1"># Using satisfiability_count() here can spare us the construction of</span>
+        <span class="c1"># a SCCP, which is more complex than just obtaining the SCCP&#39;s number.</span>
+        <span class="k">return</span> <span class="n">sample</span><span class="p">(</span><span class="n">population</span><span class="o">=</span><span class="n">satisfiability</span><span class="p">(</span><span class="n">debate</span><span class="p">,</span> <span class="n">all_models</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">k</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<span class="k">def</span> <span class="nf">subsequences_with_length</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A helper function to return all subsequences with a length of `length`.</span>
+<span class="sd">    This is useful when used incrementally: rather than generating the complete</span>
+<span class="sd">    power set, work your way up and work with what you get at every `length`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">combinations</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">fetch_conclusion</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">sentencepool</span><span class="p">,</span> <span class="n">exclude</span><span class="p">,</span> <span class="n">strategy</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds a proposition from the `sentencepool` that is not already in `exclude`</span>
+<span class="sd">    but which fits the introduction `strategy` and the belief systems of </span>
+<span class="sd">    `source` and `target`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get the conclusion candidates from the sentence pool</span>
+    <span class="n">possible_conclusions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">sentencepool</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">exclude</span><span class="p">))</span>
+    <span class="n">possible_conclusions</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Not</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">possible_conclusions</span><span class="p">)</span>
+
+    <span class="c1"># Directed strategies act as filters on possible conclusions. The list of possible values is not exhausted b/c it is not required by the currently known strategies.</span>
+    <span class="k">if</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;source_accepts_conclusion&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Yes&quot;</span><span class="p">:</span>
+        <span class="n">possible_conclusions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">possible_conclusions</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">dict_to_prop</span><span class="p">(</span><span class="n">source</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;source_accepts_conclusion&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Toleration&quot;</span><span class="p">:</span>
+        <span class="n">possible_conclusions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">possible_conclusions</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="n">Not</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dict_to_prop</span><span class="p">(</span><span class="n">source</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">})</span>
+
+    <span class="k">if</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;target_accepts_conclusion&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;No&quot;</span><span class="p">:</span>
+        <span class="n">possible_conclusions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">possible_conclusions</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">dict_to_prop</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">))</span>
+    
+    <span class="k">return</span> <span class="n">possible_conclusions</span>
+
+<span class="k">def</span> <span class="nf">fetch_premises</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fetch a combination of premises with length `n` from the input pool of</span>
+<span class="sd">    sentences. This function will not return a combination of premises that</span>
+<span class="sd">    is mentioned in `exclude`.</span>
+
+<span class="sd">    This way of iteratively drawing a random sample has no natural breakpoint</span>
+<span class="sd">    (i.e., there is no iterator that is empty at some point). Thus we estimate</span>
+<span class="sd">    that there are at most (k over n) tries, where k is the length of the</span>
+<span class="sd">    pool and `n` the desired length. The main weakness of this approach</span>
+<span class="sd">    is that it can theoretically happen that the only available combination</span>
+<span class="sd">    is not reached before the maximum amount of tries is done.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">length</span>
+
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">comb</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pool</span><span class="p">),</span> <span class="n">n</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">k</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">random_combination</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">Not</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span> <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">i</span>
+            <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+<span class="k">def</span> <span class="nf">select_premises</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">sentencepool</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">exclude</span><span class="p">,</span> 
+                    <span class="n">reserved_conclusion</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strategy</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Select fetched premises based on whether they fit an argument strategy.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">reserved_conclusion</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">conclusion_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">conclusion_set</span> <span class="o">=</span> <span class="p">{</span><span class="n">reserved_conclusion</span><span class="p">,</span> <span class="n">Not</span><span class="p">(</span><span class="n">reserved_conclusion</span><span class="p">)}</span>        
+
+    <span class="k">if</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;pick_premises_from&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">pool</span> <span class="o">=</span> <span class="n">sentencepool</span> <span class="o">-</span> <span class="n">conclusion_set</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;pick_premises_from&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span>
+            <span class="n">pool</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dict_to_prop</span><span class="p">(</span><span class="n">source</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">-</span> <span class="n">conclusion_set</span>
+        <span class="k">if</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;pick_premises_from&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;target&quot;</span><span class="p">:</span>
+            <span class="n">pool</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dict_to_prop</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">-</span> <span class="n">conclusion_set</span>
+
+    <span class="k">return</span> <span class="n">fetch_premises</span><span class="p">(</span><span class="n">pool</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">proposition_levels_from_debate</span><span class="p">(</span><span class="n">debate</span><span class="p">,</span> <span class="n">key_statements</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a dictionary of levels, following an idea by Vera Chekan.</span>
+
+<span class="sd">    Next level: Is it possible to determine key statements in a debate automatically?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">key_statements</span><span class="p">:</span>
+        <span class="c1"># Check if a list of key statements is provided.</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Key statements are required to calculate levels.&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Key statements receive level 0</span>
+    <span class="n">levels</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key_statements</span><span class="p">}</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">debate</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># Check if the debate has any Arguments.</span>
+        <span class="n">conclusions</span> <span class="o">=</span> <span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">atoms</span><span class="p">()))</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">debate</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># This case holds if the Debate does not contain any Arguments, e.g. </span>
+        <span class="c1"># if it is an EmptyDebate.</span>
+        <span class="n">conclusions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">levels</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">==</span> <span class="n">i</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">conclusions</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">levels</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">argument</span> <span class="ow">in</span> <span class="n">debate</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">argument</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">atoms</span><span class="p">()))</span>
+                <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">levels</span> <span class="ow">and</span> <span class="n">levels</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">==</span> <span class="n">i</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">argument</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">atoms</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">levels</span><span class="p">:</span>
+                            <span class="n">levels</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">break</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">debate</span><span class="o">.</span><span class="n">atoms</span><span class="p">())</span> <span class="ow">and</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;taupy Warning: Not all propositions received a level. Maybe the input debate </span><span class="se">\</span>
+<span class="s2">               did not have a connected argument map?&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">levels</span>
+
+<span class="k">def</span> <span class="nf">premise_usage_count</span><span class="p">(</span><span class="n">debate</span><span class="p">,</span> <span class="n">premises</span><span class="o">=</span><span class="nb">set</span><span class="p">()):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Counts the number of times each premise is used in the arguments of a Debate. </span>
+
+<span class="sd">    A set `premises` can be passed to this function to account for premises that are</span>
+<span class="sd">    not yet used in any argument, althought they might be in a Debate&#39;s sentence pool.</span>
+<span class="sd">    They will be returned with count 0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">debate</span><span class="p">,</span> <span class="n">tpc</span><span class="o">.</span><span class="n">Argument</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">debate</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">args</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">args</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">debate</span><span class="o">.</span><span class="n">args</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])</span>
+    
+    <span class="n">unused</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">premises</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">([</span><span class="n">Not</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">premises</span><span class="p">]))</span> <span class="k">if</span> <span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">c</span><span class="p">]</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">|</span> <span class="p">{</span><span class="n">u</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">unused</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">c</span>
+
+<span class="k">def</span> <span class="nf">z3_assertion_from_argument</span><span class="p">(</span><span class="n">premises</span><span class="o">=</span><span class="p">[],</span> <span class="n">conclusion</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A converter function from taupy Arguments, which take sympy </span>
+<span class="sd">    Symbols, to a z3 Implies function, which takes z3 Bools. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_z3_prems</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">premises</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_Not</span><span class="p">:</span>
+            <span class="n">_z3_prems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">Not</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">Bool</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="o">.</span><span class="n">atoms</span><span class="p">()))))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_z3_prems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">Bool</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="o">.</span><span class="n">atoms</span><span class="p">())))</span>
+
+    <span class="k">if</span> <span class="n">conclusion</span><span class="o">.</span><span class="n">is_Not</span><span class="p">:</span>
+        <span class="n">_z3_conc</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">Not</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">Bool</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="o">*</span><span class="n">conclusion</span><span class="o">.</span><span class="n">atoms</span><span class="p">())))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_z3_conc</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">Bool</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="o">*</span><span class="n">conclusion</span><span class="o">.</span><span class="n">atoms</span><span class="p">()))</span>
+
+    <span class="k">return</span> <span class="n">z3</span><span class="o">.</span><span class="n">Implies</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">And</span><span class="p">(</span><span class="o">*</span><span class="n">_z3_prems</span><span class="p">),</span> <span class="n">_z3_conc</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">z3_soft_constraints_from_position</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="nb">dict</span><span class="p">()):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A converter function from Positions to z3.Optimizers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">_z3_constraints</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">position</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">position</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">_z3_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">Bool</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">position</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">_z3_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">Not</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">Bool</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))))</span>
+
+    <span class="k">return</span> <span class="n">_z3_constraints</span>
+
+<span class="k">def</span> <span class="nf">z3_all_models</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">initial_terms</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The common function to extract all satisfying models of formula</span>
+<span class="sd">    with z3. See: </span>
+<span class="sd">    http://theory.stanford.edu/~nikolaj/programmingz3.html#sec-blocking-evaluations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">block_term</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span> <span class="o">!=</span> <span class="n">m</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">model_completion</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">fix_term</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span> <span class="o">==</span> <span class="n">m</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">model_completion</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">all_smt_rec</span><span class="p">(</span><span class="n">terms</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">z3</span><span class="o">.</span><span class="n">sat</span> <span class="o">==</span> <span class="n">s</span><span class="o">.</span><span class="n">check</span><span class="p">():</span>
+           <span class="n">m</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+           <span class="k">yield</span> <span class="n">m</span>
+           <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">terms</span><span class="p">)):</span>
+               <span class="n">s</span><span class="o">.</span><span class="n">push</span><span class="p">()</span>
+               <span class="n">block_term</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">terms</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+               <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+                   <span class="n">fix_term</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">terms</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+               <span class="k">yield from</span> <span class="n">all_smt_rec</span><span class="p">(</span><span class="n">terms</span><span class="p">[</span><span class="n">i</span><span class="p">:])</span>
+               <span class="n">s</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="k">yield from</span> <span class="n">all_smt_rec</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">initial_terms</span><span class="p">))</span>
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Felix Kopecky
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/scripts/furo.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    </body>
+</html>

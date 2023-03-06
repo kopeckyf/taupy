@@ -1,0 +1,1120 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
+
+    <meta name="generator" content="sphinx-5.0.1, furo 2022.06.04.1"/>
+        <title>taupy.simulation.simulation - taupy</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 100%;;
+  --admonition-title-font-size: 100%;;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">taupy</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">taupy</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation/index.html">Installation and quick start</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../basic/index.html">Base objects</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../basic/arguments.html">Arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../basic/debates.html">Debates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../basic/positions.html">Positions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../analysis/index.html">Analysis &amp; measurement</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../analysis/agreement.html">Agreement and distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../analysis/density.html">Inferential density</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../analysis/doj.html">Degrees of justification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../analysis/centrality.html">Centrality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../analysis/clustering.html">Clustering belief systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../analysis/polarisation.html">Polarisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../analysis/diversity.html">Diversity</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../generators/index.html">Synthesise new objects</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../generators/surveys.html">Surveys and aggregation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../generators/maps.html">Argument maps</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../simulation/index.html">Simulations</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../simulation/populations.html">Setting up a population</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../simulation/simulations.html">Setting up a simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../simulation/update.html">Running a simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../simulation/experiments.html">Experiments: Simulations in parallel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../simulation/evaluation.html">Evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References for further reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Class and function index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/plotting-sccp.html">Plotting the SCCP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/agreement.html">Tracking agreement in debate simulations</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <h1>Source code for taupy.simulation.simulation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Basic tools in simulations</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">Not</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">choice</span><span class="p">,</span> <span class="n">choices</span><span class="p">,</span> <span class="n">sample</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ProcessPoolExecutor</span><span class="p">,</span> <span class="n">as_completed</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">taupy.analysis.agreement</span> <span class="kn">import</span> <span class="p">(</span><span class="n">normalised_edit_distance</span><span class="p">,</span> 
+                                      <span class="n">normalised_edit_agreement</span><span class="p">,</span>
+                                      <span class="n">difference_matrix</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">taupy.basic.utilities</span> <span class="kn">import</span> <span class="p">(</span><span class="n">satisfiability_count</span><span class="p">,</span> 
+                                   <span class="n">z3_assertion_from_argument</span><span class="p">,</span>
+                                   <span class="n">satisfiability</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">taupy.basic.core</span> <span class="kn">import</span> <span class="n">EmptyDebate</span><span class="p">,</span> <span class="n">Debate</span>
+<span class="kn">from</span> <span class="nn">taupy.basic.positions</span> <span class="kn">import</span> <span class="n">Position</span>
+<span class="kn">from</span> <span class="nn">.update</span> <span class="kn">import</span> <span class="n">introduce</span><span class="p">,</span> <span class="n">response</span>
+<span class="kn">from</span> <span class="nn">taupy.generators.maps</span> <span class="kn">import</span> <span class="n">generate_hierarchical_argument_map</span>
+<span class="kn">import</span> <span class="nn">taupy.simulation.strategies</span> <span class="k">as</span> <span class="nn">strategies</span>
+
+
+<span class="k">class</span> <span class="nc">SimulationBase</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A super class for simulations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">init_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">target_length</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate initial Positions. Optionally, the Positions may start off with</span>
+<span class="sd">        explicit truth-value attributions. Positions are filled up with random</span>
+<span class="sd">        values for truth-value attributions they do not yet have.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">target_length</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">target_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">target_length</span><span class="p">:</span>
+                <span class="c1"># Only fill up positions that do not have the desired length.</span>
+                <span class="n">pool</span> <span class="o">=</span> <span class="n">sample</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">target_length</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">pool</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">s</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">p</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">target_length</span><span class="p">:</span>
+                        <span class="c1"># While filling up a position, catch when it reaches the</span>
+                        <span class="c1"># desired length.</span>
+                        <span class="n">p</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">choice</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Simulation"><a class="viewcode-back" href="../../../simulation/simulations.html#taupy.simulation.simulation.Simulation">[docs]</a><span class="k">class</span> <span class="nc">Simulation</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">SimulationBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simulation in which agents introduce new arguments bit by bit. </span>
+<span class="sd">    For historic reasons, this kind of simulation bears the generic name.</span>
+
+<span class="sd">    :param bool directed: </span>
+<span class="sd">        Boolean indicating whether purposeful argument introductions are requested.</span>
+<span class="sd">        If set to False, random arguments that do not take into account agents&#39;</span>
+<span class="sd">        belief systems are introduced.</span>
+
+<span class="sd">    :param debate_growth: </span>
+<span class="sd">        Can be either of :py:obj:`&quot;random&quot;` or :py:obj:`&quot;treelike&quot;`. Random</span>
+<span class="sd">        debate growth leads to argument maps that are like random graphs. </span>
+<span class="sd">        Tree-like debate growth leads to maps that are hierarchical, tree-like</span>
+<span class="sd">        structures. The latter require specification of :py:attr:`key_statements`,</span>
+<span class="sd">        as the roots of the tree need to be specified.</span>
+
+<span class="sd">    :param dict events:</span>
+<span class="sd">        A mapping of events to their chance of occuring. Recognised events</span>
+<span class="sd">        are :py:obj:`&quot;introduction&quot;` and :py:obj:`&quot;new_sentence&quot;`.  </span>
+
+<span class="sd">    :param sentencepool: </span>
+<span class="sd">        The initial pool of sentence available for argument introductions. The</span>
+<span class="sd">        input needs to be valid input for :py:func:`sympy.symbols`. It is</span>
+<span class="sd">        recommded to use sympy&#39;s :py:obj:`&quot;p:n&quot;` notation, where `n` refers to </span>
+<span class="sd">        the number of sentences. </span>
+
+<span class="sd">    :param max_sentencepool: </span>
+<span class="sd">        When the probability of a `&quot;new_sentence&quot;` event is non-zero, the </span>
+<span class="sd">        sentencepool is enlarged in the course of a simulation run until it </span>
+<span class="sd">        reaches its maximum extension. As in :py:attr:`sentencepool`, the input</span>
+<span class="sd">        needs to be understood by :py:func:`sympy.symbols()` and should be </span>
+<span class="sd">        equal or greater than :py:attr:`sentencepool`. If :py:obj:`None` is </span>
+<span class="sd">        input, it will default to the extension of :py:attr:`sentencepool`.</span>
+
+<span class="sd">    :param key_statements: </span>
+<span class="sd">        When a :py:obj:`&quot;treelike&quot;` :py:attr:`debate_growth` is selected, should</span>
+<span class="sd">        be an iterable of inputs understood by :py:func:`sympy.symbols`. Has no</span>
+<span class="sd">        effect when :py:obj:`&quot;random&quot;` :py:attr:`debate_growth` is selected. </span>
+<span class="sd">        These key statements will be the roots of constructed tree-like argument</span>
+<span class="sd">        map. Needs to be a subset of elements from :py:attr:`sentencepool` and</span>
+<span class="sd">        :py:attr:`max_sentencepool`.</span>
+
+<span class="sd">        .. admonition :: Example</span>
+
+<span class="sd">            A sentence pool of :py:obj:`&quot;p:20&quot;` includes the symbols </span>
+<span class="sd">            :py:obj:`p0`, :py:obj:`p1`, ..., :py:obj:`p19`. The first two items</span>
+<span class="sd">            can be selected as roots for the argument map like this:</span>
+
+<span class="sd">            &gt;&gt;&gt; s = Simulation(debate_growth=&quot;treelike&quot;, sentencepool=&quot;p:20&quot;, key_statements=[&quot;p0&quot;, &quot;p1&quot;])</span>
+
+<span class="sd">    :param parent_debate: </span>
+<span class="sd">        If supplied, the simulation will inherit this debate stage. Otherwise, </span>
+<span class="sd">        simulations are initialised with an empty debate stage.</span>
+
+<span class="sd">    :param argumentlength: </span>
+<span class="sd">        Either an integer or an iterable of integers indicating</span>
+<span class="sd">        the number of premises per argument. If an integer $n$</span>
+<span class="sd">        is provided, all arguments will have $n$ premises. If</span>
+<span class="sd">        an iterable is provided, one of its elements $e$ is </span>
+<span class="sd">        chosen randomly at each argument introduction, and the</span>
+<span class="sd">        introduced arguments will receive $e$ premises.</span>
+
+<span class="sd">        .. admonition :: Examples</span>
+
+<span class="sd">            Arguments with exactly four premises are introduced to a </span>
+<span class="sd">            simulation:</span>
+
+<span class="sd">            &gt;&gt;&gt; s = Simulation(argumentlength=4)</span>
+
+<span class="sd">            Arguments with 1–4 premises are introduced to this simulation:</span>
+
+<span class="sd">            &gt;&gt;&gt; s = Simulation(argumentlength=[1,2,3,4])</span>
+
+<span class="sd">    :param positions:</span>
+<span class="sd">        An iterable of agents participating in the debate. If not supplied, only</span>
+<span class="sd">        random arguments can be introduced in a simulation. Other argumentation </span>
+<span class="sd">        strategies require at least two agents in the population.</span>
+
+<span class="sd">        .. admonition:: Example</span>
+
+<span class="sd">            First generate a list of 10 agents with the fortify strategy:</span>
+<span class="sd">            </span>
+<span class="sd">            &gt;&gt;&gt; mypositions = [Position(debate=None, introduction_strategy=strategies.fortify) for _ in range(10)]</span>
+
+<span class="sd">            And then use it in the Simulation initialisation:</span>
+<span class="sd">            </span>
+<span class="sd">            &gt;&gt;&gt; s = Simulation(positions=mypositions)</span>
+
+<span class="sd">    :param copy_input_positions:</span>
+<span class="sd">        Decide whether to make a deep copy of the input :py:attr:`positions`. If </span>
+<span class="sd">        set to :py:obj:`False`, the input position objects will be mutated by the</span>
+<span class="sd">        simulation run. </span>
+
+<span class="sd">    :param initial_position_size:</span>
+<span class="sd">        If given as an integer $i$, positions will be filled up with random </span>
+<span class="sd">        truth-value attributions until they contain $i$ such judgements. When </span>
+<span class="sd">        :py:obj:`None` is selected, agents will have complete positions, i.e. </span>
+<span class="sd">        they will assign a truth-value to each sentence in the sentence pool.</span>
+
+<span class="sd">    :param default_introduction_strategy:</span>
+<span class="sd">        The introduction strategy for positions that have no :py:attr:`introduction_strategy`</span>
+<span class="sd">        assigned to them.</span>
+
+<span class="sd">    :param default_update_strategy:</span>
+<span class="sd">        Specifies how agents should update their belief system in case of </span>
+<span class="sd">        incoherence. Two methods are implemented:</span>
+<span class="sd">        </span>
+<span class="sd">        - :py:obj:`&quot;closest_coherent&quot;`: recommended for complete positions</span>
+<span class="sd">        - :py:obj:`&quot;closest_closed_partial_coherent&quot;`: recommended for partial positions</span>
+
+<span class="sd">    :param int partial_neighbour_search_radius:</span>
+<span class="sd">        A parameter for the :py:obj:`&quot;closest_closed_partial_coherent&quot;`. As the </span>
+<span class="sd">        number of partial neighbours rises exponentially when the distance</span>
+<span class="sd">        increases, this puts an upper limit on the number of inspected possible</span>
+<span class="sd">        positions that an agent with a partial position would move to.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">directed</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">debate_growth</span> <span class="o">=</span> <span class="s2">&quot;random&quot;</span><span class="p">,</span>
+                 <span class="n">events</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;introduction&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s2">&quot;new_sentence&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                 <span class="n">sentencepool</span> <span class="o">=</span> <span class="s2">&quot;p:10&quot;</span><span class="p">,</span>
+                 <span class="n">max_sentencepool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">key_statements</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">parent_debate</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">argumentlength</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+                 <span class="n">positions</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">copy_input_positions</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">initial_position_size</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">default_introduction_strategy</span> <span class="o">=</span> <span class="n">strategies</span><span class="o">.</span><span class="n">random</span><span class="p">,</span>
+                 <span class="n">default_update_strategy</span> <span class="o">=</span> <span class="s2">&quot;closest_coherent&quot;</span><span class="p">,</span>
+                 <span class="n">partial_neighbour_search_radius</span> <span class="o">=</span> <span class="mi">50</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">sentencepool</span> <span class="o">==</span> <span class="s2">&quot;inherit&quot;</span><span class="p">:</span> <span class="c1"># import from parent debate</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">parent_debate</span><span class="o">.</span><span class="n">atoms</span><span class="p">()]</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Inherited sentence pools are not implemented.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">symbols</span><span class="p">(</span><span class="n">sentencepool</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">used_premises</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_sentencepool</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">symbols</span><span class="p">(</span><span class="n">max_sentencepool</span><span class="p">)]</span> \
+                                 <span class="k">if</span> <span class="n">max_sentencepool</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span>
+        
+        <span class="k">if</span> <span class="n">key_statements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">key_statements</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">key_statements</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">symbols</span><span class="p">(</span><span class="n">key_statements</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">events</span> <span class="o">=</span> <span class="n">events</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">argumentlength</span> <span class="o">=</span> <span class="n">argumentlength</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">partial_neighbour_search_radius</span> <span class="o">=</span> <span class="n">partial_neighbour_search_radius</span>
+
+        <span class="k">if</span> <span class="n">positions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">copy_input_positions</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_positions</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">positions</span><span class="p">),</span> 
+                                    <span class="n">target_length</span><span class="o">=</span><span class="n">initial_position_size</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_positions</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> 
+                                    <span class="n">target_length</span><span class="o">=</span><span class="n">initial_position_size</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_positions</span><span class="p">([],</span> <span class="n">target_length</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">debate_growth</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="s2">&quot;tree&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;The requested growth method is not &quot;</span>
+                                      <span class="o">+</span> <span class="s2">&quot;implemented. Available methods are &quot;</span>
+                                      <span class="o">+</span> <span class="s2">&quot;`random`  and `tree`.&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">debate_growth</span> <span class="o">=</span> <span class="n">debate_growth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directed</span> <span class="o">=</span> <span class="n">directed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_introduction_strategy</span> <span class="o">=</span> <span class="n">default_introduction_strategy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_update_strategy</span> <span class="o">=</span> <span class="n">default_update_strategy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertions</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># assertions for z3.Solver and z3.Optimize</span>
+        <span class="nb">list</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># Initialise the Simulation with an empty debate. This is</span>
+        <span class="c1"># necessary so that the initial positions can attach to some debate.</span>
+        <span class="k">if</span> <span class="n">parent_debate</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">EmptyDebate</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parent_debate</span><span class="p">)</span>
+            <span class="c1"># Add premises in the parent debate to the used premise storage.</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">parent_debate</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">used_premises</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">premise_candidates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span> <span class="o">+</span> <span class="p">[</span><span class="n">Not</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="p">])</span>
+
+<div class="viewcode-block" id="Simulation.run"><a class="viewcode-back" href="../../../simulation/update.html#taupy.simulation.simulation.Simulation.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_density</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">max_steps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">min_sccp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run a Simulation using ``introduction_method`` and ``update_mechanism``</span>
+<span class="sd">        until either ``max_density`` is reached, the SCCP has an extension of</span>
+<span class="sd">        ``min_sccp`` or ``max_steps`` have been taken.</span>
+
+<span class="sd">        If ``quiet=False``, the last log entry which contains a summary of</span>
+<span class="sd">        the simulation is not output. This is useful in batch processing of</span>
+<span class="sd">        Simulations (see ``experiment()``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+
+            <span class="n">selected_event</span> <span class="o">=</span> <span class="n">choices</span><span class="p">([</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">items</span><span class="p">()],</span>
+                                     <span class="n">weights</span><span class="o">=</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">items</span><span class="p">()])[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">selected_event</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;introduction&quot;</span><span class="p">,</span> <span class="s2">&quot;new_sentence&quot;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;No recipe for event type </span><span class="si">{</span><span class="n">selected_event</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">selected_event</span> <span class="o">==</span> <span class="s2">&quot;introduction&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">directed</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="c1"># The user asked for a directed simulation and has supplied</span>
+                    <span class="c1"># enough Positions. Now instantiate turns of trying to </span>
+                    <span class="c1"># introduce arguments.</span>
+                    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">while</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="n">pick_positions</span> <span class="o">=</span> <span class="n">sample</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+                        <span class="c1"># Support for positions with multiple introduction </span>
+                        <span class="c1"># strategies. First, try to pick a random element from </span>
+                        <span class="c1"># the list of introduction  strategies of a position. If</span>
+                        <span class="c1"># that fails, assume that the strategy preference of a </span>
+                        <span class="c1"># position is not given as a list, but as a single item.</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">pick_strategy</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span>
+                                <span class="n">pick_positions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">introduction_strategy</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                            <span class="n">pick_strategy</span> <span class="o">=</span> <span class="n">pick_positions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">introduction_strategy</span>
+
+                        <span class="n">argument_introduced</span> <span class="o">=</span> <span class="n">introduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                                        <span class="n">source</span><span class="o">=</span><span class="n">pick_positions</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                        <span class="n">target</span><span class="o">=</span><span class="n">pick_positions</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                                        <span class="n">strategy</span><span class="o">=</span><span class="n">pick_strategy</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">argument_introduced</span><span class="p">:</span>
+                            <span class="c1"># The argument introduction did not succeed in this </span>
+                            <span class="c1"># turn. We are trying it again if there have been </span>
+                            <span class="c1"># less tries than half the size of the population.</span>
+                            <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="k">continue</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c1"># An argument was found, break out of the loop.</span>
+                            <span class="c1"># (implies argument_introduced == True)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Argument introduction suceeded after </span><span class="si">{</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> attempts.&quot;</span><span class="p">)</span>
+                            <span class="k">break</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># There have been more tries equal to half of the </span>
+                        <span class="c1"># population size, but an argument could not be found. </span>
+                        <span class="c1"># This is enough grounds to terminate the simulation run.</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="s2">&quot;Argument introduction did not succeed, even after &quot;</span>
+                            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> attempts.&quot;</span><span class="p">)</span>
+                        <span class="n">argument_introduced</span> <span class="o">=</span> <span class="kc">False</span>
+
+                    <span class="k">if</span> <span class="n">argument_introduced</span><span class="p">:</span>
+                        <span class="c1"># Check if introduction was succesful before attempting </span>
+                        <span class="c1"># response.</span>
+                        <span class="n">response</span><span class="p">(</span><span class="n">simulation</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                                 <span class="n">debate</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> 
+                                 <span class="n">positions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                 <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_update_strategy</span><span class="p">,</span>
+                                 <span class="n">sentences</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># The user did not ask for a directed simulation and/or </span>
+                    <span class="c1"># provided less than 2 positions. In this case, we&#39;re </span>
+                    <span class="c1"># investing less work.</span>
+                    <span class="n">argument_introduced</span> <span class="o">=</span> <span class="n">introduce</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_introduction_strategy</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">argument_introduced</span><span class="p">:</span>
+                        <span class="n">response</span><span class="p">(</span><span class="n">simulation</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                                 <span class="n">debate</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                 <span class="n">positions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> 
+                                 <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_update_strategy</span><span class="p">,</span>
+                                 <span class="n">sentences</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">argument_introduced</span><span class="p">:</span>
+                    <span class="c1"># Break out of the Simulation if no argument could be </span>
+                    <span class="c1"># inserted. In this case, the log will tell more about what </span>
+                    <span class="c1"># went wrong.</span>
+                    <span class="k">break</span>
+
+            <span class="k">if</span> <span class="n">selected_event</span> <span class="o">==</span> <span class="s2">&quot;new_sentence&quot;</span><span class="p">:</span>
+                <span class="c1"># Let&#39;s see which sentences could be inserted into the debate.</span>
+                <span class="c1"># This will be the difference between the sentencepool and the </span>
+                <span class="c1"># max_sentencepool</span>
+
+                <span class="n">sentence_candidates</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_sentencepool</span><span class="p">)</span> \
+                                      <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentence_candidates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># Append a random candidate to the debate&#39;s sentencepool.</span>
+                    <span class="n">selected_sentence</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sentence_candidates</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selected_sentence</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sentence </span><span class="si">{</span><span class="n">selected_sentence</span><span class="si">}</span><span class="s2"> added to &quot;</span>
+                                    <span class="o">+</span> <span class="s2">&quot;the sentence pool.&quot;</span><span class="p">)</span>
+
+                    <span class="c1"># Carry along the debate stage.</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+                    <span class="c1"># Now have the positions take a random stance toward the </span>
+                    <span class="c1"># newly inserted sentence.</span>
+                    <span class="n">expanded_positions</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">e</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                        <span class="c1"># There is a 2:1 chance that the position does not </span>
+                        <span class="c1"># suspend judgement on the new sentence.</span>
+                        <span class="k">if</span> <span class="n">choice</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]):</span>
+                            <span class="c1"># If the positions does not suspend, there is a 1:1 </span>
+                            <span class="c1"># chance it will assign either truth value.</span>
+                            <span class="n">e</span><span class="p">[</span><span class="n">selected_sentence</span><span class="p">]</span> <span class="o">=</span> <span class="n">choice</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+                        <span class="n">expanded_positions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">expanded_positions</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Failure to insert a sentence does not end the simulation, </span>
+                    <span class="c1"># but we take note of it in the log.</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s2">&quot;Tried to insert a new sentence to the debate but &quot;</span>
+                        <span class="o">+</span> <span class="s2">&quot;maximum extension was reached.&quot;</span><span class="p">)</span>
+
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">density</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">max_density</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">max_steps</span> <span class="ow">or</span> <span class="n">satisfiability_count</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">min_sccp</span><span class="p">:</span>
+                <span class="c1"># Delete objects that can&#39;t be pickled.</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertions</span>
+                <span class="k">break</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="s2">&quot;Simulation ended. &quot;</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> steps were taken. &quot;</span><span class="p">)</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Density at end: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">density</span><span class="p">()</span><span class="si">}</span><span class="s2">. &quot;</span><span class="p">)</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extension of SCCP: </span><span class="si">{</span><span class="n">satisfiability_count</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">quiet</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span></div></div>
+
+<div class="viewcode-block" id="FixedDebateSimulation"><a class="viewcode-back" href="../../../simulation/simulations.html#taupy.simulation.simulation.FixedDebateSimulation">[docs]</a><span class="k">class</span> <span class="nc">FixedDebateSimulation</span><span class="p">(</span><span class="n">SimulationBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simulation that begins with a pre-defined debate. Agents uncover arguments</span>
+<span class="sd">    from the debate in each simulation step. The pre-defined debate follows the</span>
+<span class="sd">    argument map generation algorithm Betz, Chekan &amp; Mchedlidze ([Betz2021]_).</span>
+<span class="sd">        </span>
+<span class="sd">    :param argument_selection_strategy: Can be :py:obj:`&quot;any&quot;` or :py:obj:`&quot;max&quot;`.</span>
+<span class="sd">        When set to :py:obj:`&quot;any&quot;`, a random argument is uncovered at each</span>
+<span class="sd">        step as long as it matches the argumentation strategies&#39; requirements.</span>
+<span class="sd">        If :py:obj:`&quot;max&quot;` is selected, arguments that reach the most agents in</span>
+<span class="sd">        the population is selected. </span>
+<span class="sd">        </span>
+<span class="sd">    :param dict debate_generation: Additional settings to the initial argument map </span>
+<span class="sd">        generation which are passed on to :py:func:`generate_hierarchical_argument_map`.</span>
+<span class="sd">        Note that the number of key statements and the sentencepool are provided</span>
+<span class="sd">        in dedicated attributes :py:attr:`num_key_statements` and </span>
+<span class="sd">        :py:attr:`sentencepool`.</span>
+<span class="sd">        </span>
+<span class="sd">    :param default_update_strategy: Agents who need to update their position do</span>
+<span class="sd">        so according to the strategy selected here. Options are </span>
+<span class="sd">        :py:obj:`&quot;closest_coherent&quot;` for complete positions and </span>
+<span class="sd">        :py:obj:`&quot;closest_closed_partial_coherent&quot;` for partial positions.</span>
+
+<span class="sd">    :param initial_arguments: Start the simulation with these arguments, even</span>
+<span class="sd">        if they are not part of the generated argument map. It is advised to </span>
+<span class="sd">        use the default :py:obj:`None`.</span>
+<span class="sd">        </span>
+<span class="sd">    :param initial_position_size: The number of belief for the initial positions.</span>
+<span class="sd">        If set to :py:obj:`None`, will default to the length of the </span>
+<span class="sd">        :py:attr:`sentencepool`. If smaller than the :py:attr:`sentencepool`,</span>
+<span class="sd">        positions will be partial and contain a random subset of sentences. </span>
+<span class="sd">        Positions that have no initial truth-value attributions will be randomly</span>
+<span class="sd">        assigned.</span>
+<span class="sd">        </span>
+<span class="sd">    :param int num_key_statements: The number of roots for the generated </span>
+<span class="sd">        tree-like argument map. </span>
+<span class="sd">        </span>
+<span class="sd">    :param int partial_neighbour_search_radius: An additional setting for the </span>
+<span class="sd">        :py:obj:`&quot;closest_closed_partial_coherent&quot;` updating strategy, indicating</span>
+<span class="sd">        the neighbourhood radius that is scanned for an alternative if a position</span>
+<span class="sd">        needs to update.</span>
+<span class="sd">        </span>
+<span class="sd">    :param positions: A list of initial positions, as indicated in </span>
+<span class="sd">        :ref:`Setting up a population`.</span>
+<span class="sd">        </span>
+<span class="sd">    :param sentencepool: A sentencepool, given as an iterable understood by</span>
+<span class="sd">        :py:func:`sympy.symbols`, to be forwarded to the tree-like argument map</span>
+<span class="sd">        generation. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">argument_selection_strategy</span> <span class="o">=</span> <span class="s2">&quot;any&quot;</span><span class="p">,</span>
+                 <span class="n">debate_generation</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;max_density&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>
+                 <span class="n">default_update_strategy</span> <span class="o">=</span> <span class="s2">&quot;closest_coherent&quot;</span><span class="p">,</span>
+                 <span class="n">initial_arguments</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">initial_position_size</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">num_key_statements</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="n">partial_neighbour_search_radius</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+                 <span class="n">positions</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">sentencepool</span> <span class="o">=</span> <span class="s2">&quot;p:10&quot;</span>
+                 <span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">partial_neighbour_search_radius</span> <span class="o">=</span> <span class="n">partial_neighbour_search_radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">symbols</span><span class="p">(</span><span class="n">sentencepool</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debate</span> <span class="o">=</span> <span class="n">generate_hierarchical_argument_map</span><span class="p">(</span>
+                        <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="p">),</span>
+                        <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_key_statements</span><span class="p">),</span>
+                        <span class="o">**</span><span class="n">debate_generation</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">positions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_positions</span><span class="p">([],</span> <span class="n">target_length</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_positions</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">positions</span><span class="p">),</span> 
+                                <span class="n">target_length</span><span class="o">=</span><span class="n">initial_position_size</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">updating_strategy</span> <span class="o">=</span> <span class="n">default_update_strategy</span>
+        
+        <span class="k">if</span> <span class="n">initial_arguments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uncovered_arguments</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uncovered_arguments</span> <span class="o">=</span> <span class="n">initial_arguments</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">argument_selection_strategy</span> <span class="o">=</span> <span class="n">argument_selection_strategy</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">argument_selection_strategy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;any&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;The selected argument selection strategy &quot;</span>
+                                      <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">argument_selection_strategy</span><span class="p">)</span>
+                                      <span class="o">+</span> <span class="s2">&quot; is unknown.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">updating_strategy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;closest_coherent&quot;</span><span class="p">,</span> 
+                                          <span class="s2">&quot;closest_closed_partial_coherent&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;The selected default updating strategy &quot;</span>
+                                      <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updating_strategy</span><span class="p">)</span>
+                                      <span class="o">+</span> <span class="s2">&quot; is unkown.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Control the display of individual Simulation objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulation with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">debate</span><span class="p">)</span><span class="si">}</span><span class="s2"> arguments, of which &quot;</span>
+                   <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uncovered_arguments</span><span class="p">)</span><span class="si">}</span><span class="s2"> are uncovered.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Advance Simulation by one step.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># uncovering</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># Cache to reduce calls to enumerate()</span>
+            <span class="n">enum_pos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">seen_positions</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">argument_available</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                <span class="n">available_positions</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">in</span> <span class="n">enum_pos</span> \
+                                       <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_positions</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">available_positions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">new_argument</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">break</span>
+
+                <span class="n">source_id</span><span class="p">,</span> <span class="n">source</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">available_positions</span><span class="p">)</span>
+                <span class="n">seen_positions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source_id</span><span class="p">)</span>
+
+                <span class="c1"># Support for positions with multiple introduction strategies.</span>
+                <span class="c1"># First, try to pick a random element from the list of </span>
+                <span class="c1"># introduction strategies of a position. If that fails, assume </span>
+                <span class="c1"># that the strategy preference of a position is not given as a </span>
+                <span class="c1"># list, but as a single item.</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">strategy</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">introduction_strategy</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="n">strategy</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">introduction_strategy</span>
+
+                <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">debate</span><span class="o">.</span><span class="n">args</span> \
+                                 <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncovered_arguments</span><span class="p">]:</span>
+
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">reqs</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">get_requirements</span><span class="p">()</span>
+                        <span class="n">premise_reqs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">reqs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">reqs</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">arg</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">atoms</span><span class="p">()}</span>
+                        <span class="n">conclusion_reqs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">reqs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">reqs</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">arg</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">atoms</span><span class="p">()}</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                            <span class="s2">&quot;Could not retrieve requirements from argument: &quot;</span>
+                            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2">. Arguments uncovered so far: &quot;</span>
+                            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uncovered_arguments</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                    
+                    <span class="k">if</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;pick_premises_from&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;target&quot;</span><span class="p">:</span>                    
+                        <span class="n">premise_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">in</span> <span class="n">enum_pos</span> \
+                                       <span class="k">if</span> <span class="n">premise_reqs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">p</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>                
+                    
+                    <span class="k">if</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;pick_premises_from&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span>
+                        <span class="n">premise_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">in</span> <span class="n">enum_pos</span> \
+                                       <span class="k">if</span> <span class="n">premise_reqs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">source</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+
+                    <span class="k">if</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;pick_premises_from&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">premise_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">in</span> <span class="n">enum_pos</span><span class="p">]</span>
+
+                    <span class="k">if</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;source_accepts_conclusion&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Yes&quot;</span><span class="p">:</span>
+                        <span class="n">conclusion_source_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">in</span> <span class="n">enum_pos</span> \
+                                                 <span class="k">if</span> <span class="n">conclusion_reqs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">source</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+
+                    <span class="k">if</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;source_accepts_conclusion&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Toleration&quot;</span><span class="p">:</span>
+                        <span class="n">suspend_conclusion</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">conclusion_reqs</span><span class="p">}</span>
+                        <span class="n">conclusion_source_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">in</span> <span class="n">enum_pos</span> <span class="k">if</span> <span class="n">conclusion_reqs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">source</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span> \
+                                                <span class="o">+</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">in</span> <span class="n">enum_pos</span> <span class="k">if</span> <span class="n">conclusion_reqs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">suspend_conclusion</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+
+                    <span class="k">if</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;source_accepts_conclusion&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;NA&quot;</span><span class="p">:</span>
+                        <span class="n">conclusion_source_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">in</span> <span class="n">enum_pos</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">source_id</span><span class="p">]</span>
+
+                    <span class="k">if</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;target_accepts_conclusion&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;No&quot;</span><span class="p">:</span>
+                        <span class="n">conclusion_target_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">in</span> <span class="n">enum_pos</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">conclusion_reqs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">p</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">source_id</span><span class="p">]</span>
+
+                    <span class="k">if</span> <span class="n">strategy</span><span class="p">[</span><span class="s2">&quot;target_accepts_conclusion&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;NA&quot;</span><span class="p">:</span>
+                        <span class="n">conclusion_target_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">in</span> <span class="n">enum_pos</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">source_id</span><span class="p">]</span>
+
+                    <span class="n">possible_targets</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">premise_ids</span><span class="p">)</span> \
+                                       <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">conclusion_source_ids</span><span class="p">)</span> \
+                                       <span class="o">&amp;</span> <span class="nb">set</span> <span class="p">(</span><span class="n">conclusion_target_ids</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">possible_targets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">argument_available</span> <span class="o">=</span> <span class="kc">True</span>
+                    
+                    <span class="n">c</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">possible_targets</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">argument_available</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">argument_selection_strategy</span> <span class="o">==</span> <span class="s2">&quot;any&quot;</span><span class="p">:</span>
+                        <span class="c1"># list of all arguments with at least one match</span>
+                        <span class="n">new_argument</span> <span class="o">=</span> <span class="n">choice</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">c</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">argument_selection_strategy</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span>
+                        <span class="c1"># list of all arguments that maximise the matches</span>
+                        <span class="n">new_argument</span> <span class="o">=</span> <span class="n">choice</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">c</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">c</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">)]])</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Agent with id </span><span class="si">{</span><span class="n">source_id</span><span class="si">}</span><span class="s2"> introduced </span><span class="si">{</span><span class="n">new_argument</span><span class="si">}</span><span class="s2">, &quot;</span><span class="p">)</span>
+                        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;which targets </span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="n">new_argument</span><span class="p">]</span><span class="si">}</span><span class="s2"> other agents.&quot;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    
+                    <span class="k">break</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;No </span><span class="si">{</span><span class="n">strategy</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> argument available for position </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_argument</span> <span class="o">=</span> <span class="n">choice</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">debate</span><span class="o">.</span><span class="n">args</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncovered_arguments</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">new_argument</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uncovered_arguments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_argument</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">z3_assertion_from_argument</span><span class="p">(</span><span class="n">premises</span><span class="o">=</span><span class="n">new_argument</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> 
+                                           <span class="n">conclusion</span><span class="o">=</span><span class="n">new_argument</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+            <span class="c1"># updating</span>
+            <span class="n">response</span><span class="p">(</span><span class="n">simulation</span> <span class="o">=</span> <span class="bp">self</span><span class="p">,</span>
+                     <span class="n">debate</span> <span class="o">=</span> <span class="n">Debate</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">uncovered_arguments</span><span class="p">),</span>
+                     <span class="n">positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                     <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">updating_strategy</span><span class="p">,</span>
+                     <span class="n">sentences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="FixedDebateSimulation.run"><a class="viewcode-back" href="../../../simulation/update.html#taupy.simulation.simulation.FixedDebateSimulation.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_density</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">max_steps</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">min_sccp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run Simulation steps until targets are reached</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uncovered_arguments</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_steps</span> 
+                <span class="ow">and</span> <span class="n">satisfiability_count</span><span class="p">(</span><span class="n">Debate</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">uncovered_arguments</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="n">min_sccp</span><span class="p">)</span> \
+               <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uncovered_arguments</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> 
+                   <span class="ow">and</span> <span class="n">Debate</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">uncovered_arguments</span><span class="p">)</span><span class="o">.</span><span class="n">density</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">max_density</span><span class="p">):</span>
+               <span class="k">break</span>
+
+            <span class="n">introduced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">introduced</span><span class="p">:</span>
+                <span class="k">break</span>
+        
+        <span class="k">if</span> <span class="n">quiet</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Simulation ended. </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uncovered_arguments</span><span class="p">)</span><span class="si">}</span><span class="s2"> steps taken.&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Generate a return object that only contains pickable data.</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;positions&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span>
+                <span class="s2">&quot;uncovered_arguments&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncovered_arguments</span><span class="p">,</span>
+                <span class="s2">&quot;debate&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">debate</span><span class="p">,</span>
+                <span class="s2">&quot;sentencepool&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="p">,</span>
+                <span class="s2">&quot;log&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span>
+            <span class="p">}</span></div></div>
+
+<span class="k">class</span> <span class="nc">SocialInfluenceSimulation</span><span class="p">(</span><span class="n">SimulationBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simulation in which agents update their positions based on what</span>
+<span class="sd">    other agents think, through a reason-exchange mechanism similar to</span>
+<span class="sd">    Mäs &amp; Flache ([Mäs2013]_) or Singer et al. ([Singer2019]_).</span>
+
+<span class="sd">    .. [Mäs2013] Mäs, Michael &amp; Flache, Andreas. 2013. Differentiation without </span>
+<span class="sd">                 distancing: Explaining bi-polarization of opinions without </span>
+<span class="sd">                 negative influence. PLOS ONE 8 (11). </span>
+<span class="sd">                 DOI: 10.1371/journal.pone.0074516.</span>
+
+<span class="sd">    .. [Singer2019] Singer et al. 2019. Rational social and political </span>
+<span class="sd">                    polarization. Philosophical Studies 176: 2243–2267. </span>
+<span class="sd">                    DOI: 10.1007/s11098-018-1124-5.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">debate_generation</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;max_density&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">},</span>
+                 <span class="n">number_key_statements</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+                 <span class="n">sentencepool</span> <span class="o">=</span> <span class="s2">&quot;p:10&quot;</span><span class="p">,</span>
+                 <span class="n">positions</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">initial_position_size</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+                 <span class="n">updating_strategy</span> <span class="o">=</span> <span class="s2">&quot;closest_coherent&quot;</span><span class="p">,</span>
+                 <span class="n">partial_neighbour_search_radius</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+                 <span class="n">influence_parameter</span> <span class="o">=</span> <span class="mi">0</span>
+                 <span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">symbols</span><span class="p">(</span><span class="n">sentencepool</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_statements</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sentencepool</span><span class="p">)[:</span><span class="n">number_key_statements</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debate</span> <span class="o">=</span> <span class="n">generate_hierarchical_argument_map</span><span class="p">(</span>
+                        <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="p">)),</span>
+                        <span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key_statements</span><span class="p">),</span>
+                        <span class="o">**</span><span class="n">debate_generation</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">influence_parameter</span> <span class="o">=</span> <span class="n">influence_parameter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">partial_neighbour_search_radius</span> <span class="o">=</span> <span class="n">partial_neighbour_search_radius</span>
+
+        <span class="k">if</span> <span class="n">positions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_positions</span><span class="p">([],</span> <span class="n">target_length</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_positions</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">positions</span><span class="p">),</span>
+                                <span class="n">target_length</span><span class="o">=</span><span class="n">initial_position_size</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">debate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debate</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">updating_strategy</span> <span class="o">=</span> <span class="n">updating_strategy</span>
+        <span class="c1"># Are the initial positions closed and coherent give the debate?</span>
+        <span class="c1"># If not, update these positions.</span>
+        <span class="c1"># This also means that the positions in self.positions[0] will be less</span>
+        <span class="c1"># interesting compared to those in self.positions[1]</span>
+
+        <span class="c1"># Since the debate of a Social Influence Simulation never changes, we</span>
+        <span class="c1"># need to compute the legitimate positions once. This saves a lot of </span>
+        <span class="c1"># computation time, but currently is only available for complete </span>
+        <span class="c1"># positions that do not suspend.</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">updating_strategy</span> <span class="o">==</span> <span class="s2">&quot;closest_coherent&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_models</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">satisfiability</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">debate</span><span class="p">,</span> <span class="n">all_models</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_models</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;I was unable to compute all models given the&quot;</span>
+                            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;updating strategy </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">updating_strategy</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="n">response</span><span class="p">(</span><span class="n">simulation</span> <span class="o">=</span> <span class="bp">self</span><span class="p">,</span>
+                <span class="n">debate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debate</span><span class="p">,</span>
+                <span class="n">models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_models</span><span class="p">,</span>
+                <span class="n">positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">updating_strategy</span><span class="p">,</span>
+                <span class="n">sentences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Control the display of individual objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulation with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">debate</span><span class="p">)</span><span class="si">}</span><span class="s2"> arguments &quot;</span>
+                   <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="si">}</span><span class="s2"> agents.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">pick_position</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])))</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">pick_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">source_id</span> <span class="o">=</span> <span class="n">pick_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">influence_item</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="p">)</span>
+
+        <span class="n">candidates</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">normalised_edit_distance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="n">d</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">influence_parameter</span><span class="p">,</span> <span class="n">d</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">influence_parameter</span><span class="p">]</span>
+            <span class="n">update</span> <span class="o">=</span> <span class="n">choices</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="n">weights</span><span class="o">=</span><span class="n">w</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
+                <span class="n">new_position</span> <span class="o">=</span> <span class="n">Position</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debate</span><span class="p">,</span> 
+                    <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">p</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">influence_item</span><span class="p">},</span>
+                    <span class="n">introduction_strategy</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">introduction_strategy</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">influence_item</span> <span class="ow">in</span> <span class="n">source</span><span class="p">:</span>
+                    <span class="n">new_position</span><span class="p">[</span><span class="n">influence_item</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="n">influence_item</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Position </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> was influenced by Position </span><span class="si">{</span><span class="n">source_id</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_position</span> <span class="o">=</span> <span class="n">p</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Position </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> was not influenced by Position </span><span class="si">{</span><span class="n">source_id</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_position</span><span class="p">)</span>
+
+        <span class="n">response</span><span class="p">(</span><span class="n">simulation</span> <span class="o">=</span> <span class="bp">self</span><span class="p">,</span>
+                 <span class="n">debate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debate</span><span class="p">,</span>
+                 <span class="n">positions</span> <span class="o">=</span> <span class="n">candidates</span><span class="p">,</span>
+                 <span class="n">models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_models</span><span class="p">,</span>
+                 <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">updating_strategy</span><span class="p">,</span>
+                 <span class="n">sentences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_steps</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span> <span class="n">max_agreement</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+        <span class="c1"># The step counter</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+                
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+
+            <span class="c1"># Determine the current population-wide mean agreement by taking</span>
+            <span class="c1"># the mean of the upper triangle matrix of the differences</span>
+            <span class="c1"># between positions (assuming, for simplicity, that the difference</span>
+            <span class="c1"># metric is symmetric.)</span>
+            <span class="n">current_mean_agreement</span> <span class="o">=</span> <span class="n">difference_matrix</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> 
+                <span class="n">normalised_edit_agreement</span><span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">triu_indices</span><span class="p">(</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">max_steps</span> <span class="ow">and</span> <span class="n">current_mean_agreement</span> <span class="o">&lt;=</span> <span class="n">max_agreement</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">break</span>
+        
+        <span class="k">if</span> <span class="n">quiet</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulation ended. </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> steps taken. &quot;</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Reached mean agreement of </span><span class="si">{</span><span class="n">current_mean_agreement</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;positions&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span>
+                <span class="s2">&quot;debate&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">debate</span><span class="p">,</span>
+                <span class="s2">&quot;sentencepool&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentencepool</span><span class="p">,</span>
+                <span class="s2">&quot;log&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span>
+            <span class="p">}</span>
+
+
+<div class="viewcode-block" id="experiment"><a class="viewcode-back" href="../../../simulation/experiments.html#taupy.simulation.simulation.experiment">[docs]</a><span class="k">def</span> <span class="nf">experiment</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sim_type</span><span class="o">=</span><span class="n">Simulation</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="p">{},</span> <span class="n">simulations</span><span class="o">=</span><span class="p">{},</span> <span class="n">runs</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate and execute :py:attr:`n` number of Simulations and output their </span>
+<span class="sd">    results. The Simulations can be controlled via a dictionary passed to </span>
+<span class="sd">    :py:attr:`simulations`. The :py:func:`Simulation.run()` can be controlled </span>
+<span class="sd">    with a dictionary passed to :py:attr:`runs`.</span>
+
+<span class="sd">    Settings to the :py:obj:`ProcessPoolExecutor` should be forwarded in a </span>
+<span class="sd">    dictionary to :py:attr:`executor`.</span>
+
+<span class="sd">    This function calls two Executors. The first is responsible for setting up</span>
+<span class="sd">    the Simulations in parallel. The second performs the simulation runs. This</span>
+<span class="sd">    is particularly helpful for Simulation types that involve substantial </span>
+<span class="sd">    computation for set-up, such as FixedDebateSimulation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO 1: Use logging instead of printing</span>
+    <span class="c1"># TODO 2: Catch exceptions inside simulation processes</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting experiment at </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">()</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="o">**</span><span class="n">executor</span><span class="p">)</span> <span class="k">as</span> <span class="n">init_sim_executor</span><span class="p">:</span>
+        <span class="n">init_sims</span> <span class="o">=</span> <span class="p">[</span><span class="n">init_sim_executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">sim_type</span><span class="p">,</span> 
+                                              <span class="o">**</span><span class="n">simulations</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+    
+    <span class="n">simulations</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">result</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">init_sims</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulations initialised at </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">()</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="o">**</span><span class="n">executor</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> 
+                                   <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                                   <span class="o">**</span><span class="n">runs</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">simulations</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">count</span><span class="p">,</span> <span class="n">future</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">as_completed</span><span class="p">(</span><span class="n">results</span><span class="p">),</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulation </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> completed at </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">()</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    
+    <span class="n">r</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">result</span><span class="p">())</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to save simulation </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">r</span></div>
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Felix Kopecky
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/scripts/furo.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    </body>
+</html>

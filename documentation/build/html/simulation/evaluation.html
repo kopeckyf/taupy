@@ -1,0 +1,590 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="References for further reading" href="../references.html" /><link rel="prev" title="Experiments: Simulations in parallel" href="experiments.html" />
+
+    <meta name="generator" content="sphinx-5.0.1, furo 2022.06.04.1"/>
+        <title>Evaluation - taupy</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --admonition-font-size: 100%;;
+  --admonition-title-font-size: 100%;;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">taupy</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">taupy</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">Installation and quick start</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../basic/index.html">Base objects</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../basic/arguments.html">Arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/debates.html">Debates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../basic/positions.html">Positions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../analysis/index.html">Analysis &amp; measurement</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../analysis/agreement.html">Agreement and distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../analysis/density.html">Inferential density</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../analysis/doj.html">Degrees of justification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../analysis/centrality.html">Centrality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../analysis/clustering.html">Clustering belief systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../analysis/polarisation.html">Polarisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../analysis/diversity.html">Diversity</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../generators/index.html">Synthesise new objects</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../generators/surveys.html">Surveys and aggregation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generators/maps.html">Argument maps</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Simulations</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="populations.html">Setting up a population</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulations.html">Setting up a simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="update.html">Running a simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="experiments.html">Experiments: Simulations in parallel</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References for further reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Class and function index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/plotting-sccp.html">Plotting the SCCP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/agreement.html">Tracking agreement in debate simulations</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="evaluation">
+<h1>Evaluation<a class="headerlink" href="#evaluation" title="Permalink to this heading">#</a></h1>
+<p>The <a class="reference internal" href="#taupy.simulation.evaluation.Evaluation" title="taupy.simulation.evaluation.Evaluation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Evaluation</span></code></a> class
+provides methods for analysing large chunks of data and storing that
+information in a combined table. It performs most of its operations
+concurrently and gives a performance advantage on machines with many CPUs.
+All measures described in <a class="reference internal" href="../analysis/index.html#analysis-measurement"><span class="std std-ref">Analysis &amp; measurement</span></a> can be applied to
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Evaluation</span></code> objects.</p>
+<section id="setting-up-an-evaluation-object">
+<h2>Setting up an Evaluation object<a class="headerlink" href="#setting-up-an-evaluation-object" title="Permalink to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.Evaluation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taupy.simulation.evaluation.</span></span><span class="sig-name descname"><span class="pre">Evaluation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debate_stages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_of_positions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clustering_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiprocessing_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#Evaluation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.Evaluation" title="Permalink to this definition">#</a></dt>
+<dd><p>A class to collect measurement values for a simulation while storing shared 
+information between evaluation functions (such as clusterings).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>debate_stages</strong> – An iterator containing the lists of debate stages for
+each simulation run.</p></li>
+<li><p><strong>list_of_positions</strong> – An iterator containing the lists of belief sytems
+for each simulation run.</p></li>
+<li><p><strong>clustering_method</strong> – When evaluation functions that rely on position
+clustering are called, the clustering algorithm specified here will be
+used. Functions from <code class="xref py py-mod docutils literal notranslate"><span class="pre">taupy.analysis.clustering</span></code> can be selected
+here, in particular <code class="xref py py-func docutils literal notranslate"><span class="pre">leiden()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">affinity_propagation()</span></code>,
+and <code class="xref py py-func docutils literal notranslate"><span class="pre">agglomerative_clustering()</span></code>.</p></li>
+<li><p><strong>multiprocessing_settings</strong> (<em>dict</em>) – Settings forwarded to multiprocessing. 
+Should be options that are recognised by 
+<code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.ProcessPoolExecutor</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> – A <code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> containing the analysed data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="viewing-results">
+<h2>Viewing results<a class="headerlink" href="#viewing-results" title="Permalink to this heading">#</a></h2>
+<p>All measurement functions from the evaluation module are configured to add
+columns to a shared <code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> stored in
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">Evaluation.data</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">e</span> <span class="o">=</span> <span class="n">Evaluation</span><span class="p">()</span>
+<span class="c1"># View the DataFrame</span>
+<span class="n">e</span><span class="o">.</span><span class="n">data</span>
+<span class="c1"># Since e.data is a pandas DataFrame, all DataFrame operations can be used:</span>
+<span class="n">e</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;myexport.csv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>An <code class="xref py py-obj docutils literal notranslate"><span class="pre">Evaluation.data</span></code> table is structured like this:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>density</p></th>
+<th class="head"><p>dispersion</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0.02324</p></td>
+<td><p>0.29561402</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>0.07451</p></td>
+<td><p>0.30156791</p></td>
+</tr>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>2</p></td>
+<td><p>0.08462</p></td>
+<td><p>0.30196067</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>3</p></td>
+<td><p>0.09880</p></td>
+<td><p>0.30971113</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The first two columns indicate the <code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.MultiIndex</span></code> for the table.
+The first column corresponds to the simulation number within the experiment, and
+the second column to the debate stage within the simulation. The remaining
+columns are inserted by the <code class="xref py py-class docutils literal notranslate"><span class="pre">Evaluation</span></code> class methods described
+below.</p>
+</section>
+<section id="a-minimal-example">
+<h2>A minimal example<a class="headerlink" href="#a-minimal-example" title="Permalink to this heading">#</a></h2>
+<p>Suppose you have run an experiment with iterative argument introductions and
+want to analyse the density and pairwise dispersion of each debate stage.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># First, create 10 positions with strategy random</span>
+<span class="n">my_population</span> <span class="o">=</span> <span class="p">[</span><span class="n">Position</span><span class="p">(</span><span class="n">debate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">introduction_strategy</span><span class="o">=</span><span class="n">strategies</span><span class="o">.</span><span class="n">random</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+
+<span class="c1"># Run 4 simulations in an experiment:</span>
+<span class="n">my_experiments</span> <span class="o">=</span> <span class="n">experiment</span><span class="p">(</span>
+    <span class="n">n</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">simulations</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;positions&quot;</span><span class="p">:</span> <span class="n">my_population</span><span class="p">,</span> <span class="s2">&quot;sentencepool&quot;</span><span class="p">:</span> <span class="s2">&quot;p:10&quot;</span><span class="p">,</span> <span class="s2">&quot;argumentlength&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]},</span>
+    <span class="n">runs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;max_density&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span> <span class="s2">&quot;max_steps&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">}</span>
+    <span class="p">)</span>
+
+<span class="c1"># Create an Evaluation object</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">Evaluation</span><span class="p">(</span>
+    <span class="n">debate_stages</span><span class="o">=</span><span class="n">my_experiments</span><span class="p">,</span>
+    <span class="n">list_of_positions</span><span class="o">=</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">positions</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">my_experiments</span><span class="p">]</span>
+    <span class="p">)</span>
+<span class="c1"># Add a density column to the data</span>
+<span class="n">e</span><span class="o">.</span><span class="n">densities</span><span class="p">()</span>
+<span class="c1"># Add a column with pairwise dispersion measurements to the data</span>
+<span class="n">e</span><span class="o">.</span><span class="n">dispersions</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The resulting <code class="xref py py-obj docutils literal notranslate"><span class="pre">e.data</span></code> table is intended for further data analysis, such
+as statistics or plotting. These operations will be performed outside of
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">taupy</span></code>, in modules such as <code class="xref py py-mod docutils literal notranslate"><span class="pre">numpy</span></code> or <code class="xref py py-mod docutils literal notranslate"><span class="pre">seaborn</span></code>.</p>
+</section>
+<section id="adding-data-to-an-evaluation-object">
+<h2>Adding data to an Evaluation object<a class="headerlink" href="#adding-data-to-an-evaluation-object" title="Permalink to this heading">#</a></h2>
+<section id="shortcut-functions">
+<h3>Shortcut functions<a class="headerlink" href="#shortcut-functions" title="Permalink to this heading">#</a></h3>
+<p>These functions are shortcuts to the functions explained in more detail below.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.Evaluation.densities">
+<span class="sig-prename descclassname"><span class="pre">Evaluation.</span></span><span class="sig-name descname"><span class="pre">densities</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#Evaluation.densities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.Evaluation.densities" title="Permalink to this definition">#</a></dt>
+<dd><p>A shortcut function to directly add the densities to the evaluation
+DataFrame.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.Evaluation.dispersions">
+<span class="sig-prename descclassname"><span class="pre">Evaluation.</span></span><span class="sig-name descname"><span class="pre">dispersions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#Evaluation.dispersions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.Evaluation.dispersions" title="Permalink to this definition">#</a></dt>
+<dd><p>A shortcut function to directly add pairwise dispersion measurements to 
+the evaluation DataFrame.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.Evaluation.agreement_means">
+<span class="sig-prename descclassname"><span class="pre">Evaluation.</span></span><span class="sig-name descname"><span class="pre">agreement_means</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#Evaluation.agreement_means"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.Evaluation.agreement_means" title="Permalink to this definition">#</a></dt>
+<dd><p>A shortcut to directly add the mean population-wide agreement to the
+evaluation DataFrame.</p>
+</dd></dl>
+
+</section>
+<section id="measures-that-only-analyse-debate-stages">
+<h3>Measures that only analyse debate stages<a class="headerlink" href="#measures-that-only-analyse-debate-stages" title="Permalink to this heading">#</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.Evaluation.debate_stage_analysis">
+<span class="sig-prename descclassname"><span class="pre">Evaluation.</span></span><span class="sig-name descname"><span class="pre">debate_stage_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#Evaluation.debate_stage_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.Evaluation.debate_stage_analysis" title="Permalink to this definition">#</a></dt>
+<dd><p>A generic evaluation method to analyse, in multiprocessing, only debate
+stages without taking further data into account. From this module, 
+functions that can be passed to <code class="xref py py-attr docutils literal notranslate"><span class="pre">function</span></code> are:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#taupy.simulation.evaluation.densities_of_debate_stages" title="taupy.simulation.evaluation.densities_of_debate_stages"><code class="xref py py-func docutils literal notranslate"><span class="pre">densities_of_debate_stages()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#taupy.simulation.evaluation.sccp_extension" title="taupy.simulation.evaluation.sccp_extension"><code class="xref py py-func docutils literal notranslate"><span class="pre">sccp_extension()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#taupy.simulation.evaluation.progress" title="taupy.simulation.evaluation.progress"><code class="xref py py-func docutils literal notranslate"><span class="pre">progress()</span></code></a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.densities_of_debate_stages">
+<span class="sig-prename descclassname"><span class="pre">taupy.simulation.evaluation.</span></span><span class="sig-name descname"><span class="pre">densities_of_debate_stages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debate_stages</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#densities_of_debate_stages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.densities_of_debate_stages" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.sccp_extension">
+<span class="sig-prename descclassname"><span class="pre">taupy.simulation.evaluation.</span></span><span class="sig-name descname"><span class="pre">sccp_extension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debate_stages</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#sccp_extension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.sccp_extension" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.progress">
+<span class="sig-prename descclassname"><span class="pre">taupy.simulation.evaluation.</span></span><span class="sig-name descname"><span class="pre">progress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debate_stages</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#progress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.progress" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="measures-that-only-analyse-positions">
+<h3>Measures that only analyse positions<a class="headerlink" href="#measures-that-only-analyse-positions" title="Permalink to this heading">#</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.Evaluation.position_analysis">
+<span class="sig-prename descclassname"><span class="pre">Evaluation.</span></span><span class="sig-name descname"><span class="pre">position_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#Evaluation.position_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.Evaluation.position_analysis" title="Permalink to this definition">#</a></dt>
+<dd><p>A generic method to evaluate functions that work on positions, with
+multiprocessing. Examples are (see the shortcut functions as well):</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#taupy.simulation.evaluation.dispersions_between_positions" title="taupy.simulation.evaluation.dispersions_between_positions"><code class="xref py py-func docutils literal notranslate"><span class="pre">dispersions_between_positions()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#taupy.simulation.evaluation.mean_agreement_between_positions" title="taupy.simulation.evaluation.mean_agreement_between_positions"><code class="xref py py-func docutils literal notranslate"><span class="pre">mean_agreement_between_positions()</span></code></a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.dispersions_between_positions">
+<span class="sig-prename descclassname"><span class="pre">taupy.simulation.evaluation.</span></span><span class="sig-name descname"><span class="pre">dispersions_between_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measure=&lt;function</span> <span class="pre">normalised_hamming_distance&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#dispersions_between_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.dispersions_between_positions" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.mean_agreement_between_positions">
+<span class="sig-prename descclassname"><span class="pre">taupy.simulation.evaluation.</span></span><span class="sig-name descname"><span class="pre">mean_agreement_between_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measure=&lt;function</span> <span class="pre">bna&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#mean_agreement_between_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.mean_agreement_between_positions" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="measures-that-rely-on-clustering">
+<h3>Measures that rely on clustering<a class="headerlink" href="#measures-that-rely-on-clustering" title="Permalink to this heading">#</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.Evaluation.generate_clusters">
+<span class="sig-prename descclassname"><span class="pre">Evaluation.</span></span><span class="sig-name descname"><span class="pre">generate_clusters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clustering_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#Evaluation.generate_clusters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.Evaluation.generate_clusters" title="Permalink to this definition">#</a></dt>
+<dd><p>Apply the clustering algorithm selected in 
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">Evaluation.clustering_method</span></code> to the stored debate stages and 
+positions. The clusters are saved in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Evaluation.clusters</span></code> 
+list and can be accessed by functions that work on clusterings.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.Evaluation.group_divergence">
+<span class="sig-prename descclassname"><span class="pre">Evaluation.</span></span><span class="sig-name descname"><span class="pre">group_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measure=&lt;function</span> <span class="pre">normalised_hamming_distance&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#Evaluation.group_divergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.Evaluation.group_divergence" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate the group divergence between all positions stored in the 
+<a class="reference internal" href="#taupy.simulation.evaluation.Evaluation" title="taupy.simulation.evaluation.Evaluation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Evaluation</span></code></a> object and add a column to the data object.
+Raises an error if no clustering has been generated.</p>
+<p>See <a class="reference internal" href="../analysis/polarisation.html#taupy.analysis.polarisation.group_divergence" title="taupy.analysis.polarisation.group_divergence"><code class="xref py py-func docutils literal notranslate"><span class="pre">taupy.analysis.polarisation.group_divergence()</span></code></a> for details.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.Evaluation.group_consensus">
+<span class="sig-prename descclassname"><span class="pre">Evaluation.</span></span><span class="sig-name descname"><span class="pre">group_consensus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measure=&lt;function</span> <span class="pre">normalised_hamming_distance&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#Evaluation.group_consensus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.Evaluation.group_consensus" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate the group consensus between all positions stored in the 
+<a class="reference internal" href="#taupy.simulation.evaluation.Evaluation" title="taupy.simulation.evaluation.Evaluation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Evaluation</span></code></a> object and add a column to the data object.
+Raises an error if no clustering has been generated.</p>
+<p>See <a class="reference internal" href="../analysis/polarisation.html#taupy.analysis.polarisation.group_consensus" title="taupy.analysis.polarisation.group_consensus"><code class="xref py py-func docutils literal notranslate"><span class="pre">taupy.analysis.polarisation.group_consensus()</span></code></a> for details.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taupy.simulation.evaluation.Evaluation.clusters_analysis">
+<span class="sig-prename descclassname"><span class="pre">Evaluation.</span></span><span class="sig-name descname"><span class="pre">clusters_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'NAME'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/taupy/simulation/evaluation.html#Evaluation.clusters_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#taupy.simulation.evaluation.Evaluation.clusters_analysis" title="Permalink to this definition">#</a></dt>
+<dd><p>Generic multi-process function to apply a measure that works on the 
+cluster structure of a simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>function</strong> – <p>A function to be applied in multiprocessing. 
+Here is a list of examples from different <cite>taupy</cite> 
+submodules that work with this function:</p>
+<blockquote>
+<div><ul>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">number_of_groups</span></code></p></li>
+<li><p><a class="reference internal" href="../analysis/polarisation.html#taupy.analysis.polarisation.group_size_parity" title="taupy.analysis.polarisation.group_size_parity"><code class="xref py py-func docutils literal notranslate"><span class="pre">group_size_parity</span></code></a></p></li>
+<li><p><a class="reference internal" href="../analysis/polarisation.html#taupy.analysis.polarisation.coverage_of_clustering" title="taupy.analysis.polarisation.coverage_of_clustering"><code class="xref py py-func docutils literal notranslate"><span class="pre">coverage_of_clustering</span></code></a></p></li>
+<li><p><a class="reference internal" href="../analysis/diversity.html#taupy.analysis.diversity.Shannon_index" title="taupy.analysis.diversity.Shannon_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">Shannon_index</span></code></a></p></li>
+<li><p><a class="reference internal" href="../analysis/diversity.html#taupy.analysis.diversity.normalised_Shannon_index" title="taupy.analysis.diversity.normalised_Shannon_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">normalised_Shannon_index</span></code></a></p></li>
+<li><p><a class="reference internal" href="../analysis/diversity.html#taupy.analysis.diversity.Simpson_index" title="taupy.analysis.diversity.Simpson_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">Simpson_index</span></code></a></p></li>
+<li><p><a class="reference internal" href="../analysis/diversity.html#taupy.analysis.diversity.inverse_Simpson_index" title="taupy.analysis.diversity.inverse_Simpson_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">inverse_Simpson_index</span></code></a></p></li>
+<li><p><a class="reference internal" href="../analysis/diversity.html#taupy.analysis.diversity.Gini_Simpson_index" title="taupy.analysis.diversity.Gini_Simpson_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">Gini_Simpson_index</span></code></a></p></li>
+</ul>
+</div></blockquote>
+<p>Note that <a class="reference internal" href="#taupy.simulation.evaluation.Evaluation.group_divergence" title="taupy.simulation.evaluation.Evaluation.group_divergence"><code class="xref py py-func docutils literal notranslate"><span class="pre">group_divergence()</span></code></a> and <a class="reference internal" href="#taupy.simulation.evaluation.Evaluation.group_consensus" title="taupy.simulation.evaluation.Evaluation.group_consensus"><code class="xref py py-func docutils literal notranslate"><span class="pre">group_consensus()</span></code></a>
+are calculated with dedicated methods. This is because both functions
+rely on additional information not present in the clustering alone.</p>
+</p></li>
+<li><p><strong>column_name</strong> (<em>str</em>) – Title of the column that is added to the 
+Evaluations <code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code> table. Should be indicative of the 
+measure that was applied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../references.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">References for further reading</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="experiments.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Experiments: Simulations in parallel</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Felix Kopecky
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Evaluation</a><ul>
+<li><a class="reference internal" href="#setting-up-an-evaluation-object">Setting up an Evaluation object</a></li>
+<li><a class="reference internal" href="#viewing-results">Viewing results</a></li>
+<li><a class="reference internal" href="#a-minimal-example">A minimal example</a></li>
+<li><a class="reference internal" href="#adding-data-to-an-evaluation-object">Adding data to an Evaluation object</a><ul>
+<li><a class="reference internal" href="#shortcut-functions">Shortcut functions</a></li>
+<li><a class="reference internal" href="#measures-that-only-analyse-debate-stages">Measures that only analyse debate stages</a></li>
+<li><a class="reference internal" href="#measures-that-only-analyse-positions">Measures that only analyse positions</a></li>
+<li><a class="reference internal" href="#measures-that-rely-on-clustering">Measures that rely on clustering</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/scripts/furo.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    </body>
+</html>

@@ -25,7 +25,7 @@ class SimulationBase:
     """
     A super class for simulations.
     """
-    def init_positions(self, positions, target_length):
+    def init_positions(self, positions, target_length, shared_judgements=0):
         """
         Generate initial Positions. Optionally, the Positions may start off with
         explicit truth-value attributions. Positions are filled up with random
@@ -36,7 +36,18 @@ class SimulationBase:
         if target_length == None:
             target_length = len(self.sentencepool)
 
+        if shared_judgements > 0:
+            shared_subposition = {
+                i: choice([True, False]) for i in sample(
+                    self.sentencepool, k=shared_judgements)
+            }
+
         for p in positions:
+
+            if shared_judgements > 0:
+                for i in shared_subposition:
+                    p[i] = shared_subposition[i]
+
             if len(p) < target_length:
                 # Only fill up positions that do not have the desired length.
                 pool = sample(self.sentencepool, k=target_length)
@@ -149,9 +160,13 @@ class Simulation(list, SimulationBase):
         :py:obj:`None` is selected, agents will have complete positions, i.e. 
         they will assign a truth-value to each sentence in the sentence pool.
 
+    :param randomly_shared_judgements: A non-zero setting will produce a random
+        sub-position of this length that all positions share before being filled 
+        up to :py:obj:`initial_position_size`.
+
     :param default_introduction_strategy:
-        The introduction strategy for positions that have no :py:attr:`introduction_strategy`
-        assigned to them.
+        The introduction strategy for positions that have no 
+        :py:attr:`introduction_strategy` assigned to them.
 
     :param default_update_strategy:
         Specifies how agents should update their belief system in case of 
@@ -180,6 +195,7 @@ class Simulation(list, SimulationBase):
                  positions = None,
                  copy_input_positions = True,
                  initial_position_size = None,
+                 randomly_shared_judgements = 0,
                  default_introduction_strategy = strategies.random,
                  default_update_strategy = "closest_coherent",
                  partial_neighbour_search_radius = 50):
@@ -207,10 +223,12 @@ class Simulation(list, SimulationBase):
         if positions is not None:
             if copy_input_positions == True:
                 self.init_positions(deepcopy(positions), 
-                                    target_length=initial_position_size)
+                                    target_length=initial_position_size,
+                                    shared_judgements=randomly_shared_judgements)
             else:
                 self.init_positions(positions, 
-                                    target_length=initial_position_size)
+                                    target_length=initial_position_size,
+                                    shared_judgements=randomly_shared_judgements)
         else:
             self.init_positions([], target_length=0)
 
@@ -424,6 +442,10 @@ class FixedDebateSimulation(SimulationBase):
         positions will be partial and contain a random subset of sentences. 
         Positions that have no initial truth-value attributions will be randomly
         assigned.
+
+    :param randomly_shared_judgements: A non-zero setting will produce a random
+        sub-position of this length that all positions share before being filled 
+        up to :py:obj:`initial_position_size`.
         
     :param int num_key_statements: The number of roots for the generated 
         tree-like argument map. 
@@ -447,6 +469,7 @@ class FixedDebateSimulation(SimulationBase):
                  default_update_strategy = "closest_coherent",
                  initial_arguments = None,
                  initial_position_size = None,
+                 randomly_shared_judgements = 0,
                  num_key_statements = 1,
                  partial_neighbour_search_radius = 100,
                  positions = None,
@@ -466,7 +489,8 @@ class FixedDebateSimulation(SimulationBase):
             self.init_positions([], target_length=0)
         else:
             self.init_positions(deepcopy(positions), 
-                                target_length=initial_position_size)
+                                target_length=initial_position_size,
+                                shared_judgements=randomly_shared_judgements)
 
         self.updating_strategy = default_update_strategy
         

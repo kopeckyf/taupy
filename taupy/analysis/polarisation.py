@@ -109,7 +109,8 @@ def group_divergence(clusters, adjacency_matrix):
         # stored on the diagonal, and so we take it out.
         np.fill_diagonal(mask_of_neighbours, 1)
         neighbours = ma.array(
-            adjacency_matrix, mask=mask_of_neighbours, copy=True)
+            adjacency_matrix, mask=mask_of_neighbours, copy=True
+            )
         # Now do the inverse operation for strangers. Instead of a
         # matrix of Ones, we start with one of Zeros.
         strangers_indices = list(set(range(len(adjacency_matrix))) - set(c))
@@ -119,14 +120,17 @@ def group_divergence(clusters, adjacency_matrix):
         mask_of_strangers[np.ix_(strangers_indices, strangers_indices)] = 1
         np.fill_diagonal(mask_of_strangers, 1)
         strangers = ma.array(
-            adjacency_matrix, mask=mask_of_strangers, copy=True)
+            adjacency_matrix, mask=mask_of_strangers, copy=True
+            )
 
         if neighbours.count() > 1 and strangers.count() > 0:
-            # Every cluster has at least one member -- or it wouldn't be a cluster, hence
-            # the check for neighbours.count() > 1.
+            # Default case: there is at least one neighbour for the current 
+            # agent at at least one stranger.
             l.append(abs(neighbours.mean() - strangers.mean()))
         else:
-            if(strangers.count() > 1):
+            # Catch special cases in which clusters are singletons or the
+            # population consists of only one cluster.
+            if(neighbours.count() > 1):
                 l.append(neighbours.mean())
             if(strangers.count() > 0):
                 l.append(strangers.mean())

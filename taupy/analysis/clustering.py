@@ -13,11 +13,16 @@ def clustering_matrix(positions, *, measure=normalised_hamming_distance,
                       scale=-4, distance_threshold=0.2):
     """
     Converts a difference matrix to a sparse clustering (adjacency) matrix that 
-    can be input to community structuring algorithms. This is necessary because 
-    many clustering algorithms are designed for sparse social networks.
+    can be input to the Leiden and affinity propagation community structuring 
+    algorithms. These clustering algorithms are designed for sparse adjacency
+    matrices.
 
-    The default scale of -4 means that agents with a normalised δ > 0.4 will be
-    flattened.
+    Other clustering algorithms, like agglomerative clustering, work on 
+    difference matrices. This function should not be used with these algorithms.
+
+    The default scale of -4 and threshold of 0.2 implies that agent pairs with a 
+    normalised δ > 0.4 will be considered with 0 adjacency in clustering. With a 
+    scale of -2, only agent paris with normalised δ > 0.8 are filtered.
     """
 
     diff_matrix = difference_matrix(positions, measure=measure)
@@ -27,9 +32,6 @@ def clustering_matrix(positions, *, measure=normalised_hamming_distance,
     else:
         filtered_matrix = diff_matrix
 
-    # Create a filtered (lower) triangle matrix
-    np.fill_diagonal(filtered_matrix, 0)
-    filtered_matrix[np.triu_indices(len(positions))] = 0
     # All cells below the filter threshold are flattened.
     filtered_matrix[filtered_matrix < distance_threshold] = 0
 

@@ -55,13 +55,18 @@ def leiden(positions, *, clustering_settings={},
     # Perform the community_leiden() method on the Graph objects and return
     return list(graph.community_leiden(**algorithm_settings))
 
-def affinity_propagation(positions, *, clustering_settings={}):
+def affinity_propagation(positions, *, clustering_settings={},
+                         algorithm_settings={
+                             "affinity": "precomputed", 
+                             "random_state": 0,
+                             "max_iter": 1000
+                         }):
     """
     Return the community structure obtained by clustering with Affinity 
     Propagation ([Frey2007]_).
     """
     matrix = clustering_matrix(positions=positions, **clustering_settings)
-    fits = AffinityPropagation(affinity="precomputed", random_state=0).fit(matrix) 
+    fits = AffinityPropagation(**algorithm_settings).fit(matrix) 
     return [[i[0] for i in enumerate(fits.labels_) if i[1] == j] 
              for j in range(len(fits.cluster_centers_indices_))
            ] 

@@ -3,7 +3,7 @@ Clusterings are required by other analysis modules, such as diversity and
 polarisation functions.
 """
 import numpy as np
-from igraph import Graph, ADJ_MAX
+from igraph import Graph
 from sklearn.cluster import AffinityPropagation, AgglomerativeClustering, DBSCAN
 
 from taupy.analysis.agreement import (normalised_hamming_distance, 
@@ -37,7 +37,11 @@ def clustering_matrix(positions, *, measure=normalised_hamming_distance,
 
     return filtered_matrix
 
-def leiden(positions, *, clustering_settings={}):
+def leiden(positions, *, clustering_settings={}, 
+           algorithm_settings={
+               "weights": "weight", "objective_function": "modularity"
+               }
+          ):
     """
     Return the community structure obtained by the Leiden clustering algorithm
     (see [Traag2019]_).
@@ -46,12 +50,10 @@ def leiden(positions, *, clustering_settings={}):
 
     # Creates igraph Graph objects from clustering matrices.
     graph = Graph.Weighted_Adjacency(
-                matrix.astype("float64").tolist(), mode=ADJ_MAX
+                matrix.astype("float64").tolist(), mode="max"
             )
     # Perform the community_leiden() method on the Graph objects and return
-    return list(graph.community_leiden(
-                    weights="weight", objective_function="modularity")
-               )
+    return list(graph.community_leiden(**algorithm_settings))
 
 def affinity_propagation(positions, *, clustering_settings={}):
     """

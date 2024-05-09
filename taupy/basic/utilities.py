@@ -36,12 +36,15 @@ def dict_to_binary(dictionary):
         if dictionary[k] == True: l.append(1)
         if dictionary[k] == False: l.append(0)
         if dictionary[k] == None:
-            raise ValueError("Position contains suspension and can't be represented in binary form.")
+            raise ValueError(
+                "Position contains suspension and can't be represented in \
+                    binary form."
+                )
     return l
 
 def free_premises(debate):
     """
-    Returns a list of premises that are "free" in the sense of [1: Def. 3].
+    Returns a list of premises that are “free” in the sense of [1: Def. 3].
     -----
     Referenes:
     [1] Betz, Gregor. 2009. Evaluating dialectical structures. In: Journal
@@ -76,7 +79,8 @@ def neighbours_of_list(l):
 
 def satisfiability_count(formula):
     """
-    Count the models that satisfy a Boolean formula, using Binary decision diagrams.
+    Count the models that satisfy a Boolean formula, using binary decision 
+    diagrams.
     """
     variables = iter_to_list_of_strings(formula.atoms())
     diagram = BDD()
@@ -107,18 +111,23 @@ def satisfiability(formula, all_models = False):
 
 def satisfiable_extensions(debate, position):
     """
-    Return all extensions of a (partial) position relative to a debate. If the position is
-    complete and satisfiable, it is returned as a satisfiable extension of itself. If it is
-    a partial position and satisfiable, complete positions that extend it are returned.
+    Return all extensions of a (partial) position relative to a debate. If the 
+    position is complete and satisfiable, it is returned as a satisfiable 
+    extension of itself. If it is a partial position and satisfiable, complete 
+    positions that extend it are returned.
     """
-    # The union of propositions in the position and debate is used here in case the position
-    # has a stance toward a proposition that is not yet part of an argument.
-    variables = list({str(i) for i in debate.atoms()} | {str(i) for i in position.keys()})
+    # The union of propositions in the position and debate is used here in case 
+    # the position has a stance toward a proposition that is not yet part of an 
+    # argument.
+    variables = list({str(i) for i in debate.atoms()} 
+                     | {str(i) for i in position.keys()})
     diagram = BDD()
     diagram.declare(*variables)
 
     expression = diagram.add_expr(str(to_cnf(debate)))
-    for m in diagram.pick_iter(expression, care_vars={str(i) for i in variables}):
+    for m in diagram.pick_iter(expression, 
+                               care_vars={str(i) for i in variables}
+                              ):
         yield {symbols(k): v for (k, v) in m.items()}
 
 def graph_from_positions(positions, return_attributions=False):
@@ -136,7 +145,9 @@ def graph_from_positions(positions, return_attributions=False):
     props = sorted(positions[0].keys(), key=lambda x: x.sort_key())
     bits = [list (1 if p[i] else 0 for i in props) for p in positions]
     for b in bits:
-        neighbourlist = [iter_to_string(x) for x in neighbours_of_list(b) if x in bits]
+        neighbourlist = [
+            iter_to_string(x) for x in neighbours_of_list(b) if x in bits
+            ]
         d[iter_to_string(b)] = neighbourlist
     if return_attributions:
         return d, dict(zip(list(iter_to_string(b) for b in bits), positions))
@@ -156,7 +167,7 @@ def ari(partition1, partition2):
     """
     # First, let's look at the number of elements
     if sum(len(l) for l in partition1) != sum(len(l) for l in partition2):
-        raise ValueError("The two partitions have a different number of elements.")
+        raise ValueError("The two partitions have unequal number of elements.")
     else:
         num_of_elements = sum(len(l) for l in partition1)
 
@@ -167,9 +178,9 @@ def ari(partition1, partition2):
     columns = sum([n * (n-1)/2 for n in sums_of_columns])
     rows = sum([n * (n-1)/2 for n in sums_of_rows])
     elements = sum([n * (n-1)/2 for n in np.nditer(contingency)])
-    expected_value = columns * rows / (num_of_elements * (num_of_elements-1)/2)
+    expected_value = columns*rows / (num_of_elements*(num_of_elements-1)/2)
 
-    return (elements - expected_value) / ((1/2 * (rows + columns)) - expected_value)
+    return (elements-expected_value) / ((1/2*(rows + columns))-expected_value)
 
 def contingency_matrix(partition1, partition2):
     """
@@ -210,15 +221,26 @@ def fetch_conclusion(*, sentencepool, exclude, strategy, source, target):
     possible_conclusions = list(set(sentencepool) - set(exclude))
     possible_conclusions += list(Not(i) for i in possible_conclusions)
 
-    # Directed strategies act as filters on possible conclusions. The list of possible values is not exhausted b/c it is not required by the currently known strategies.
+    # Directed strategies act as filters on possible conclusions. The list of 
+    # possible values is not exhausted b/c it is not required by the currently 
+    # known strategies.
     if strategy["source_accepts_conclusion"] == "Yes":
-        possible_conclusions = list(set(possible_conclusions) & set(dict_to_prop(source).args))
+        possible_conclusions = list(
+                                set(possible_conclusions) 
+                                & set(dict_to_prop(source).args)
+                                )
 
     if strategy["source_accepts_conclusion"] == "Toleration":
-        possible_conclusions = list(set(possible_conclusions) - {Not(i) for i in dict_to_prop(source).args})
+        possible_conclusions = list(
+                                set(possible_conclusions) 
+                                - {Not(i) for i in dict_to_prop(source).args}
+                                )
 
     if strategy["target_accepts_conclusion"] == "No":
-        possible_conclusions = list(set(possible_conclusions) - set(dict_to_prop(target).args))
+        possible_conclusions = list(
+                                set(possible_conclusions) 
+                                - set(dict_to_prop(target).args)
+                                )
     
     return possible_conclusions
 
@@ -351,35 +373,35 @@ def z3_assertion_from_argument(premises=[], conclusion=None):
     A converter function from taupy Arguments, which take sympy 
     Symbols, to a z3 Implies function, which takes z3 Bools. 
     """
-    _z3_prems = []
+    z3_premises = []
 
     for p in premises:
         if p.is_Not:
-            _z3_prems.append(z3.Not(z3.Bool(str(*p.atoms()))))
+            z3_premises.append(z3.Not(z3.Bool(str(*p.atoms()))))
         else:
-            _z3_prems.append(z3.Bool(str(*p.atoms())))
+            z3_premises.append(z3.Bool(str(*p.atoms())))
 
     if conclusion.is_Not:
-        _z3_conc = z3.Not(z3.Bool(str(*conclusion.atoms())))
+        z3_conclusion = z3.Not(z3.Bool(str(*conclusion.atoms())))
     else:
-        _z3_conc = z3.Bool(str(*conclusion.atoms()))
+        z3_conclusion = z3.Bool(str(*conclusion.atoms()))
 
-    return z3.Implies(z3.And(*_z3_prems), _z3_conc)
+    return z3.Implies(z3.And(*z3_premises), z3_conclusion)
 
 def z3_soft_constraints_from_position(position=dict()):
     """
     A converter function from Positions to z3.Optimizers
     """
     
-    _z3_constraints = []
+    constraints = []
     
     for p in position:
         if position[p] == True:
-            _z3_constraints.append(z3.Bool(str(p)))
+            constraints.append(z3.Bool(str(p)))
         if position[p] == False:
-            _z3_constraints.append(z3.Not(z3.Bool(str(p))))
+            constraints.append(z3.Not(z3.Bool(str(p))))
 
-    return _z3_constraints
+    return constraints
 
 def z3_all_models(s, initial_terms):
     """

@@ -6,7 +6,7 @@ from .utilities import (satisfiability_count, satisfiability, dict_to_prop,
                         free_premises, graph_from_positions, ari,
                         subsequences_with_length, satisfiable_extensions,
                         fetch_premises, proposition_levels_from_debate,
-                        premise_usage_count,
+                        premise_usage_count, numsat_from_density, density_from_numsat,
                         fetch_conclusion, select_premises, z3_assertion_from_argument,
                         z3_soft_constraints_from_position, z3_all_models)
 
@@ -21,7 +21,7 @@ __all__ = [
             'free_premises', 'graph_from_positions', 'ari',
             'subsequences_with_length', 'satisfiable_extensions', 'fetch_premises',
             'proposition_levels_from_debate', 'fetch_conclusion', 'select_premises',
-            'premise_usage_count',
+            'premise_usage_count', 'numsat_from_density', 'density_from_numsat',
             # z3 helper functions
             'z3_assertion_from_argument', 'z3_soft_constraints_from_position',
             'z3_all_models'

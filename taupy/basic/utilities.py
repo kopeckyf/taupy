@@ -332,6 +332,20 @@ def premise_usage_count(debate, premises=set()):
     c = c | {u: 0 for u in unused}
     return c
 
+def numsat_from_density(*, d, n, b):
+    """
+    Calculate the number of satisfying assignments at a point of inferential
+    density `d`, given the number of atomic propositions `n` and base `b`.
+    """
+    return b ** (n-n*d)
+
+def density_from_numsat(*, s, n, b):
+    """
+    Calculate the inferential density based on a given number `s` of satisfying
+    assignments to a debate of `n` atomic propositions and base `b`.
+    """
+    return (n-math.log(s, b)) / n
+
 def z3_assertion_from_argument(premises=[], conclusion=None):
     """
     A converter function from taupy Arguments, which take sympy 

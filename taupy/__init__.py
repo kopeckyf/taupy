@@ -9,7 +9,8 @@ from .basic import (satisfiability_count, satisfiability, dict_to_prop,
                     free_premises, graph_from_positions, ari,
                     subsequences_with_length, satisfiable_extensions, fetch_premises,
                     proposition_levels_from_debate, premise_usage_count,
-                    select_premises, fetch_conclusion,
+                    select_premises, fetch_conclusion, numsat_from_density,
+                    density_from_numsat,
                     z3_assertion_from_argument, z3_soft_constraints_from_position,
                     z3_all_models)
 
@@ -23,7 +24,8 @@ from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, 
                        inverse_Simpson_index, normalised_attribute_diversity_page,
                        normalised_Shannon_index, Shannon_index, Simpson_index,
                        ncc, average_ncc, clustering_matrix, leiden, affinity_propagation,
-                       agglomerative_clustering, density_based_clustering)
+                       agglomerative_clustering, density_based_clustering,
+                       switch_neighbourhood)
 
 from .simulation import (Simulation, FixedDebateSimulation, 
                          SocialInfluenceSimulation,
@@ -51,6 +53,7 @@ __all__ = [
             'aggregated_position_of_winners', 'ncc', 'average_ncc',
             'clustering_matrix', 'leiden', 'affinity_propagation', 
             'agglomerative_clustering', 'density_based_clustering',
+            'switch_neighbourhood',
             # .simulation
             'Simulation', 'FixedDebateSimulation', 'SocialInfluenceSimulation',
             'experiment', 'Evaluation', 'evaluate_experiment', 'strategies',
@@ -62,7 +65,8 @@ __all__ = [
             'free_premises', 'graph_from_positions', 'ari', 
             'subsequences_with_length', 'satisfiable_extensions', 'fetch_premises',
             'proposition_levels_from_debate', 'premise_usage_count',
-            'fetch_conclusion', 'select_premises',
+            'fetch_conclusion', 'select_premises', 'numsat_from_density',
+            'density_from_numsat',
             'z3_assertion_from_argument', 'z3_soft_constraints_from_position',
             'z3_all_models',
             # Generators

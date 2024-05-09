@@ -12,6 +12,7 @@ from taupy.analysis.agreement import (normalised_edit_distance,
                                       normalised_edit_agreement,
                                       difference_matrix)
 from taupy.basic.utilities import (satisfiability_count, 
+                                   density_from_numsat,
                                    z3_assertion_from_argument,
                                    satisfiability)
 from taupy.basic.core import EmptyDebate, Debate
@@ -269,6 +270,12 @@ class Simulation(list, SimulationBase):
         """
 
         i = 0
+        # The expected density reached at `min_sccp`
+        density_from_min_sccp = density_from_numsat(
+            s=min_sccp, n=len(self.max_sentencepool), b=2
+            )
+
+        stopping_density = min(max_density, density_from_min_sccp)
 
         while True:
 
@@ -392,7 +399,7 @@ class Simulation(list, SimulationBase):
                         + "maximum extension was reached.")
 
             i += 1
-            if self[-1].density() >= max_density or i >= max_steps or satisfiability_count(self[-1]) <= min_sccp:
+            if self[-1].density() >= stopping_density or i >= max_steps:
                 # Delete objects that can't be pickled.
                 del self.assertions
                 break
@@ -651,12 +658,15 @@ class FixedDebateSimulation(SimulationBase):
         """
         Run Simulation steps until targets are reached
         """
+        density_from_min_sccp = density_from_numsat(
+            s=min_sccp, n=len(self.sentencepool), b=2
+            )
+        stopping_density = min(max_density, density_from_min_sccp)
 
         while True:
-            if (len(self.uncovered_arguments) > max_steps 
-                and satisfiability_count(Debate(*self.uncovered_arguments)) <= min_sccp) \
+            if len(self.uncovered_arguments) > max_steps \
                or (len(self.uncovered_arguments) > 1 
-                   and Debate(*self.uncovered_arguments).density() > max_density):
+                   and Debate(*self.uncovered_arguments).density() > stopping_density):
                break
 
             introduced = self.step()

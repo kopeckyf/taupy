@@ -406,8 +406,7 @@ def z3_soft_constraints_from_position(position=dict()):
 def z3_all_models(s, initial_terms):
     """
     The common function to extract all satisfying models of formula
-    with z3. See: 
-    http://theory.stanford.edu/~nikolaj/programmingz3.html#sec-blocking-evaluations
+    with z3. See: http://theory.stanford.edu/~nikolaj/programmingz3.html#sec-blocking-evaluations
     """
     def block_term(s, m, t):
         s.add(t != m.eval(t, model_completion=True))
@@ -425,3 +424,19 @@ def z3_all_models(s, initial_terms):
                yield from all_smt_rec(terms[i:])
                s.pop()
     yield from all_smt_rec(list(initial_terms))
+
+def z3_solver_status(solver):
+    """
+    Check the status of `solver` and report back depending on satisfiability.
+    """
+    sat_result = solver.check()
+
+    if sat_result == z3.sat:
+        return True
+    if sat_result == z3.unsat:
+        return False
+    if sat_result == z3.unknown:
+        raise RuntimeError(
+            f"Could not determine statisfiability. The assertions used are:\
+                {solver.assertions}"
+        )

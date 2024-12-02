@@ -8,7 +8,8 @@ from .utilities import (satisfiability_count, satisfiability, dict_to_prop,
                         fetch_premises, proposition_levels_from_debate,
                         premise_usage_count, numsat_from_density, density_from_numsat,
                         fetch_conclusion, select_premises, z3_assertion_from_argument,
-                        z3_soft_constraints_from_position, z3_all_models)
+                        z3_soft_constraints_from_position, z3_all_models,
+                        z3_solver_status)
 
 __all__ = [
             # core
@@ -24,5 +25,5 @@ __all__ = [
             'premise_usage_count', 'numsat_from_density', 'density_from_numsat',
             # z3 helper functions
             'z3_assertion_from_argument', 'z3_soft_constraints_from_position',
-            'z3_all_models'
+            'z3_all_models', 'z3_solver_status'
           ]

@@ -12,7 +12,7 @@ from .basic import (satisfiability_count, satisfiability, dict_to_prop,
                     select_premises, fetch_conclusion, numsat_from_density,
                     density_from_numsat,
                     z3_assertion_from_argument, z3_soft_constraints_from_position,
-                    z3_all_models)
+                    z3_all_models, z3_solver_status)
 
 from .analysis import (doj, hamming_distance, normalised_hamming_distance, bna, next_neighbours, 
                        edit_distance, normalised_edit_distance, switch_deletion_neighbourhood,
@@ -68,7 +68,7 @@ __all__ = [
             'fetch_conclusion', 'select_premises', 'numsat_from_density',
             'density_from_numsat',
             'z3_assertion_from_argument', 'z3_soft_constraints_from_position',
-            'z3_all_models',
+            'z3_all_models', 'z3_solver_status',
             # Generators
             'generate_hierarchical_argument_map'
           ]

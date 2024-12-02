@@ -128,7 +128,13 @@ def introduce(_sim, source=None, target=None, strategy=None):
                     break
         
         if _found_premises and _found_conclusion:
-            if satisfiability(And( _sim[-1], Argument(And(*selected_premises), selected_conclusion))):
+            if satisfiability(
+                    And(
+                        dict_to_prop(_sim.ground_truth),
+                        _sim[-1], 
+                        Argument(And(*selected_premises), selected_conclusion)
+                        )
+                    ):
                 _sim.used_premises.append(selected_premises)
                 _found_valid_argument = True
                 break
@@ -286,7 +292,7 @@ def response(*,
                     # closedness(model,return_alternative=True)[1] stores the closed version of a model.
                     candidates = []
                     base_models = [{symbols(str(i)): eval(str(m[i])) for i in m if symbols(str(i)) in position} \
-                                    for m in z3_all_models(o, [z3.Bool(str(i)) for i in debate.atoms()])]
+                                    for m in z3_all_models(o, [z3.Bool(str(i)) for i in debate.atoms()])] # < --- care terms = model atoms?
                     unique_base_models = list(unique_everseen(base_models, key=lambda item: frozenset(item.items())))
 
                     for m in unique_base_models:
@@ -304,21 +310,22 @@ def response(*,
                     curr_candidates = candidates + saved_candidates
                     a = np.array([edit_distance(i, position) for i in curr_candidates])
                     
-                    # ... and pick the min of distances, if the distance, but ...
+                    # ... and pick the min of distances, but ...
                     if a.size > 0:
                         new_position = Position(debate,
                                             curr_candidates[choice(np.argwhere(a == np.amin(a)).flatten().tolist())],
                                             introduction_strategy=position.introduction_strategy,
                                             update_strategy=position.update_strategy)
                         
-                        # ... if it is better then what would be expected at the next iteration.
+                        # ... only if it is better then what would be expected 
+                        # at the next iteration.
                         if np.amin(a) > len(constraints)-k+1 and k > 0:
                             saved_candidates.append(new_position)
                         else:
                             break
 
-                    # Could not determine an optimal candidate while demanding k constraints. 
-                    # Decrease k and try again.
+                    # Could not determine an optimal candidate while demanding 
+                    # k constraints. Decrease k and try again.
                     k -= 1
                 else:
                     # This is here purely for diagnostic purposes.

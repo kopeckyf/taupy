@@ -182,6 +182,10 @@ class Simulation(list, SimulationBase):
         increases, this puts an upper limit on the number of inspected possible
         positions that an agent with a partial position would move to.
 
+    :param dict ground_truth:
+        A mapping of truth-value assignments that must never be violated
+        through argument introduction.
+
     """
 
     def __init__(self,
@@ -189,6 +193,7 @@ class Simulation(list, SimulationBase):
                  debate_growth = "random",
                  events = {"introduction": 9, "new_sentence": 1},
                  sentencepool = "p:10",
+                 ground_truth = {},
                  max_sentencepool = None,
                  key_statements = None,
                  parent_debate = None,
@@ -220,6 +225,7 @@ class Simulation(list, SimulationBase):
         self.events = events
         self.argumentlength = argumentlength
         self.partial_neighbour_search_radius = partial_neighbour_search_radius
+        self.ground_truth = ground_truth
 
         if positions is not None:
             if copy_input_positions == True:

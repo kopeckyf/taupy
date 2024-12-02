@@ -6,7 +6,7 @@ from .agreement import (hamming_distance, bna, next_neighbours,
                         edit_distance, switch_deletion_neighbourhood,
                         normalised_hamming_distance, normalised_edit_distance,
                         normalised_edit_agreement, ncc, average_ncc,
-                        difference_matrix)
+                        difference_matrix, switch_neighbourhood)
 from .clustering import (clustering_matrix, leiden, affinity_propagation, 
                          agglomerative_clustering, density_based_clustering)
 from .polarisation import (groups_from_stance_toward_single_proposition,
@@ -25,6 +25,7 @@ __all__ = [
             'switch_deletion_neighbourhood', 'difference_matrix',
             'normalised_edit_distance', 'normalised_hamming_distance',
             'normalised_edit_agreement', 'ncc', 'average_ncc',
+            'switch_neighbourhood',
             # clustering
             'clustering_matrix', 'leiden', 'affinity_propagation', 
             'agglomerative_clustering', 'density_based_clustering',

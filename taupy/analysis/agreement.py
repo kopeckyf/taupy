@@ -1,5 +1,6 @@
 from fractions import Fraction
 from taupy.basic.utilities import subsequences_with_length
+from itertools import combinations
 import numpy as np
 
 def hamming_distance(pos1, pos2):
@@ -129,6 +130,15 @@ def next_neighbours(pos, *, debate, models):
     distances_to_candidates = np.array([hamming_distance(i, pos_debate_union) for i in models])
 
     return [models[i] for i in np.where(distances_to_candidates == distances_to_candidates.min())[0].tolist()]
+
+def switch_neighbourhood(position, *, distance):
+    
+    combs = combinations(position.keys(), r=distance)
+    comb_partial_positions = [{k: not position[k] for k in c} for c in combs]
+
+    neighbourhood = [{**c, **{k: position[k] for k in position if k not in c}} \
+                     for c in comb_partial_positions]
+    return neighbourhood
 
 def switch_deletion_neighbourhood(position, distance):
     """

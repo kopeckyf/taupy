@@ -9,7 +9,7 @@ from concurrent.futures import ProcessPoolExecutor
 from taupy import (difference_matrix, group_divergence, group_consensus, 
                    normalised_hamming_distance, spread, pairwise_dispersion, 
                    bna, satisfiability_count, Position, 
-                   aggregated_position_of_winners)
+                   aggregated_position_of_winners, normalised_edit_agreement)
 
 from statistics import mean
 import numpy as np
@@ -293,6 +293,22 @@ class Evaluation():
 
         self.add_data_columns(cmp)
         return 
+    
+    def veracity(self, *, measure=normalised_edit_agreement):
+
+        with ProcessPoolExecutor(**self.mpsettings) as executor:
+            calculations = [executor.submit(
+                                average_agreement_with_ground_truth,
+                                positions=self.positions[i],
+                                ground_truth=sim.ground_truth,
+                                measure=measure
+                            )
+                            for i, sim in enumerate(self.simulations)]
+        
+        ver = [i.result() for i in calculations]
+
+        self.add_data_columns(ver)
+        return
 
 def densities_of_debate_stages(debate_stages):
     return pd.Series([i.density() for i in debate_stages], name="density")
@@ -326,6 +342,14 @@ def mean_agreement_between_positions(positions, *, measure=bna):
                 np.triu_indices(len(i), k=1)].mean() for i in positions],
             name="agreement"
             )
+
+def average_agreement_with_ground_truth(*, positions, ground_truth,
+                                        measure=normalised_edit_agreement):
+    return pd.Series(
+        [np.array([measure(ground_truth, i) for i in p]).mean() \
+                       for p in positions],
+        name="veracity"
+    )
 
 def majority_coherences(*, positions, debate_stages, not_present_value=None):
     return pd.Series([Position(

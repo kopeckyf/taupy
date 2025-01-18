@@ -182,10 +182,17 @@ class Simulation(list, SimulationBase):
         increases, this puts an upper limit on the number of inspected possible
         positions that an agent with a partial position would move to.
 
+    :param float introduction_attempts:
+        Controls the number of attempts at each argumentation introduction step. 
+        The number of attempts is calculated by multiplying this factor by the 
+        number of positions in the simulation. It is recommended to increase
+        this factor from the default 0.5 to a setting like 4 in difficult 
+        scenarios, such as a low number of agents and an opponent-sensitive
+        argumentation strategy.
+
     :param dict ground_truth:
         A mapping of truth-value assignments that must never be violated
         through argument introduction.
-
     """
 
     def __init__(self,
@@ -204,7 +211,8 @@ class Simulation(list, SimulationBase):
                  randomly_shared_judgements = 0,
                  default_introduction_strategy = strategies.random,
                  default_update_strategy = "closest_coherent",
-                 partial_neighbour_search_radius = 50):
+                 partial_neighbour_search_radius = 50,
+                 introduction_attempts = 0.5):
 
         if sentencepool == "inherit": # import from parent debate
             self.sentencepool = [i for i in parent_debate.atoms()]
@@ -225,6 +233,7 @@ class Simulation(list, SimulationBase):
         self.events = events
         self.argumentlength = argumentlength
         self.partial_neighbour_search_radius = partial_neighbour_search_radius
+        self.introduction_attempts = introduction_attempts
         self.ground_truth = ground_truth
 
         if positions is not None:
@@ -298,7 +307,7 @@ class Simulation(list, SimulationBase):
                     # enough Positions. Now instantiate turns of trying to 
                     # introduce arguments.
                     j = 0
-                    while j < len(self.positions[-1]) / 2:
+                    while j < len(self.positions[-1]) * self.introduction_attempts:
                         pick_positions = sample(self.positions[-1], k=2)
 
                         # Support for positions with multiple introduction 
@@ -329,8 +338,8 @@ class Simulation(list, SimulationBase):
                                 f"Argument introduction suceeded after {j+1} attempts.")
                             break
                     else:
-                        # There have been more tries equal to half of the 
-                        # population size, but an argument could not be found. 
+                        # An argument could not be found within the available 
+                        # introduction attempts. 
                         # This is enough grounds to terminate the simulation run.
                         self.log.append(
                             "Argument introduction did not succeed, even after "
@@ -362,6 +371,7 @@ class Simulation(list, SimulationBase):
                     # Break out of the Simulation if no argument could be 
                     # inserted. In this case, the log will tell more about what 
                     # went wrong.
+                    del self.assertions
                     break
 
             if selected_event == "new_sentence":

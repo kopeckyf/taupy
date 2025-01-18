@@ -1,4 +1,3 @@
-from fractions import Fraction
 from taupy.basic.utilities import subsequences_with_length
 from itertools import combinations
 import numpy as np
@@ -21,7 +20,7 @@ def normalised_hamming_distance(pos1, pos2):
     Returns the Hamming distance normalised by the number of propositions in the 
     positions' domain.
     """
-    return Fraction(len([k for k in pos1 if pos1[k] != pos2[k]]), len(pos1))
+    return len([k for k in pos1 if pos1[k] != pos2[k]]) / len(pos1)
 
 def edit_distance(pos1, pos2, weights = {"substitution": 1.0, 
                                          "insertion": 1.0, 

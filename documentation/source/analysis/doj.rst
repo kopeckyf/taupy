@@ -11,8 +11,8 @@ be treated as a probability in the sense that it fulfils the Kolmogorov axioms
              
 .. autofunction:: taupy.analysis.doj.doj
 
-.. tip:: :func:`taupy.doj` returns a fraction. If you want to use integers instead,
-         call :code:`float(doj())`.
+.. tip:: Until Version 0.5, :func:`taupy.doj` returned a fraction but returns a 
+   float in later versions.
 
 Unconditional DOJs
 ------------------

@@ -1,4 +1,3 @@
-from decimal import Decimal
 from itertools import combinations
 from math import log2
 from sympy.logic import (And, Implies, Not)
@@ -89,7 +88,7 @@ class Base():
         ([Betz2013]_ , pp. 44–49).
         """
         sigma = satisfiability_count(self)
-        return Decimal((len(self.atoms()) - log2(sigma)) / len(self.atoms()))
+        return (len(self.atoms()) - log2(sigma)) / len(self.atoms())
     
     def list_of_premises(self):
         """

@@ -26,6 +26,3 @@ position incoherent. And so, not every argument contributes to density equally,
 and some won't change it at all. 
 
 .. automethod:: taupy.basic.core.Base.density
-
-.. tip:: Density is returned as a fraction. If you prefer integers, try 
-         :code:`float(tau1.density())`.

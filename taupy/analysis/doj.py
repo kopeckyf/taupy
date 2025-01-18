@@ -1,6 +1,5 @@
 from taupy.basic.utilities import satisfiability_count, dict_to_prop
 from sympy.logic import And
-from fractions import Fraction
 
 def doj(pos, debate=None, conditional=None):
     """
@@ -25,4 +24,4 @@ def doj(pos, debate=None, conditional=None):
     
     n = satisfiability_count(And(dict_to_prop(pos), debate))
     m = satisfiability_count(debate)
-    return Fraction(n, m)
+    return n/m

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "taupy"
-version = "0.5.0"
+version = "0.6.0"
 description = "A Python package to study the theory of dialectical structures"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.9,<4"

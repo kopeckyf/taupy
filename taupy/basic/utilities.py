@@ -42,6 +42,18 @@ def dict_to_binary(dictionary):
                 )
     return l
 
+def literals(formula):
+    """
+    Return the literals of a `formula`, that is, all unique propositions used
+    as premises and conclusions. Assumes that `formula` is a taupy.Debate-like
+    object. This function retains negation (the `atoms()` method from `sympy`
+    would return only the atomic forms of the propositions).
+
+    This function should at some point be integrated into updated Argument and 
+    Debate classes.
+    """
+    return {p for a in formula for p in (*a.args[0].args, a.args[1])}
+
 def free_premises(debate):
     """
     Returns a list of premises that are “free” in the sense of [1: Def. 3].

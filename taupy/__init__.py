@@ -10,7 +10,7 @@ from .basic import (satisfiability_count, satisfiability, dict_to_prop,
                     subsequences_with_length, satisfiable_extensions, fetch_premises,
                     proposition_levels_from_debate, premise_usage_count,
                     select_premises, fetch_conclusion, numsat_from_density,
-                    density_from_numsat,
+                    density_from_numsat, literals,
                     z3_assertion_from_argument, z3_soft_constraints_from_position,
                     z3_all_models, z3_solver_status)
 
@@ -66,7 +66,7 @@ __all__ = [
             'subsequences_with_length', 'satisfiable_extensions', 'fetch_premises',
             'proposition_levels_from_debate', 'premise_usage_count',
             'fetch_conclusion', 'select_premises', 'numsat_from_density',
-            'density_from_numsat',
+            'density_from_numsat', 'literals',
             'z3_assertion_from_argument', 'z3_soft_constraints_from_position',
             'z3_all_models', 'z3_solver_status',
             # Generators

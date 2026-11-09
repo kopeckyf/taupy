@@ -3,7 +3,7 @@ from .positions import (Position, position_compatibility, closedness)
 
 from .utilities import (satisfiability_count, satisfiability, dict_to_prop,
                         dict_to_binary, pick_random_positions_from_debate,
-                        free_premises, graph_from_positions, ari,
+                        free_premises, graph_from_positions, ari, literals,
                         subsequences_with_length, satisfiable_extensions,
                         fetch_premises, proposition_levels_from_debate,
                         premise_usage_count, numsat_from_density, density_from_numsat,
@@ -19,7 +19,7 @@ __all__ = [
             # utilities
             'satisfiability_count', 'satisfiability', 'dict_to_prop',
             'dict_to_binary', 'pick_random_positions_from_debate',
-            'free_premises', 'graph_from_positions', 'ari',
+            'free_premises', 'graph_from_positions', 'ari', 'literals',
             'subsequences_with_length', 'satisfiable_extensions', 'fetch_premises',
             'proposition_levels_from_debate', 'fetch_conclusion', 'select_premises',
             'premise_usage_count', 'numsat_from_density', 'density_from_numsat',

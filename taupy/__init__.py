@@ -4,6 +4,7 @@ taupy is a Python 3 library for the theory of dialectical structures.
 
 from .basic import Argument, Debate, EmptyDebate
 from .basic import (Position, position_compatibility, closedness)
+from .basic import Stance
 from .basic import (satisfiability_count, satisfiability, dict_to_prop, 
                     dict_to_binary, pick_random_positions_from_debate,
                     free_premises, graph_from_positions, ari,
@@ -38,7 +39,7 @@ from .generators import generate_hierarchical_argument_map
 __all__ = [
             # Core ontology
             'Argument', 'Debate', 'EmptyDebate', 'Position', 
-            'position_compatibility', 'closedness',
+            'position_compatibility', 'closedness', 'Stance',
             # .analysis
             'doj', 
             'attribute_diversity_page', 'Gini_Simpson_index', 
